@@ -14,27 +14,22 @@
     <script type="text/javascript"
         src="//dapi.kakao.com/v2/maps/sdk.js?appkey=89c94138aac3b434362c7179cb6bc993&libraries=services,clusterer,drawing"></script>
     <script src="//t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js"></script>
-    <script defer src="index.js"></script>
+    <!-- <script defer src="index.js"></script> -->
+    <script defer src="test.js"></script>
     <link href="index.css" rel="stylesheet">
+    
     <title>Document</title>
 </head>
 
 <body>
     <h1>햄세권</h1>
-    <p style="margin-top:-12px">
-        <em class="link">
-            <a href="javascript:void(0);" onclick="window.open('http://fiy.daum.net/fiy/map/CsGeneral.daum', '_blank', 'width=981, height=650')">
-                혹시 주소 결과가 잘못 나오는 경우에는 여기에 제보해주세요.
-            </a>
-        </em>
+    <p>
+        <button onclick="setMapType('HYBRID')">맵타입 바꾸기</button> 
+        <button onclick="setMapType('ROADMAP')">맵타입 바꾸기</button> 
     </p>
     <div id="map" style="width:100%;height:350px;"></div>
     <br>
-    <input type="text" id="sample6_postcode" placeholder="우편번호">
-    <input type="button" onclick="sample6_execDaumPostcode()" value="주소 검색"><br>
-    <input type="text" id="sample6_address" placeholder="주소"><br>
-    <input type="text" id="sample6_detailAddress" placeholder="상세주소">
-    <input type="text" id="sample6_extraAddress" placeholder="참고항목">
+    <input type="button" onclick="addressSearchPopUp()" value="주소 검색"><br>
     <img src="./images/air-balloon.svg">
     <svg viewBox="0 0 640 480" xmlns="http://www.w3.org/2000/svg">
         <g fill-rule="evenodd">
