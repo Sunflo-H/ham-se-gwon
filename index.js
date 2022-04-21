@@ -7,40 +7,46 @@ var mapContainer = document.getElementById('map'), // 지도를 표시할 div
         center: new kakao.maps.LatLng(37.566826, 126.9786567), // 지도의 중심좌표
         level: 3, // 지도의 확대 레벨
         // mapTypeId : kakao.maps.MapTypeId.SKYVIEW
-};
+    };
 
 // 지도를 생성합니다
-var map = new kakao.maps.Map(mapContainer, mapOption); 
+var map = new kakao.maps.Map(mapContainer, mapOption);
 // 주소 검색 객체를 생성합니다.
 var geocoder = new kakao.maps.services.Geocoder();
 // 장소 검색 객체를 생성합니다
-var ps = new kakao.maps.services.Places(); 
+var ps = new kakao.maps.services.Places();
 // 장소 검색 옵션 객체
 let coords = new kakao.maps.LatLng(37.566826, 126.9786567);
-geocoder.addressSearch('서울 광진구 구의동', addressSearchCallback);
 
-/*
-    geocoder.addressSearch('주소', callback함수);
-    주소를 입력하면 주소에 맞는 위치 정보를 찾는다.
-    찾은 위치 정보를 result로 callback함수의 인자로 전달한다.
-    그럼 나는 callback으로 데이터를 다루면 되는거네
+function a(address) {
+    return new Promise((resolve, reject) => {
+        geocoder.addressSearch(`${address}`, (result, status) => {
+            if (status === kakao.maps.services.Status.OK) {
+                let coords = new kakao.maps.LatLng(result[0].y, result[0].x);
+                map.setCenter(coords);
 
-*/
+                // 결과값으로 받은 위치를 마커로 표시합니다
+                var marker = new kakao.maps.Marker({
+                    map: map, // 추후 추가하려면 marker.setMap을 이용한다.
+                    position: coords
+                });
 
-function addressSearchCallback(result, status) {
-    if(status === kakao.maps.services.Status.OK) {
-        console.log(result[0].y, result[0].x);
-    }
+                // 인포윈도우로 장소에 대한 설명을 표시합니다
+                var infowindow = new kakao.maps.InfoWindow({
+                    content: `<div style="width:150px;text-align:center;padding:6px 0;">${result[0].address_name}</div>`
+                });
+                infowindow.open(map, marker);
+
+                resolve(result[0]);
+            } else {
+                const error = new Error();
+                error.name = "stateIsNotOk";
+                reject(error);
+            }
+        });
+    })
 }
 
-
-// locationSearch().then(result => {
-    //     console.log("작업이 끝났어요");
-    //     console.log(mapLocation);
-    // });
-    
-
-    
 
 
 
@@ -70,5 +76,7 @@ function addressSearchPopUp() {
 }
 
 inputButton.addEventListener('click', () => {
-    
+    a('서울시 광진구 구의동')
+        .then(console.log)
+        .catch(console.log);
 })

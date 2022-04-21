@@ -38,33 +38,32 @@ function addressSearchCallback(result, status) {
 // console.log(addressSearchCallback("hi","OK"));
 
 function a() {
-    let location = '';
-    geocoder.addressSearch('서울 광진구 구의동', (result, status) => {
-        if (status === kakao.maps.services.Status.OK) {
-
-            var coords = new kakao.maps.LatLng(result[0].y, result[0].x);
-    
-            // 결과값으로 받은 위치를 마커로 표시합니다
-            var marker = new kakao.maps.Marker({
-                map: map, // 추후 추가하려면 marker.setMap을 이용한다.
-                position: coords
-            });
-    
-            // 지도의 중심을 결과값으로 받은 위치로 이동시킵니다
-            map.setCenter(coords);
-            console.log(coords);
-            location = coords;
-            console.log(location);
-
-        }
-    });
-    setTimeout(() => console.log(location),1000);
+    // let location = '';
     return new Promise((resolve, reject) => {
-        console.log(resolve);
-        console.log(reject);
+        geocoder.addressSearch('서울 광진구 구의동', (result, status) => {
+            if (status === kakao.maps.services.Status.OK) {
+    
+                var coords = new kakao.maps.LatLng(result[0].y, result[0].x);
+        
+                // 결과값으로 받은 위치를 마커로 표시합니다
+                var marker = new kakao.maps.Marker({
+                    map: map, // 추후 추가하려면 marker.setMap을 이용한다.
+                    position: coords
+                });
+        
+                // 지도의 중심을 결과값으로 받은 위치로 이동시킵니다
+                map.setCenter(coords);
+                // console.log(coords);
+                // location = coords;
+                // console.log(location);
+                resolve(result);
+            }
+        });
     })
 }
-a();
+a().then((resolve) => {
+    console.log(resolve);
+});
 
 /* 사용법
 
