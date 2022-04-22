@@ -1,3 +1,4 @@
-svg:hover .balloon {
-    fill: red;
+:root {
+    --bg1: #f0f5fc;
+    --bg2: #fff;
 }
