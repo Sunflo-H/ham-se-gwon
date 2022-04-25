@@ -2,3 +2,30 @@
     --bg1: #f0f5fc;
     --bg2: #fff;
 }
+
+body, html {
+    width: 100%;
+    height: 100%;
+    background-color: var(--bg1 );
+}
+
+main {
+    display: flex;
+    width: 100%;
+    height: 100%;
+    /* background-color: #fff; */
+    border: 1px solid red;
+    box-sizing: border-box;
+}
+
+.action-box {
+    width: 20%;
+    height: 80%;
+    background-color: #fff;
+}
+
+.map-box {
+    width: 60%;
+    height: 80%;
+    background-color: red;
+}
