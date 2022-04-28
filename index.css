@@ -11,43 +11,28 @@ body, html {
 header {
     width: 100%;
     height: 50px;
-    background-color: #fff;
 }
 main {
     display: flex;
-    width: 100%;
-    height: 100%;
-    /* background-color: #fff; */
-    border: 1px solid red;
+    /* width: calc(100%-30px); */
+    height: calc(100% - 50px);
+    /* border: 1px solid red; */
     box-sizing: border-box;
+    margin: 0 20px;
 }
 
 .action-box {
-    width: 20%;
-    height: 80%;
+    min-width: 200px;
+    height: 95%;
     background-color: var(--bg2);
-    border-radius: 30px;
+    border-radius: 20px;
     margin-right: 20px;
-    border: 1px solid red;
+    /* border: 1px solid red; */
 }
 
 .map-box {
-    width: 78%;
-    height: 80%;
-    background-color: red;
-}
-
-.switch-box {
-    position: absolute;
-    left: 100%;
-    transform: translate(-50px,50px);
-    transition-duration: 0.5s;
-    width: 150px;
-    height: 150px;
-    border: 1px solid red;
-    background-color: var(--bg2);
-    border-radius: 30px;
-}
-.switch-box:hover {
-    transform: translate(-120px,50px);
+    width: 85%;
+    height: 95%;
+    background-color: white;
+    border-radius: 20px;
 }
