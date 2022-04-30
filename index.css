@@ -148,7 +148,7 @@ main {
     line-height: 40px;
     font-size: 20px;
     margin: 0 auto 5px;
-    /* overflow: hidden; */
+    overflow: hidden;
     z-index: 1;
     box-sizing: border-box;
     cursor: pointer;
@@ -159,18 +159,17 @@ main {
 .wave-top {
     position: absolute;
     left: 0;
-    top: 0;
-    border: 1px solid red;
+    top: -34px;
+    /* border: 1px solid red; */
     width: 40px;
     height: 40px;
     border-radius: 15px;
-    animation: move 3000ms infinite linear;
+    animation: move 5000ms infinite linear;
     background-color: white;
-    z-index: -1;
+    z-index: -2;
 }
-.action-box .category-circle:hover .wave-top {
-    transform: translate(0px, 40px) rotate(360deg);
-    z-index: -1;
+.action-box .category-circle:hover .wave-top { 
+    z-index: 1;
 }
 .action-box .category-circle .wave-bot {
     content: "";
@@ -188,7 +187,7 @@ main {
 .action-box .category-circle:hover .wave-bot {
     background-color: #0046DD;
     transform: translate(0px, calc(0px - var(--category-circle-w)));
-    z-index: -1;
+    z-index: -2;
 }
 .action-box .category-name{
     display: block;
