@@ -83,7 +83,7 @@ main {
     box-sizing: border-box;
     margin: 0 20px;
 }
-
+/* 액션 박스 */
 .action-box {
     max-width: var(--action-box-w);
     min-width: var(--action-box-w);
@@ -112,6 +112,7 @@ main {
     color: #0046DD;
 }
 
+/* 주변 탐색 박스*/
 .action-box .around-box {
     width: calc(100% - 40px);
     height: 250px;
@@ -121,6 +122,7 @@ main {
 .action-box .sub-title {
     font-weight: bold;
     font-size: 16px;
+    margin-bottom: 10px;
 }
 .action-box .category-box {
     width: 100%;
@@ -130,23 +132,23 @@ main {
     justify-content: space-around;
 }
 .action-box .category{
-    width: 30%;
-    border: 1px solid red;
+    width: 25%;
+    /* border: 1px solid red; */
     height: 50px;
-    margin-bottom: 10px;
+    margin-bottom: 20px;
     
 }
 .action-box .category-circle {
     position: relative;
-    border: 1px solid blue;
+    border: 1px solid rgba(237, 237, 237, 0.98);
     border-radius: 100px;
     width: var(--category-circle-w);
     height: var(--category-circle-w);
     text-align: center;
     line-height: 40px;
     font-size: 20px;
-    margin: auto;
-    overflow: hidden;
+    margin: 0 auto 5px;
+    /* overflow: hidden; */
     z-index: 1;
     box-sizing: border-box;
     cursor: pointer;
@@ -154,21 +156,36 @@ main {
 .action-box .category-circle > i {
     transition: all 0.5s;
 }
-.action-box .category-circle::after {
+.wave-top {
+    position: absolute;
+    left: 0;
+    top: 0;
+    border: 1px solid red;
+    width: 40px;
+    height: 40px;
+    border-radius: 15px;
+    animation: move 3000ms infinite linear;
+    background-color: white;
+    z-index: -1;
+}
+.action-box .category-circle:hover .wave-top {
+    transform: translate(0px, 40px) rotate(360deg);
+    z-index: -1;
+}
+.action-box .category-circle .wave-bot {
     content: "";
     position: absolute;
     left: 0;
     top: 100%;
-    border: 1px solid black;
     width: 100%;
-    height: 100%;
+    height: 200%;
     transition-duration: 0.5s;
 }
 .action-box .category-circle:hover{
     color: white;
     
 }
-.action-box .category-circle:hover::after {
+.action-box .category-circle:hover .wave-bot {
     background-color: #0046DD;
     transform: translate(0px, calc(0px - var(--category-circle-w)));
     z-index: -1;
@@ -176,14 +193,10 @@ main {
 .action-box .category-name{
     display: block;
     font-size: 12px;
-    border: 1px solid red;
+    /* border: 1px solid red; */
     text-align: center;
     cursor: pointer;
-}
-.action-box .category-name:hover .category-circle::after {
-    background-color: red;
-    transform: translate(0px, calc(0px - var(--category-circle-w)));
-    z-index: -1;
+    color: rgba(152, 152, 152, 0.98);
 }
 
 .map-box {
@@ -195,4 +208,10 @@ main {
 
 .history-box {
     
+}
+
+@keyframes move {
+	100% {
+		transform: rotate(360deg);
+	}
 }
