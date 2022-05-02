@@ -1,0 +1,160 @@
+/* 메뉴 아이콘 클릭시 보여지는 메뉴바 */
+#menu-bar {
+    position:absolute;
+    left: 0;
+    top: 0;
+    display: flex;
+    width: 100%;
+    height: 100%;
+    z-index: 1;
+    background-color: white;
+}
+.menu-box {
+    display: flex;
+    width: 40%;
+    height: 100%;
+    background-color: var(--blue);
+    box-sizing: border-box;
+    align-items: center;
+}
+.menu-box:hover {
+    animation: menu-box-hover 500ms forwards linear;   
+}
+.menu-box .text {
+    width: 100%;
+    height: 50px;
+    color: white;
+    text-align: center;
+    font-size: 3rem;
+    font-weight: bold;
+    margin-top: -25px;
+}
+.menu-box:hover .text {
+    animation: menu-text-hover 500ms forwards linear;
+}
+.menu-box .text span{
+    cursor: pointer;
+}
+
+.close {
+    position: absolute;
+    right: 0;
+    top: 0;
+    cursor: pointer;
+    margin-right: 10px;
+    margin-top: 10px;
+    color: white;
+    font-size: 25px;
+}
+
+.menu-compare-box{
+    border-left:1px solid white;
+    border-right: 1px solid white;
+}
+.menu-compare-box:hover {
+    border-left:1px solid var(--blue);
+    border-right: 1px solid var(--blue);
+}
+
+
+/* 비교 메뉴의 화살표에 관련된 코드 */
+.menu-compare-box {
+    position: relative;
+}
+.menu-compare-box .arrow-box {
+    position: absolute;
+    display: flex;
+    opacity: 0;
+    width: 100%;
+    height: 45px;
+    align-items: center;
+    
+}
+.menu-compare-box .arrow-box .stick {
+    width: 0px;
+    height: 40%;
+    background-color: var(--blue2);
+}
+.menu-compare-box .arrow-box .triangle {
+    width: 0px;
+    height: 0px;
+    border-left: 45px solid var(--blue2);
+    border-bottom: 22.5px solid transparent;
+    border-top: 22.5px solid transparent;
+}
+.arrow-position-top {
+    left: 0;
+    top: 25%;
+}
+.arrow-position-bot {
+    left: 0;
+    bottom: 25%;
+}
+.menu-compare-box:hover .arrow-box {
+    opacity: 1;
+    transition-delay: 300ms;
+    transition-duration: 300ms;
+}
+.menu-compare-box:hover .arrow-position-top .stick {
+    animation: arrow-w-top 900ms 400ms forwards;
+}
+.menu-compare-box:hover .arrow-position-bot .stick {
+    animation: arrow-w-bot 900ms 400ms forwards ease-out;
+}
+
+
+@keyframes arrow-w-top {
+    0% {
+        width: 0%;
+    }
+    100% {
+        width: 50%;
+    }
+}
+
+@keyframes arrow-w-bot {
+    0% {
+        width: 0%;
+    }
+
+    100% {
+        width: 100%;
+    }
+}
+
+/* 애니메이션 */
+@keyframes menu-box-hover {
+    0% {
+        background-color: var(--blue);
+    }
+    100% {
+        background-color: white;
+    }
+}
+
+@keyframes menu-box-leave {
+
+}
+
+@keyframes menu-text-hover {
+    0% {
+        color: white;
+    }
+    50% {
+        color: var(--blue);
+    }
+    100% {
+        color: var(--blue2);
+    }
+}
+
+@keyframes menu-bar {
+    0% {
+
+    }
+
+    50% {
+        z-index: 10;
+    }
+
+}

@@ -18,6 +18,8 @@
     <script defer src="index.js"></script>
     <link href="reset.css" rel="stylesheet">
     <link href="index.css" rel="stylesheet">
+    <link href="menubar.css" rel="stylesheet">
+    
 
     <title>Document</title>
 </head>
@@ -156,18 +158,29 @@
             <div class="map-box">
                 지도
             </div>
-            <div class="history-box">
-                기록
-            </div>
+            
         </div>
 
         <div id="cocoa-compare"></div>
         <div id="cocoa-weather"></div>
     </main>
-    <div id="menu-bar">
-        <div class="menu-map-box menu-box"><div>Map</div></div>
-        <div class="menu-compare-box menu-box"><div>Compare</div></div>
-        <div class="menu-weather-box menu-box"><div>Weather</div></div>
+    <!-- <div id="menu-bar" class="hide"> -->
+    <div id="menu-bar" >
+        <div class="menu-map-box menu-box"><div class="text">Map</div></div>
+        <div class="menu-compare-box menu-box">
+            <div class="arrow-box arrow-position-top">
+                <div class="stick orange"></div>
+                <div class="triangle triangle-orange"></div>
+            </div>
+            
+            <div class="arrow-box arrow-position-bot">
+                <div class="stick green"></div>
+                <div class="triangle triangle-green"></div>
+            </div>
+            <div class="text"><span>Compare</span></div>
+        </div>
+        <div class="menu-weather-box menu-box"><div class="text">Weather</div></div>
+        <div class="close"><i class="fa-solid fa-x"></i></div>
     </div>
 </body>
 
