@@ -16,10 +16,11 @@
         src="//dapi.kakao.com/v2/maps/sdk.js?appkey=89c94138aac3b434362c7179cb6bc993&libraries=services,clusterer,drawing"></script>
     <script src="//t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js"></script>
     <script defer src="index.js"></script>
+    <script defer src="menubar.js" type="module"></script>
     <link href="reset.css" rel="stylesheet">
     <link href="index.css" rel="stylesheet">
     <link href="menubar.css" rel="stylesheet">
-    
+
 
     <title>Document</title>
 </head>
@@ -158,28 +159,85 @@
             <div class="map-box">
                 지도
             </div>
-            
+
         </div>
 
         <div id="cocoa-compare"></div>
         <div id="cocoa-weather"></div>
     </main>
     <!-- <div id="menu-bar" class="hide"> -->
-    <div id="menu-bar" >
-        <div class="menu-map-box menu-box"><div class="text">Map</div></div>
+    <div id="menu-bar">
+        <div class="menu-map-box menu-box">
+            <div class="text"><span>Map</span></div>
+        </div>
         <div class="menu-compare-box menu-box">
-            <div class="arrow-box arrow-position-top">
-                <div class="stick orange"></div>
-                <div class="triangle triangle-orange"></div>
+            <div class="arrow-box arrow-top">
+                <div class="stick"></div>
+                <div class="triangle"></div>
             </div>
-            
-            <div class="arrow-box arrow-position-bot">
-                <div class="stick green"></div>
-                <div class="triangle triangle-green"></div>
+            <div class="arrow-box arrow-bot">
+                <div class="stick"></div>
+                <div class="triangle"></div>
             </div>
             <div class="text"><span>Compare</span></div>
         </div>
-        <div class="menu-weather-box menu-box"><div class="text">Weather</div></div>
+        <div class="menu-weather-box menu-box">
+            <div class="weather-icon-box weather-icon-top">
+                <svg version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg"
+                    xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" viewBox="0 0 44.9 44.9"
+                    style="enable-background:new 0 0 44.9 44.9;" xml:space="preserve" height="100px" width="100px">
+                    <g id="Sun">
+                        <circle id="XMLID_61_" class="sun" cx="22.4" cy="22.6" r="11" />
+                        <g>
+                            <path id="XMLID_60_" class="sun"
+                                d="M22.6,8.1h-0.3c-0.3,0-0.6-0.3-0.6-0.6v-7c0-0.3,0.3-0.6,0.6-0.6l0.3,0c0.3,0,0.6,0.3,0.6,0.6 v7C23.2,7.8,22.9,8.1,22.6,8.1z" />
+                            <path id="XMLID_59_" class="sun"
+                                d="M22.6,36.8h-0.3c-0.3,0-0.6,0.3-0.6,0.6v7c0,0.3,0.3,0.6,0.6,0.6h0.3c0.3,0,0.6-0.3,0.6-0.6v-7 C23.2,37,22.9,36.8,22.6,36.8z" />
+                            <path id="XMLID_58_" class="sun"
+                                d="M8.1,22.3v0.3c0,0.3-0.3,0.6-0.6,0.6h-7c-0.3,0-0.6-0.3-0.6-0.6l0-0.3c0-0.3,0.3-0.6,0.6-0.6h7 C7.8,21.7,8.1,21.9,8.1,22.3z" />
+                            <path id="XMLID_57_" class="sun"
+                                d="M36.8,22.3v0.3c0,0.3,0.3,0.6,0.6,0.6h7c0.3,0,0.6-0.3,0.6-0.6v-0.3c0-0.3-0.3-0.6-0.6-0.6h-7 C37,21.7,36.8,21.9,36.8,22.3z" />
+                            <path id="XMLID_56_" class="sun"
+                                d="M11.4,31.6l0.2,0.3c0.2,0.2,0.2,0.6-0.1,0.8l-5.3,4.5c-0.2,0.2-0.6,0.2-0.8-0.1l-0.2-0.3 c-0.2-0.2-0.2-0.6,0.1-0.8l5.3-4.5C10.9,31.4,11.2,31.4,11.4,31.6z" />
+                            <path id="XMLID_55_" class="sun"
+                                d="M33.2,13l0.2,0.3c0.2,0.2,0.6,0.3,0.8,0.1l5.3-4.5c0.2-0.2,0.3-0.6,0.1-0.8l-0.2-0.3 c-0.2-0.2-0.6-0.3-0.8-0.1l-5.3,4.5C33,12.4,33,12.7,33.2,13z" />
+                            <path id="XMLID_54_" class="sun"
+                                d="M11.4,13.2l0.2-0.3c0.2-0.2,0.2-0.6-0.1-0.8L6.3,7.6C6.1,7.4,5.7,7.5,5.5,7.7L5.3,7.9 C5.1,8.2,5.1,8.5,5.4,8.7l5.3,4.5C10.9,13.5,11.2,13.5,11.4,13.2z" />
+                            <path id="XMLID_53_" class="sun"
+                                d="M33.2,31.9l0.2-0.3c0.2-0.2,0.6-0.3,0.8-0.1l5.3,4.5c0.2,0.2,0.3,0.6,0.1,0.8l-0.2,0.3 c-0.2,0.2-0.6,0.3-0.8,0.1l-5.3-4.5C33,32.5,33,32.1,33.2,31.9z" />
+                            <animate attributeType="CSS" attributeName="opacity" attributeType="XML" dur="0.5s"
+                                keyTimes="0;0.5;1" repeatCount="indefinite" values="1;0.6;1" calcMode="linear" />
+                        </g>
+                    </g>
+                </svg>
+            </div>
+            <div class="weather-icon-box weather-icon-bot">
+                <svg version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg"
+                    xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" viewBox="0 0 60.7 40"
+                    style="enable-background:new 0 0 60.7 40;" xml:space="preserve" height="100px" width="100px">
+                    <g id="Cloud_1">
+                        <g id="White_cloud_1">
+                            <path id="XMLID_2_" class="cloud1"
+                                d="M47.2,40H7.9C3.5,40,0,36.5,0,32.1l0,0c0-4.3,3.5-7.9,7.9-7.9h39.4c4.3,0,7.9,3.5,7.9,7.9v0 C55.1,36.5,51.6,40,47.2,40z" />
+                            <circle id="XMLID_3_" class="cloud1" cx="17.4" cy="22.8" r="9.3" />
+                            <circle id="XMLID_4_" class="cloud1" cx="34.5" cy="21.1" r="15.6" />
+                            <animateTransform attributeName="transform" attributeType="XML" dur="6s" keyTimes="0;0.5;1"
+                                repeatCount="indefinite" type="translate" values="0;5;0" calcMode="linear">
+                            </animateTransform>
+                        </g>
+                        <g id="Gray_cloud_1">
+                            <path id="XMLID_6_" class="cloud2"
+                                d="M54.7,22.3H33.4c-3.3,0-6-2.7-6-6v0c0-3.3,2.7-6,6-6h21.3c3.3,0,6,2.7,6,6v0 C60.7,19.6,58,22.3,54.7,22.3z" />
+                            <circle id="XMLID_7_" class="cloud2" cx="45.7" cy="10.7" r="10.7" />
+                            <animateTransform attributeName="transform" attributeType="XML" dur="6s" keyTimes="0;0.5;1"
+                                repeatCount="indefinite" type="translate" values="0;-3;0" calcMode="linear">
+                            </animateTransform>
+                        </g>
+                    </g>
+                </svg>
+            </div>
+            <div class="text"><span>Weather</span></div>
+        </div>
         <div class="close"><i class="fa-solid fa-x"></i></div>
     </div>
 </body>

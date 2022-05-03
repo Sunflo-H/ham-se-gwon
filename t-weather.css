@@ -1,0 +1,41 @@
+* {
+    margin: 0;
+    padding: 0;
+}
+
+.element {
+    height: 50px;
+    width: 50px;
+    margin: 10px;
+    border: 1px solid red;
+}
+
+.container {
+    display: flex;
+    justify-content: center;
+    flex-direction: column;
+    align-items: center;
+    height: 100vh;
+    background: linear-gradient(to bottom, #57c1eb 0%, #246fa8 100%);
+}
+
+.elements {
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    border: 1px solid red;
+
+}
+
+.white {
+    fill: #FFFFFF;
+    /* background: #FFFFFF; */
+}
+
+.gray {
+    fill: #E0E0E0
+}
+
+.yellow {
+    fill: #FFEB3B
+}
