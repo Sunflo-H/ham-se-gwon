@@ -57,6 +57,41 @@
     border-right: 1px solid var(--blue2);
 }
 
+/* 지도 메뉴의 애니메이션 */
+.menu-map-box {
+    position: relative;
+    z-index: 2;
+}
+.menu-map-box .text {
+    z-index: 2;
+}
+.menu-map-box .map-svg-box {
+    position: absolute;
+    width: 100%;
+    height: 100px;
+}
+.menu-map-box .map-svg-box path{
+    stroke-width: 3;
+    stroke:var(--blue2);
+    stroke-dasharray: 420;
+    stroke-dashoffset: 420;
+    stroke-linecap:round;
+    fill:none;
+    opacity: 0;
+}
+.menu-map-box:hover .map-svg-box path{
+    opacity: 1;
+    animation: circle 1s 400ms forwards linear;
+}
+
+@keyframes circle {
+    0% {
+        stroke-dashoffset: 420;
+    }
+    100% {
+        stroke-dashoffset: 0;
+    }
+}
 
 /* 비교 메뉴의 애니메이션 */
 .menu-compare-box {
