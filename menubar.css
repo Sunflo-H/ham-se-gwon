@@ -65,28 +65,49 @@
 .menu-map-box .text {
     z-index: 2;
 }
-.menu-map-box .map-svg-box {
+.menu-map-box .menu-svg-box {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+}
+.menu-map-box .svg-line {
+    position: absolute;
+}
+.menu-map-box .svg-line line {
+    stroke: rgba(128, 128, 128, 0.459);
+}
+.menu-map-box .svg-mark {
     position: absolute;
     width: 100%;
-    height: 100px;
+    height: 100%;
 }
-.menu-map-box .map-svg-box path{
-    stroke-width: 3;
-    stroke:var(--blue2);
-    stroke-dasharray: 420;
-    stroke-dashoffset: 420;
-    stroke-linecap:round;
-    fill:none;
+.menu-map-box .svg-line path{
+    fill: none;
+    stroke-width: 1;
+    stroke: var(--blue2);
+    stroke-dasharray: 160;    
+    stroke-dashoffset: 160;
     opacity: 0;
 }
-.menu-map-box:hover .map-svg-box path{
+.menu-map-box:hover .svg-line path{
     opacity: 1;
-    animation: circle 1s 400ms forwards linear;
+    animation: line 700ms 400ms forwards linear;
+}
+.menu-map-box .svg-mark {
+    fill: var(--blue2);
+    opacity: 0;
+    transition-delay: 300ms;
+    transition-duration: 100ms;
+}
+.menu-map-box:hover .svg-mark {
+    opacity: 1;
 }
 
-@keyframes circle {
+@keyframes line {
     0% {
-        stroke-dashoffset: 420;
+        stroke-dashoffset: 160;
     }
     100% {
         stroke-dashoffset: 0;
