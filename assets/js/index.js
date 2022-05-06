@@ -6,15 +6,9 @@ const mapContainer = document.getElementById('map'); // 지도를 표시할 div
 
 
 
-
-
-
-function success(position) {
-    const userLat = position.coords.latitude;
-    const userLng = position.coords.longitude;
-
+function createMap(lat, lng) {
     let mapOption = {
-        center: new kakao.maps.LatLng(userLat, userLng), // 지도의 중심좌표
+        center: new kakao.maps.LatLng(lat, lng), // 지도의 중심좌표
         level: 3, // 지도의 확대 레벨
     };
 
@@ -22,7 +16,7 @@ function success(position) {
     let map = new kakao.maps.Map(mapContainer, mapOption);
 
     // 마커가 표시될 위치입니다 
-    var markerPosition = new kakao.maps.LatLng(userLat, userLng);
+    var markerPosition = new kakao.maps.LatLng(lat, lng);
 
     // 마커를 생성합니다
     var marker = new kakao.maps.Marker({
@@ -33,16 +27,19 @@ function success(position) {
     marker.setMap(map);
 
     // 아래 코드는 지도 위의 마커를 제거하는 코드입니다
-    // marker.setMap(null);   
+    // marker.setMap(null);  
+}
+
+
+function success(position) {
+    const userLat = position.coords.latitude;
+    const userLng = position.coords.longitude;
+
+     createMap(userLat, userLng)
 }
 
 function error() {
     alert('Sorry, no position available.');
-}
-
-function getUserLocation() {
-    if (!navigator.geolocation) { throw "위치 정보가 지원되지 않습니다."; }
-    navigator.geolocation.getCurrentPosition(success, error);
 }
 
 function init() {
@@ -54,7 +51,8 @@ function init() {
      * 
      * 보여주기, 거리
      */
-    getUserLocation();
+    if(navigator.geolocation) navigator.geolocation.getCurrentPosition(success, error);
+    else { throw "위치 정보가 지원되지 않습니다."; }
 }
 
 init();
