@@ -74,15 +74,16 @@ header .hamberger-container {
     margin-top: 25px;
     margin-right: 30px;
 }
-header .hamberger-container:hover div {
-    border: 2px solid var(--blue2);
-}
 header .hamberger-container div{
     width: 25px;
     margin-top: 5px;
-    border: 2px solid black;
+    border: 2px solid white;
     border-radius: 50px;
-    transition-duration: 0.3s;
+    transition-duration: 500ms;
+    background-color: white;
+}
+header .hamberger-container:hover div {
+    border: 2px solid var(--blue2);
 }
 
 main {

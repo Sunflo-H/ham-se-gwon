@@ -126,22 +126,16 @@
     box-shadow:  2px 2px 5px #dedede,
              -1px -1px 5px #ffffff;
 }
-.map-container .map-wrapper{
+.map-container #map{
     width: 100%;
     height: 100%;
-    padding: 15px 20px;
     box-sizing: border-box;
-}
-.map-container .map-wrapper .map {
-    width: 100%;
-    height: 100%;
-    border: 1px solid red;
     border-radius: 20px;
 }
 /* 한번 포장한뒤 맵을 보여줄지
     아니면 바로 맵을 보여줄지
  */
- 
+
 
 
 
