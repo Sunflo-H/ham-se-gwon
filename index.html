@@ -15,11 +15,14 @@
     <script type="text/javascript"
         src="//dapi.kakao.com/v2/maps/sdk.js?appkey=89c94138aac3b434362c7179cb6bc993&libraries=services,clusterer,drawing"></script>
     <script src="//t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js"></script>
-    <script defer src="index.js"></script>
-    <script defer src="menubar.js" type="module"></script>
-    <link href="reset.css" rel="stylesheet">
-    <link href="index.css" rel="stylesheet">
-    <link href="menubar.css" rel="stylesheet">
+
+    <script defer src="assets/js/index.js"></script>
+    <script defer src="assets/js/menubar.js"></script>
+
+    <link rel="stylesheet" href="assets/css/reset.css">
+    <link rel="stylesheet" href="assets/css/index.css">
+    <link rel="stylesheet" href="assets/css/cocoaMap.css">
+    <link rel="stylesheet" href="assets/css/menubar.css">
 
 
     <title>Document</title>
@@ -27,17 +30,17 @@
 
 <body>
     <header>
-        <div class="logo-box">
-            <b>COCOA MAP</b>
+        <div class="logo-container">
+            <span>COCOA<span>MAP</span></span>
         </div>
-        <div class="search-box">
+        <div class="search-container">
             <div class="search-bar">
                 <input type="text" placeholder="검색" />
                 <i class="fa fa-search"></i>
             </div>
 
         </div>
-        <div class="hamberger-box">
+        <div class="hamberger-container">
             <div></div>
             <div></div>
             <div></div>
@@ -45,14 +48,14 @@
     </header>
     <main>
         <div id="cocoa-map">
-            <div class="action-box">
-                <div class="current-location-info-box">
+            <div class="action-container">
+                <div class="current-location-info-container">
                     <p>서울 광진구 구의동</p>
                     <p>맑음 <b>17도</b> 미세 <span>좋음</span> 황사 <span>좋음</span></p>
                 </div>
-                <div class="around-box">
+                <div class="around-container">
                     <p class="sub-title">주변 탐색</p>
-                    <div class="category-box">
+                    <div class="category-container">
                         <div class="category">
                             <div class="category-circle">
                                 <i class="fa fa-cutlery"></i>
@@ -152,12 +155,16 @@
                     </div>
 
                 </div>
-                <div class="map-setting-box">
+                <div class="map-setting-container">
 
                 </div>
             </div>
-            <div class="map-box">
-                지도
+            <div class="map-container">
+                <div class="map-wrapper">
+                    <div class="map">
+                        
+                    </div>
+                </div>
             </div>
 
         </div>
@@ -165,27 +172,27 @@
         <div id="cocoa-compare"></div>
         <div id="cocoa-weather"></div>
     </main>
-    <!-- <div id="menu-bar" class="hide"> -->
-    <div id="menu-bar">
-        <div class="menu-map-box menu-box">
-            <div class="menu-svg-box">
+    <div id="menu-bar" class="hide">
+    <!-- <div id="menu-bar"> -->
+        <div class="menu-map-container menu-container">
+            <div class="menu-svg-container">
                 <svg class="svg-line"width="100%" height="100%" viewBox="0 0 100 100">
                     <!-- <circle cx="0" cy="0" r="1" fill="red"></circle>
                     <circle cx="100" cy="0" r="1" fill="red"></circle>
                     <circle cx="0" cy="100" r="1" fill="red"></circle>
-                    <circle cx="100" cy="100" r="1" fill="red"></circle>
+                    <circle cx="100" cy="100" r="1" fill="red"></circle> -->
 
-                    <circle cx="0" cy="30" r="1" fill="black"></circle>
-                    <circle cx="100" cy="30" r="1" fill="black"></circle>
+                    <!-- <circle cx="0" cy="30" r="1" fill="black"></circle>
+                    <circle cx="100" cy="30" r="1" fill="black"></circle> -->
 
-                    <circle cx="0" cy="70" r="1" fill="black"></circle>
-                    <circle cx="100" cy="70" r="1" fill="black"></circle>
+                    <!-- <circle cx="0" cy="70" r="1" fill="black"></circle>
+                    <circle cx="100" cy="70" r="1" fill="black"></circle> -->
 
-                    <circle cx="20" cy="0" r="1" fill="green"></circle>
-                    <circle cx="20" cy="100" r="1" fill="green"></circle>
+                    <!-- <circle cx="20" cy="0" r="2" fill="#258fff"></circle> -->
+                    <!-- <circle cx="20" cy="100" r="1" fill="green"></circle> -->
 
-                    <circle cx="80" cy="0" r="1" fill="green"></circle>
-                    <circle cx="80" cy="100" r="1" fill="green"></circle> -->
+                    <!-- <circle cx="80" cy="0" r="1" fill="green"></circle> -->
+                    <circle cx="80" cy="100" r="2" fill="#258fff"></circle>
 
                     <!-- <line x1="0" y1="30" x2="100" y2="30" stroke="black"></line>
                     <line x1="0" y1="70" x2="100" y2="70" stroke="black"></line>
@@ -210,30 +217,30 @@
                     <path
                         d="M39.08,40.958c-1.021,1.475-1.979,2.761-2.777,3.793c7.916,0.475,13.104,2.184,15.034,3.456   c-2.261,1.491-8.98,3.587-19.338,3.587c-10.358,0-17.077-2.097-19.338-3.587c1.93-1.271,7.114-2.979,15.022-3.455   c-0.8-1.032-1.759-2.317-2.781-3.792c-9.741,0.959-16.816,3.841-16.816,7.246c0,4.19,10.707,7.588,23.913,7.588   c13.207,0,23.912-3.397,23.912-7.588C55.913,44.799,48.83,41.916,39.08,40.958z" />
                 </svg>
-                <svg class="svg-mark" viewBox="-488 -640 650 650">
+                <!-- <svg class="svg-mark" viewBox="-488 -640 650 650">
                     <path d="M44.525,20.734c0-6.919-5.608-12.527-12.528-12.527s-12.527,5.608-12.527,12.527c0,9.913,12.527,24.581,12.527,24.581
                     S44.525,30.596,44.525,20.734z M25.819,19.986c0-3.413,2.767-6.179,6.179-6.179c3.412,0,6.179,2.766,6.179,6.179   
                     c0,3.413-2.767,6.179-6.179,6.179C28.586,26.165,25.819,23.399,25.819,19.986z" />
                     <circle cx="31.997" cy="19.986" r="3.038" />
                     <path
                         d="M39.08,40.958c-1.021,1.475-1.979,2.761-2.777,3.793c7.916,0.475,13.104,2.184,15.034,3.456   c-2.261,1.491-8.98,3.587-19.338,3.587c-10.358,0-17.077-2.097-19.338-3.587c1.93-1.271,7.114-2.979,15.022-3.455   c-0.8-1.032-1.759-2.317-2.781-3.792c-9.741,0.959-16.816,3.841-16.816,7.246c0,4.19,10.707,7.588,23.913,7.588   c13.207,0,23.912-3.397,23.912-7.588C55.913,44.799,48.83,41.916,39.08,40.958z" />
-                </svg>
+                </svg> -->
             </div>
             <div class="text"><span>Map</span></div>
         </div>
-        <div class="menu-compare-box menu-box">
-            <div class="arrow-box arrow-top">
+        <div class="menu-compare-container menu-container">
+            <div class="arrow-container arrow-top">
                 <div class="stick"></div>
                 <div class="triangle"></div>
             </div>
-            <div class="arrow-box arrow-bot">
+            <div class="arrow-container arrow-bot">
                 <div class="stick"></div>
                 <div class="triangle"></div>
             </div>
             <div class="text"><span>Compare</span></div>
         </div>
-        <div class="menu-weather-box menu-box">
-            <div class="weather-icon-box weather-icon-top">
+        <div class="menu-weather-container menu-container">
+            <div class="weather-icon-container weather-icon-top">
                 <svg version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg"
                     xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" viewBox="0 0 44.9 44.9"
                     style="enable-background:new 0 0 44.9 44.9;" xml:space="preserve" height="100px" width="100px">
@@ -262,7 +269,7 @@
                     </g>
                 </svg>
             </div>
-            <div class="weather-icon-box weather-icon-bot">
+            <div class="weather-icon-container weather-icon-bot">
                 <svg version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg"
                     xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" viewBox="0 0 60.7 40"
                     style="enable-background:new 0 0 60.7 40;" xml:space="preserve" height="100px" width="100px">

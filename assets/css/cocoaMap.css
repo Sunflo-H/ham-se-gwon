@@ -1,0 +1,156 @@
+/* 지도 페이지 */
+#cocoa-map {
+    display: flex;
+    width: calc(100% - 40px);
+    height: 100%;
+    margin: 0 20px;
+}
+/* 액션 박스 */
+.action-container {
+    position: relative;
+    max-width: var(--action-container-w);
+    min-width: var(--action-container-w);
+    height: calc(100% - 20px);
+    background-color: var(--bg2);
+    border-radius: 20px;
+    margin-right: 20px;
+    box-shadow:  1px 1px 5px #dedede,
+             -1px -1px 5px #ffffff;
+}
+.action-container .current-location-info-container {
+    width: 100%;
+    margin-top: 20px;
+    border-bottom: 1px solid #e4e4e4;
+}
+.action-container .current-location-info-container p{
+    margin-bottom: 10px;
+    margin-left: 20px;
+}
+.action-container .current-location-info-container p:nth-child(1){
+    font-size: 14px;
+    font-weight: bold;
+}
+.action-container .current-location-info-container p:nth-child(2){
+    font-size: 12px;
+}
+.action-container .current-location-info-container p:nth-child(2) span{
+    color: var(--blue);
+}
+
+/* 주변 탐색 박스*/
+.action-container .around-container {
+    width: calc(100% - 40px);
+    height: 250px;
+    margin: 10px 20px;
+}
+.action-container .sub-title {
+    font-weight: bold;
+    font-size: 16px;
+    margin-bottom: 10px;
+}
+.action-container .category-container {
+    width: 100%;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-around;
+}
+.action-container .category{
+    width: 25%;
+    height: 50px;
+    margin-bottom: 20px;
+}
+.action-container .category-circle {
+    position: relative;
+    border: 1px solid rgba(237, 237, 237, 0.98);
+    border-radius: 100px;
+    width: var(--category-circle-w);
+    height: var(--category-circle-w);
+    text-align: center;
+    line-height: 40px;
+    font-size: 20px;
+    margin: 0 auto 5px;
+    overflow: hidden;
+    z-index: 1;
+    box-sizing: border-box;
+    cursor: pointer;
+}
+.action-container .category-circle > i {
+    transition: all 0.5s;
+    font-weight: 900;
+}
+.action-container .category-circle .wave-top {
+    position: absolute;
+    left: 0;
+    top: -34px;
+    width: 40px;
+    height: 40px;
+    border-radius: 15px;
+    animation: wave 5000ms infinite linear;
+    background-color: white;
+    z-index: -2;
+}
+.action-container .category-circle:hover .wave-top { 
+    z-index: 1;
+}
+.action-container .category-circle .wave-bot {
+    content: "";
+    position: absolute;
+    left: 0;
+    top: 100%;
+    width: 100%;
+    height: 200%;
+    transition-duration: 0.5s;
+}
+.action-container .category-circle:hover{
+    color: white;
+}
+.action-container .category-circle:hover .wave-bot {
+    background-color: var(--blue2);
+    transform: translate(0px, calc(0px - var(--category-circle-w)));
+    z-index: -2;
+}
+.action-container .category-name{
+    display: block;
+    font-size: 12px;
+    text-align: center;
+    cursor: pointer;
+    color: rgba(152, 152, 152, 0.98);
+}
+
+/* 지도 박스 */
+.map-container {
+    width: calc(100% - 200px);
+    height: calc(100% - 20px);
+    background-color: white;
+    border-radius: 20px;
+    box-shadow:  2px 2px 5px #dedede,
+             -1px -1px 5px #ffffff;
+}
+.map-container .map-wrapper{
+    width: 100%;
+    height: 100%;
+    padding: 15px 20px;
+    box-sizing: border-box;
+}
+.map-container .map-wrapper .map {
+    width: 100%;
+    height: 100%;
+    border: 1px solid red;
+    border-radius: 20px;
+}
+/* 한번 포장한뒤 맵을 보여줄지
+    아니면 바로 맵을 보여줄지
+ */
+ 
+
+
+
+
+
+
+
+@keyframes wave {
+	100% {
+		transform: rotate(360deg);
+	}
+}

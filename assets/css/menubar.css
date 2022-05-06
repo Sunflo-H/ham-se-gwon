@@ -11,17 +11,17 @@
     background-color: white;
 }
 
-.menu-box {
+.menu-container {
     display: flex;
     width: 40%;
     height: 100%;
     background-color: var(--blue2);
-    box-sizing: border-box;
+    container-sizing: border-container;
     align-items: center;
     transition-duration: 500ms;
 }
 
-.menu-box .text {
+.menu-container .text {
     width: 100%;
     height: 50px;
     color: white;
@@ -31,7 +31,7 @@
     margin-top: -25px;
 }
 
-.menu-box .text span {
+.menu-container .text span {
     cursor: pointer;
     transition-duration: 1.5s;
 }
@@ -47,43 +47,43 @@
     font-size: 25px;
 }
 
-.menu-compare-box {
+.menu-compare-container {
     border-left: 1px solid white;
     border-right: 1px solid white;
 }
 
-.menu-compare-box:hover {
+.menu-compare-container:hover {
     border-left: 1px solid var(--blue2);
     border-right: 1px solid var(--blue2);
 }
 
 /* 지도 메뉴의 애니메이션 */
-.menu-map-box {
+.menu-map-container {
     position: relative;
     z-index: 2;
 }
-.menu-map-box .text {
+.menu-map-container .text {
     z-index: 2;
 }
-.menu-map-box .menu-svg-box {
+.menu-map-container .menu-svg-container {
     position: absolute;
     top: 0;
     left: 0;
     width: 100%;
     height: 100%;
 }
-.menu-map-box .svg-line {
+.menu-map-container .svg-line {
     position: absolute;
 }
-.menu-map-box .svg-line line {
+.menu-map-container .svg-line line {
     stroke: rgba(128, 128, 128, 0.459);
 }
-.menu-map-box .svg-mark {
+.menu-map-container .svg-mark {
     position: absolute;
     width: 100%;
     height: 100%;
 }
-.menu-map-box .svg-line path{
+.menu-map-container .svg-line path{
     fill: none;
     stroke-width: 1;
     stroke: var(--blue2);
@@ -91,21 +91,26 @@
     stroke-dashoffset: 160;
     opacity: 0;
 }
-.menu-map-box:hover .svg-line path{
+.menu-map-container:hover .svg-line path{
     opacity: 1;
-    animation: line 700ms 400ms forwards linear;
+    animation: path 700ms 400ms forwards linear;
 }
-.menu-map-box .svg-mark {
+.menu-map-container:hover .svg-line circle{
+    opacity: 1;
+    animation: mark2 600ms ;
+}
+.menu-map-container .svg-mark {
     fill: var(--blue2);
     opacity: 0;
-    transition-delay: 300ms;
-    transition-duration: 100ms;
 }
-.menu-map-box:hover .svg-mark {
+.menu-map-container:hover .svg-mark {
+    animation: mark 600ms ;
+}
+.menu-map-container:hover .svg-mark {
     opacity: 1;
 }
 
-@keyframes line {
+@keyframes path {
     0% {
         stroke-dashoffset: 160;
     }
@@ -113,13 +118,34 @@
         stroke-dashoffset: 0;
     }
 }
+@keyframes mark {
+    0% {
+        opacity: 0;
+        transform: translateY(-30px);
+    }
+    100% {
+        opacity: 1;
+        transform: translateY(0px);
+    }
+}
+@keyframes mark2 {
+    0% {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+    100% {
+        opacity: 1;
+        transform: translateY(0px);
+    }
+}
+
 
 /* 비교 메뉴의 애니메이션 */
-.menu-compare-box {
+.menu-compare-container {
     position: relative;
 }
 
-.menu-compare-box .arrow-box {
+.menu-compare-container .arrow-container {
     position: absolute;
     display: flex;
     opacity: 0;
@@ -129,7 +155,7 @@
 
 }
 
-.menu-compare-box .arrow-box .stick {
+.menu-compare-container .arrow-container .stick {
     width: 0px;
     height: 40%;
     background-color: var(--blue2);
@@ -137,7 +163,7 @@
     transition-delay: 400ms;
 }
 
-.menu-compare-box .arrow-box .triangle {
+.menu-compare-container .arrow-container .triangle {
     width: 0px;
     height: 0px;
     border-left: 45px solid var(--blue2);
@@ -155,17 +181,17 @@
     bottom: 25%;
 }
 
-.menu-compare-box:hover .arrow-box {
+.menu-compare-container:hover .arrow-container {
     opacity: 1;
     transition-delay: 300ms;
     transition-duration: 300ms;
 }
 
-.menu-compare-box:hover .arrow-top .stick {
+.menu-compare-container:hover .arrow-top .stick {
     animation: arrow-w-top 900ms 400ms forwards;
 }
 
-.menu-compare-box:hover .arrow-bot .stick {
+.menu-compare-container:hover .arrow-bot .stick {
     animation: arrow-w-bot 900ms 400ms forwards ease-out;
 }
 
@@ -191,23 +217,23 @@
 }
 
 /* 날씨 메뉴의 애니메이션 */
-.menu-weather-box {
+.menu-weather-container {
     position: relative;
     overflow: hidden;
 }
 
-.menu-weather-box .weather-icon-box {
+.menu-weather-container .weather-icon-container {
     position: absolute;
     width: 80px;
     height: 80px;
     opacity: 0;
 }
 
-.menu-weather-box:hover .weather-icon-top {
+.menu-weather-container:hover .weather-icon-top {
     animation: weatherIconTop 5s infinite linear;
 }
 
-.menu-weather-box:hover .weather-icon-bot {
+.menu-weather-container:hover .weather-icon-bot {
     animation: weatherIconBot 5s infinite linear;
 }
 

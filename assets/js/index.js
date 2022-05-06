@@ -1,8 +1,3 @@
-let p = 1000;
-let q = 2;
-let total = p * q;
-price = 2000;
-console.log(`총 가격 ${total}원`);
 const inputButton = document.querySelector('input[type=button]');
 
 let addressPopup = ''; // 주소검색팝업창에서 얻은 주소 정보
