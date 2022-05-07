@@ -1,12 +1,8 @@
-const inputButton = document.querySelector('input[type=button]');
+const input = document.querySelector('.search-bar input[type=text]');
 
-let addressPopup = ''; // 주소검색팝업창에서 얻은 주소 정보
-let mapLocation = ''; // 주소로 검색한 지도상 위치
-const mapContainer = document.getElementById('map'); // 지도를 표시할 div 
+function setMap(lat, lng) {
+    const mapContainer = document.getElementById('map'); // 지도를 표시할 div 
 
-
-
-function createMap(lat, lng) {
     let mapOption = {
         center: new kakao.maps.LatLng(lat, lng), // 지도의 중심좌표
         level: 3, // 지도의 확대 레벨
@@ -31,15 +27,27 @@ function createMap(lat, lng) {
 }
 
 
+// 내 위치 정보를 얻어 지도에 표시한다.
+function getUserLocation() {
+    if(navigator.geolocation) navigator.geolocation.getCurrentPosition(success, error);
+    else { throw "위치 정보가 지원되지 않습니다."; }
+}
+
 function success(position) {
     const userLat = position.coords.latitude;
     const userLng = position.coords.longitude;
 
-     createMap(userLat, userLng)
+     setMap(userLat, userLng) 
 }
 
 function error() {
     alert('Sorry, no position available.');
+}
+
+
+function search() {
+    
+    console.log(text);
 }
 
 function init() {
@@ -51,12 +59,21 @@ function init() {
      * 
      * 보여주기, 거리
      */
-    if(navigator.geolocation) navigator.geolocation.getCurrentPosition(success, error);
-    else { throw "위치 정보가 지원되지 않습니다."; }
+    getUserLocation();    
 }
 
 init();
 
+console.log(input);
+
+$(input).on("change paste input",function(e) {
+    fetch(`https://dapi.kakao.com/v2/local/search/address.json?query=${e.target.value}&size=5`, {
+    headers: { Authorization: `KakaoAK 621a24687f9ad83f695acc0438558af2` }
+    })
+    .then((response) => response.json())
+    .then((data) => console.log(data))
+    .catch((error) => console.log("error:" + error));
+});
 
 
 

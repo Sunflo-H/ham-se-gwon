@@ -55,15 +55,16 @@ header .search-container .search-bar {
     margin-top: calc((var(--header-h) - 36px) / 2);
     background-color: var(--bg2);
     border-radius: 30px;
-    line-height: 36px;
+    line-height: 34px;
     box-shadow:  2px 2px 5px #dedede,
              -1px -1px 5px #ffffff;
 }
 header .search-container .search-bar input[type=text]{
-    width: 350px;
+    width: 340px;
     border: none;
-    margin-left: 10px;
+    margin-left: 20px;
     outline: none;
+    /* border: 1px solid red; */
 }
 
 header .hamberger-container {
