@@ -53,7 +53,7 @@ header .search-container .search-bar {
     height: 36px;
     margin-top: calc((var(--header-h) - 36px) / 2);
     background-color: white;
-    border-radius: 30px;
+    border-radius: 15px;
     line-height: 34px;
     box-shadow:  2px 2px 5px #dedede,
              -1px -1px 5px #ffffff;
@@ -69,17 +69,22 @@ header .search-container .search-bar i{
 }
 header .search-container .relation-words{
     width: 100%;
+    background-color: white;
     border: 1px solid #e4e4e4;
+    border-radius: 0px 0px 10px 10px;
+    box-sizing: border-box;
+    box-shadow:  2px 2px 5px #dedede,
+             -1px -1px 5px #ffffff;
 }
 header .search-container .relation-words .relation-word{
-    background-color: white;
-    /* line-height: 60px; */
+    font-size: 14px;
+    font-weight: bold;
+    padding: 3px 0px;
 }
 header .search-container .relation-words .relation-word:hover{
     background-color: #e4e4e4;
 }
 header .search-container .relation-words .relation-word:last-child {
-    border-radius: 30px;
 }
 header .search-container .relation-words .relation-word span{
     margin-left: 20px;

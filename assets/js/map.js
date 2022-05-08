@@ -75,7 +75,20 @@ $(input).on("change paste input",function(e) {
     .catch((error) => console.log("error:" + error));
 });
 
-
+input.addEventListener('focus', e => {
+    const relationWords = document.querySelector('.relation-words');
+    const searchBar = document.querySelector('.search-bar');
+    console.log(searchBar);
+    searchBar.style.borderRadius = "15px 15px 0px 0px";
+    relationWords.classList.remove('hide');
+})
+input.addEventListener('blur', e => {
+    const relationWords = document.querySelector('.relation-words');
+    const searchBar = document.querySelector('.search-bar');
+    console.log(relationWords);
+    relationWords.classList.add('hide');
+    searchBar.style.borderRadius = "15px";
+})
 
 // // 주소 검색 객체를 생성합니다.
 // var geocoder = new kakao.maps.services.Geocoder();
