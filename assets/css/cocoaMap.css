@@ -11,7 +11,7 @@
     max-width: var(--action-container-w);
     min-width: var(--action-container-w);
     height: calc(100% - 20px);
-    background-color: var(--bg2);
+    background-color: white;
     border-radius: 20px;
     margin-right: 20px;
     box-shadow:  1px 1px 5px #dedede,
