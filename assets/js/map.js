@@ -37,7 +37,7 @@ function success(position) {
     const userLat = position.coords.latitude;
     const userLng = position.coords.longitude;
 
-     setMap(userLat, userLng) 
+    setMap(userLat, userLng);
 }
 
 function error() {
@@ -45,21 +45,30 @@ function error() {
 }
 
 
-function search() {
-    
-    console.log(text);
+function createRelationWord(data) {
+    console.log(data);
+    console.log(data.documents.length);
+    data.documents.forEach(data => {
+        console.log(data.address_name);
+    }); 
 }
 
 function init() {
     /**
-     * 현재 위치 정보 알아낸뒤
+     * 현재 위치 정보 알아낸뒤 (getUserLocation -> success -> setMap)
      * 현재 위치를 지도에 보여줘
      * 
      * 검색
+     * 검색해서 나온 data를 
+     * .relation-container, .history-container 안에
+     * .relation과 .history를 만들어서 보여주고, 
+     * 가장 마지막으로 출력된 data를 저장
+     * 만약 data를 검색한 적이 없으면 검색바는 모양이 달라지지 않는다.
+     * 
      * 
      * 보여주기, 거리
      */
-    getUserLocation();    
+    getUserLocation();
 }
 
 init();
@@ -71,22 +80,22 @@ $(input).on("change paste input",function(e) {
     headers: { Authorization: `KakaoAK 621a24687f9ad83f695acc0438558af2` }
     })
     .then((response) => response.json())
-    .then((data) => console.log(data))
+    .then((data) => {
+        createRelationWord(data);
+    })
     .catch((error) => console.log("error:" + error));
 });
 
 input.addEventListener('focus', e => {
-    const relationWords = document.querySelector('.relation-words');
+    const wordContainer = document.querySelector('.word-container');
     const searchBar = document.querySelector('.search-bar');
-    console.log(searchBar);
+    wordContainer.classList.remove('hide');
     searchBar.style.borderRadius = "15px 15px 0px 0px";
-    relationWords.classList.remove('hide');
 })
 input.addEventListener('blur', e => {
-    const relationWords = document.querySelector('.relation-words');
+    const wordContainer = document.querySelector('.word-container');
     const searchBar = document.querySelector('.search-bar');
-    console.log(relationWords);
-    relationWords.classList.add('hide');
+    wordContainer.classList.add('hide');
     searchBar.style.borderRadius = "15px";
 })
 
