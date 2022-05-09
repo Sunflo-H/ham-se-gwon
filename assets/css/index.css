@@ -67,26 +67,45 @@ header .search-container .search-bar input[type=text]{
 header .search-container .search-bar i{
     color: #3a7bd5;
 }
-header .search-container .relation-words{
+header .search-container .word-container {
     width: 100%;
     background-color: white;
     border: 1px solid #e4e4e4;
     border-radius: 0px 0px 10px 10px;
     box-sizing: border-box;
-    box-shadow:  2px 2px 5px #dedede,
-             -1px -1px 5px #ffffff;
-}
-header .search-container .relation-words .relation-word{
+    box-shadow:  2px 2px 5px #dedede, -1px -1px 5px #ffffff;
     font-size: 14px;
     font-weight: bold;
+}
+header .search-container .word-container .relation-container .relation{   
     padding: 3px 0px;
 }
-header .search-container .relation-words .relation-word:hover{
+header .search-container .word-container .relation-container .relation:hover{
     background-color: #e4e4e4;
 }
-header .search-container .relation-words .relation-word:last-child {
+header .search-container .word-container .relation-container .relation span{
+    margin-left: 20px;
 }
-header .search-container .relation-words .relation-word span{
+
+header .search-container .word-container .history-container{
+    border-top: 1px solid #e4e4e4;
+}
+header .search-container .word-container .history-container .title{
+    margin-top: 5px;
+    margin-bottom: 5px;
+    color: #e4e4e4;
+    font-weight: normal;
+}
+header .search-container .word-container .history-container .history {
+    padding: 3px 0px;
+}
+header .search-container .word-container .history-container .history:hover {
+    background-color: #e4e4e4;
+}
+header .search-container .word-container .history-container .history i{
+    margin-right: 10px;
+}
+header .search-container .word-container .history-container div{
     margin-left: 20px;
 }
 

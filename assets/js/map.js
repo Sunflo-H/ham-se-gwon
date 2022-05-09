@@ -1,5 +1,7 @@
 const input = document.querySelector('.search-bar input[type=text]');
 
+let addresses = [];
+
 function setMap(lat, lng) {
     const mapContainer = document.getElementById('map'); // 지도를 표시할 div 
 
@@ -45,12 +47,20 @@ function error() {
 }
 
 
-function createRelationWord(data) {
-    console.log(data);
-    console.log(data.documents.length);
-    data.documents.forEach(data => {
-        console.log(data.address_name);
+function showRelation(data) {
+    const relationContainer = document.querySelector('.relation-container');
+    const api_data =  data.documents;
+    while ( relationContainer.hasChildNodes() ) {
+          relationContainer.removeChild( relationContainer.firstChild ); 
+    }
+    api_data.forEach(data => {
+        let html = `<div class="relation"><span>${data.address_name}</span></div>`
+        relationContainer.insertAdjacentHTML('beforeend',html);
     }); 
+}
+
+function createHistory(data) {
+
 }
 
 function init() {
@@ -73,17 +83,18 @@ function init() {
 
 init();
 
-console.log(input);
-
+// 검색창에 값이 입력될 때마다 연관검색어를 보여주는 이벤트
 $(input).on("change paste input",function(e) {
+    if(e.target.value === '') return; //value가 공백이 되면 query에러가 발생하여 넣은 코드
     fetch(`https://dapi.kakao.com/v2/local/search/address.json?query=${e.target.value}&size=5`, {
     headers: { Authorization: `KakaoAK 621a24687f9ad83f695acc0438558af2` }
     })
     .then((response) => response.json())
     .then((data) => {
-        createRelationWord(data);
+        showRelation(data);
     })
     .catch((error) => console.log("error:" + error));
+    console.log(e.target.value);
 });
 
 input.addEventListener('focus', e => {
@@ -91,13 +102,13 @@ input.addEventListener('focus', e => {
     const searchBar = document.querySelector('.search-bar');
     wordContainer.classList.remove('hide');
     searchBar.style.borderRadius = "15px 15px 0px 0px";
-})
+});
 input.addEventListener('blur', e => {
     const wordContainer = document.querySelector('.word-container');
     const searchBar = document.querySelector('.search-bar');
     wordContainer.classList.add('hide');
     searchBar.style.borderRadius = "15px";
-})
+});
 
 // // 주소 검색 객체를 생성합니다.
 // var geocoder = new kakao.maps.services.Geocoder();
@@ -170,5 +181,3 @@ input.addEventListener('blur', e => {
 //         .then(console.log)
 //         .catch(console.log);
 // })
-
-console.log('hi');
