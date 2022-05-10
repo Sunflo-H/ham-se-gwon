@@ -38,7 +38,7 @@ header .logo-container span span {
 }
 
 header .search-container {
-    margin-left: 20px;
+    margin-left: 50px;
     z-index: 2;
 }
 /* 
@@ -46,12 +46,12 @@ header .search-container {
 검색창 클릭하면 검색창의 border-radius를 위쪽만주고 연관검색어 div를 hide 해제!
 */
 header .search-container .search-wrapper {
-    margin-left: 30px;
+    border: 1px solid red;
+    margin-top: calc((var(--header-h) - 36px) / 2);
 }
 header .search-container .search-bar {
     width: 400px;
     height: 36px;
-    margin-top: calc((var(--header-h) - 36px) / 2);
     background-color: white;
     border-radius: 15px;
     line-height: 34px;

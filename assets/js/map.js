@@ -1,6 +1,8 @@
 const input = document.querySelector('.search-bar input[type=text]');
+const searchWrapper = document.querySelector('.search-wrapper');
+const body = document.querySelector('body');
 
-let addresses = [];
+let historyList = [];
 
 function setMap(lat, lng) {
     const mapContainer = document.getElementById('map'); // 지도를 표시할 div 
@@ -56,7 +58,24 @@ function showRelation(data) {
     api_data.forEach(data => {
         let html = `<div class="relation"><span>${data.address_name}</span></div>`
         relationContainer.insertAdjacentHTML('beforeend',html);
-    }); 
+        const a = relationContainer.querySelector('.relation');
+    });
+    
+    const a = relationContainer.querySelectorAll('.relation');
+    
+    a.forEach(b => {
+        b.addEventListener('mouseenter', e => console.log(e.target));
+        b.addEventListener('click', e => console.log(e.target));
+    })
+    // addEventRelation();
+}
+
+function addEventRelation() {
+    const relationContainer = document.querySelector('.relation-container');
+    relationContainer.addEventListener('click', e => {
+        console.log('hi');
+        console.log(e.target);
+    })
 }
 
 function createHistory(data) {
@@ -94,20 +113,28 @@ $(input).on("change paste input",function(e) {
         showRelation(data);
     })
     .catch((error) => console.log("error:" + error));
-    console.log(e.target.value);
 });
-
-input.addEventListener('focus', e => {
+searchWrapper.addEventListener('click', e => {
     const wordContainer = document.querySelector('.word-container');
     const searchBar = document.querySelector('.search-bar');
     wordContainer.classList.remove('hide');
     searchBar.style.borderRadius = "15px 15px 0px 0px";
 });
-input.addEventListener('blur', e => {
-    const wordContainer = document.querySelector('.word-container');
-    const searchBar = document.querySelector('.search-bar');
-    wordContainer.classList.add('hide');
-    searchBar.style.borderRadius = "15px";
+body.addEventListener('click', e => {
+    // 이벤트 대상이 searchWrpper면 검색창 유지, 그 외의 요소들이면 검색창 닫기
+    if(e.target === searchWrapper || 
+       e.target.parentNode === searchWrapper || 
+       e.target.parentNode.parentNode === searchWrapper ||
+       e.target.parentNode.parentNode.parentNode === searchWrapper ||
+       e.target.parentNode.parentNode.parentNode.parentNode === searchWrapper){
+       return; 
+    } else {
+        console.log('hi');
+        const wordContainer = document.querySelector('.word-container');
+        const searchBar = document.querySelector('.search-bar');
+        wordContainer.classList.add('hide');
+        searchBar.style.borderRadius = "15px";
+    }
 });
 
 // // 주소 검색 객체를 생성합니다.
