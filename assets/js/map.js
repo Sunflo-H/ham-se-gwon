@@ -58,8 +58,14 @@ function showRelation(data) {
 // 연관 단어를 클릭하면 바로 검색결과 나타나게 하는 함수
 function clickRelation(e) {
     const addr = e.target.innerText;
+    const listContainer = document.querySelector('.list-container');
+    const searchBar = document.querySelector('.search-bar');
+    const currentLocation = document.querySelector('.current-location');
 
     findCoordsByAddr(addr);
+    currentLocation.innerText = addr;
+    listContainer.classList.add('hide');
+    searchBar.style.borderRadius = "15px";
 }
 
 function showHistory() {
@@ -170,6 +176,7 @@ body.addEventListener('click', e => {
         searchBar.style.borderRadius = "15px";
     }
 });
+
 
 // // 주소 검색 객체를 생성합니다.
 // var geocoder = new kakao.maps.services.Geocoder();
