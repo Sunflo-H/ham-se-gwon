@@ -4,44 +4,34 @@ const body = document.querySelector('body');
 
 let historyList = [];
 
-function setMap(lat, lng) {
+function showInMap(lat, lng) {
     const mapContainer = document.getElementById('map'); // 지도를 표시할 div 
-
     let mapOption = {
         center: new kakao.maps.LatLng(lat, lng), // 지도의 중심좌표
         level: 3, // 지도의 확대 레벨
     };
-
-    // 지도 그리기
     let map = new kakao.maps.Map(mapContainer, mapOption);
-
-    // 마커가 표시될 위치입니다 
-    var markerPosition = new kakao.maps.LatLng(lat, lng);
-
-    // 마커를 생성합니다
+    var coords = new kakao.maps.LatLng(lat, lng);
     var marker = new kakao.maps.Marker({
-        position: markerPosition
+        position: coords
     });
 
-    // 마커가 지도 위에 표시되도록 설정합니다
+    marker.setMap(null);  
     marker.setMap(map);
 
-    // 아래 코드는 지도 위의 마커를 제거하는 코드입니다
-    // marker.setMap(null);  
 }
 
 
 // 내 위치 정보를 얻어 지도에 표시한다.
-function getUserLocation() {
-    if(navigator.geolocation) navigator.geolocation.getCurrentPosition(success, error);
+function findUserLocation() {
+    if (navigator.geolocation) navigator.geolocation.getCurrentPosition(success, error);
     else { throw "위치 정보가 지원되지 않습니다."; }
 }
 
 function success(position) {
-    const userLat = position.coords.latitude;
-    const userLng = position.coords.longitude;
-
-    setMap(userLat, userLng);
+    const lat = position.coords.latitude;
+    const lng = position.coords.longitude;
+    showInMap(lat, lng);
 }
 
 function error() {
@@ -51,36 +41,76 @@ function error() {
 
 function showRelation(data) {
     const relationContainer = document.querySelector('.relation-container');
-    const api_data =  data.documents;
-    while ( relationContainer.hasChildNodes() ) {
-          relationContainer.removeChild( relationContainer.firstChild ); 
+    const api_data = data.documents;
+
+    while (relationContainer.hasChildNodes()) {
+        relationContainer.removeChild(relationContainer.firstChild);
     }
+
     api_data.forEach(data => {
-        let html = `<div class="relation"><span>${data.address_name}</span></div>`
-        relationContainer.insertAdjacentHTML('beforeend',html);
-        const a = relationContainer.querySelector('.relation');
+        let html = `<div class="relation">${data.address_name}</div>`
+        relationContainer.insertAdjacentHTML('beforeend', html);
     });
-    
-    const a = relationContainer.querySelectorAll('.relation');
-    
-    a.forEach(b => {
-        b.addEventListener('mouseenter', e => console.log(e.target));
-        b.addEventListener('click', e => console.log(e.target));
+
+    relationContainer.addEventListener('click', clickRelation);
+}
+
+// 연관 단어를 클릭하면 바로 검색결과 나타나게 하는 함수
+function clickRelation(e) {
+    const addr = e.target.innerText;
+
+    findCoordsByAddr(addr);
+}
+
+function showHistory() {
+    const historyContainer = document.querySelector('.history-container');
+    while(historyContainer.hasChildNodes()){
+        historyContainer.removeChild(historyContainer.firstChild);
+    }
+    historyList.forEach(history => {
+        let html = `<div class="history"><i class="fa-solid fa-location-dot"></i>${history}</div>`
+        historyContainer.insertAdjacentHTML('beforeend', html);
     })
-    // addEventRelation();
+    historyContainer.addEventListener('click', clickHistory);
 }
 
-function addEventRelation() {
-    const relationContainer = document.querySelector('.relation-container');
-    relationContainer.addEventListener('click', e => {
-        console.log('hi');
-        console.log(e.target);
-    })
+function clickHistory() {
+    console.log(e.target);
 }
 
-function createHistory(data) {
+function setHistoryList(history) {
+    // 값이 중복이 아니면 push , 배열의 크기가 5면 shift
+    if(historyList.find(_history => history === _history) === undefined){
+
+        if(historyList.length === 5) {
+            historyList.shift();
+        }
+        
+        historyList.push(history);
+    }
+}
+
+function findCoordsByAddr(addr) {
+    // 주소-좌표 변환 객체를 생성합니다
+    var geocoder = new kakao.maps.services.Geocoder();
+
+    // 주소로 좌표를 검색합니다
+    geocoder.addressSearch(addr, function (result, status) {
+
+        // 정상적으로 검색이 완료됐으면 
+        if (status === kakao.maps.services.Status.OK) {
+            const lat = result[0].y;
+            const lng = result[0].x;
+            showInMap(lat, lng);
+            setHistoryList(addr);
+        }
+    });
+}
+
+function findCoordsByKeyword(keyword) {
 
 }
+
 
 function init() {
     /**
@@ -97,42 +127,46 @@ function init() {
      * 
      * 보여주기, 거리
      */
-    getUserLocation();
+    findUserLocation();
 }
 
 init();
 
 // 검색창에 값이 입력될 때마다 연관검색어를 보여주는 이벤트
-$(input).on("change paste input",function(e) {
-    if(e.target.value === '') return; //value가 공백이 되면 query에러가 발생하여 넣은 코드
+$(input).on("change paste input", function (e) {
+    if (e.target.value === '') return; //value가 공백이 되면 query에러가 발생하여 넣은 코드
     fetch(`https://dapi.kakao.com/v2/local/search/address.json?query=${e.target.value}&size=5`, {
-    headers: { Authorization: `KakaoAK 621a24687f9ad83f695acc0438558af2` }
+        headers: { Authorization: `KakaoAK 621a24687f9ad83f695acc0438558af2` }
     })
-    .then((response) => response.json())
-    .then((data) => {
-        showRelation(data);
-    })
-    .catch((error) => console.log("error:" + error));
+        .then((response) => response.json())
+        .then((data) => {
+            showRelation(data);
+            if(historyList.length !== 0) showHistory();
+        })
+        .catch((error) => console.log("error:" + error));
 });
+
+// 검색창 클릭시 연관검색어, 히스토리 리스트를 보여주는 이벤트
 searchWrapper.addEventListener('click', e => {
-    const wordContainer = document.querySelector('.word-container');
+    const listContainer = document.querySelector('.list-container');
     const searchBar = document.querySelector('.search-bar');
-    wordContainer.classList.remove('hide');
+    listContainer.classList.remove('hide');
     searchBar.style.borderRadius = "15px 15px 0px 0px";
 });
+
+// e.target이 searchWrapper면 검색창을 유지하고, 그 외의 요소들이면 검색창 닫는 이벤트
 body.addEventListener('click', e => {
-    // 이벤트 대상이 searchWrpper면 검색창 유지, 그 외의 요소들이면 검색창 닫기
-    if(e.target === searchWrapper || 
-       e.target.parentNode === searchWrapper || 
-       e.target.parentNode.parentNode === searchWrapper ||
-       e.target.parentNode.parentNode.parentNode === searchWrapper ||
-       e.target.parentNode.parentNode.parentNode.parentNode === searchWrapper){
-       return; 
-    } else {
-        console.log('hi');
-        const wordContainer = document.querySelector('.word-container');
+    if (e.target === searchWrapper ||
+        e.target.parentNode === searchWrapper ||
+        e.target.parentNode.parentNode === searchWrapper ||
+        e.target.parentNode.parentNode.parentNode === searchWrapper ||
+        e.target.parentNode.parentNode.parentNode.parentNode === searchWrapper) {
+        return;
+    }
+    else {
+        const listContainer = document.querySelector('.list-container');
         const searchBar = document.querySelector('.search-bar');
-        wordContainer.classList.add('hide');
+        listContainer.classList.add('hide');
         searchBar.style.borderRadius = "15px";
     }
 });

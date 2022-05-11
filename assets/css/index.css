@@ -13,6 +13,7 @@ body, html {
     height: 100%;
     background: linear-gradient(to left, #00d2ff, #3a7bd5);
 }
+
 body {
     position: relative;
 }
@@ -26,31 +27,30 @@ header {
     margin: 0 20px;
 }
 
-header .logo-container {
+.logo-container {
     width: var(--action-container-w);
     text-align: center;
     font-size: 30px;
     color: white;
     line-height: var(--header-h);
 }
-header .logo-container span span {
+
+.logo-container span span {
     font-weight: bold;
 }
 
-header .search-container {
+.search-container {
+    width: 400px;
     margin-left: 50px;
     z-index: 2;
 }
-/* 
-검색 컨테이너에 미리 연관검색어 div를 만들고 hide를 줘 
-검색창 클릭하면 검색창의 border-radius를 위쪽만주고 연관검색어 div를 hide 해제!
-*/
-header .search-container .search-wrapper {
-    border: 1px solid red;
+
+.search-wrapper {
     margin-top: calc((var(--header-h) - 36px) / 2);
 }
-header .search-container .search-bar {
-    width: 400px;
+
+.search-bar {
+    width: 100%;
     height: 36px;
     background-color: white;
     border-radius: 15px;
@@ -58,16 +58,19 @@ header .search-container .search-bar {
     box-shadow:  2px 2px 5px #dedede,
              -1px -1px 5px #ffffff;
 }
-header .search-container .search-bar input[type=text]{
+
+.search-bar input[type=text]{
     width: 340px;
     border: none;
     margin-left: 20px;
     outline: none;
 }
-header .search-container .search-bar i{
+
+.search-bar i{
     color: #3a7bd5;
 }
-header .search-container .word-container {
+
+.search-container .list-container {
     width: 100%;
     background-color: white;
     border: 1px solid #e4e4e4;
@@ -76,38 +79,45 @@ header .search-container .word-container {
     box-shadow:  2px 2px 5px #dedede, -1px -1px 5px #ffffff;
     font-size: 14px;
     font-weight: bold;
-}
-header .search-container .word-container .relation-container .relation{   
-    padding: 3px 0px;
-}
-header .search-container .word-container .relation-container .relation:hover{
-    background-color: #e4e4e4;
-}
-header .search-container .word-container .relation-container .relation span{
-    margin-left: 20px;
+    /* border: 1px solid red; */
 }
 
-header .search-container .word-container .history-container{
+.relation-container .relation{
+    width: 100%;
+    padding: 3px 0px;
+}
+
+.relation-container .relation:hover{
+    background-color: #e4e4e4;
+}
+
+.history-container{
     border-top: 1px solid #e4e4e4;
 }
-header .search-container .word-container .history-container .title{
+
+.history-container .title{
     margin-top: 5px;
     margin-bottom: 5px;
     color: #e4e4e4;
     font-weight: normal;
 }
-header .search-container .word-container .history-container .history {
+
+.history-container .history {
     padding: 3px 0px;
 }
-header .search-container .word-container .history-container .history:hover {
+
+.history-container .history:hover {
     background-color: #e4e4e4;
 }
-header .search-container .word-container .history-container .history i{
+
+.history-container .history i{
     margin-right: 10px;
 }
-header .search-container .word-container .history-container div{
+
+.history-container div{
     margin-left: 20px;
 }
+
 
 
 
