@@ -1,5 +1,5 @@
-const input = document.querySelector('.search-bar input[type=text]');
-const searchWrapper = document.querySelector('.search-wrapper');
+const searchInput = document.querySelector('.search-bar input[type=text]');
+const searchBar = document.querySelector('.search-bar');
 const body = document.querySelector('body');
 
 let historyList = [];
@@ -16,7 +16,7 @@ function showInMap(lat, lng) {
         position: coords
     });
 
-    marker.setMap(null);  
+    marker.setMap(null);
     marker.setMap(map);
 
 }
@@ -58,19 +58,17 @@ function showRelation(data) {
 // 연관 단어를 클릭하면 바로 검색결과 나타나게 하는 함수
 function clickRelation(e) {
     const addr = e.target.innerText;
-    const listContainer = document.querySelector('.list-container');
-    const searchBar = document.querySelector('.search-bar');
     const currentLocation = document.querySelector('.current-location');
 
     findCoordsByAddr(addr);
+    closeSearchBar();
     currentLocation.innerText = addr;
-    listContainer.classList.add('hide');
-    searchBar.style.borderRadius = "15px";
+
 }
 
 function showHistory() {
     const historyContainer = document.querySelector('.history-container');
-    while(historyContainer.hasChildNodes()){
+    while (historyContainer.hasChildNodes()) {
         historyContainer.removeChild(historyContainer.firstChild);
     }
     historyList.forEach(history => {
@@ -86,12 +84,12 @@ function clickHistory() {
 
 function setHistoryList(history) {
     // 값이 중복이 아니면 push , 배열의 크기가 5면 shift
-    if(historyList.find(_history => history === _history) === undefined){
+    if (historyList.find(_history => history === _history) === undefined) {
 
-        if(historyList.length === 5) {
+        if (historyList.length === 5) {
             historyList.shift();
         }
-        
+
         historyList.push(history);
     }
 }
@@ -117,6 +115,20 @@ function findCoordsByKeyword(keyword) {
 
 }
 
+function closeSearchBar() {
+    console.log("실행");
+    const listContainer = document.querySelector('.list-container');
+    const searchBar = document.querySelector('.search-bar');
+    listContainer.classList.add('hide');
+    searchBar.style.borderRadius = "15px";
+}
+
+function openSearchBar() {
+    const listContainer = document.querySelector('.list-container');
+    const searchBar = document.querySelector('.search-bar');
+    listContainer.classList.remove('hide');
+    searchBar.style.borderRadius = "15px 15px 0px 0px";
+}
 
 function init() {
     /**
@@ -139,7 +151,7 @@ function init() {
 init();
 
 // 검색창에 값이 입력될 때마다 연관검색어를 보여주는 이벤트
-$(input).on("change paste input", function (e) {
+searchInput.addEventListener('input', e => {
     if (e.target.value === '') return; //value가 공백이 되면 query에러가 발생하여 넣은 코드
     fetch(`https://dapi.kakao.com/v2/local/search/address.json?query=${e.target.value}&size=5`, {
         headers: { Authorization: `KakaoAK 621a24687f9ad83f695acc0438558af2` }
@@ -147,34 +159,44 @@ $(input).on("change paste input", function (e) {
         .then((response) => response.json())
         .then((data) => {
             showRelation(data);
-            if(historyList.length !== 0) showHistory();
+            if (historyList.length !== 0) showHistory();
+            openSearchBar();
         })
         .catch((error) => console.log("error:" + error));
-});
+})
+
+searchInput.addEventListener('click', e => {
+    if (searchInput.value !== '') {
+        fetch(`https://dapi.kakao.com/v2/local/search/address.json?query=${e.target.value}&size=5`, {
+            headers: { Authorization: `KakaoAK 621a24687f9ad83f695acc0438558af2` }
+        })
+            .then((response) => response.json())
+            .then((data) => {
+                showRelation(data);
+                if (historyList.length !== 0) showHistory();
+                openSearchBar();
+            })
+            .catch((error) => console.log("error:" + error));
+    }
+})
 
 // 검색창 클릭시 연관검색어, 히스토리 리스트를 보여주는 이벤트
-searchWrapper.addEventListener('click', e => {
-    const listContainer = document.querySelector('.list-container');
-    const searchBar = document.querySelector('.search-bar');
-    listContainer.classList.remove('hide');
-    searchBar.style.borderRadius = "15px 15px 0px 0px";
-});
+// searchBar.addEventListener('click', openSearchBar);
 
 // e.target이 searchWrapper면 검색창을 유지하고, 그 외의 요소들이면 검색창 닫는 이벤트
 body.addEventListener('click', e => {
-    if (e.target === searchWrapper ||
-        e.target.parentNode === searchWrapper ||
-        e.target.parentNode.parentNode === searchWrapper ||
-        e.target.parentNode.parentNode.parentNode === searchWrapper ||
-        e.target.parentNode.parentNode.parentNode.parentNode === searchWrapper) {
-        return;
-    }
-    else {
-        const listContainer = document.querySelector('.list-container');
-        const searchBar = document.querySelector('.search-bar');
-        listContainer.classList.add('hide');
-        searchBar.style.borderRadius = "15px";
-    }
+    if (e.target === searchBar || e.target.parentNode === searchBar) return;
+    else closeSearchBar();
+    // if (e.target === searchBar ||
+    //     e.target.parentNode === searchBar ||
+    //     e.target.parentNode.parentNode === searchBar ||
+    //     e.target.parentNode.parentNode.parentNode === searchBar ||
+    //     e.target.parentNode.parentNode.parentNode.parentNode === searchBar) {
+    //     return;
+    // }
+    // else {
+    //     closeSearchBar();
+    // }
 });
 
 

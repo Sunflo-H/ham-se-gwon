@@ -84,7 +84,8 @@ header {
 
 .relation-container .relation{
     width: 100%;
-    padding: 3px 0px;
+    padding: 3px 0px 3px 20px;
+    box-sizing: border-box;
 }
 
 .relation-container .relation:hover{
@@ -103,7 +104,7 @@ header {
 }
 
 .history-container .history {
-    padding: 3px 0px;
+    padding: 3px 0px 3px 20px;
 }
 
 .history-container .history:hover {
@@ -112,10 +113,6 @@ header {
 
 .history-container .history i{
     margin-right: 10px;
-}
-
-.history-container div{
-    margin-left: 20px;
 }
 
 
