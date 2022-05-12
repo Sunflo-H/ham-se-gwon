@@ -158,9 +158,14 @@ searchInput.addEventListener('input', e => {
     })
         .then((response) => response.json())
         .then((data) => {
-            showRelation(data);
+            if(data.documents.length !== 0) {
+                showRelation(data);
+                openSearchBar();
+            } else {
+                // showRelation(data);
+                closeSearchBar();
+            }
             if (historyList.length !== 0) showHistory();
-            openSearchBar();
         })
         .catch((error) => console.log("error:" + error));
 })
