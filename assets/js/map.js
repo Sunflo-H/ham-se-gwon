@@ -3,6 +3,7 @@ const searchBar = document.querySelector('.search-bar');
 const body = document.querySelector('body');
 
 let historyList = [];
+const HISTORY_LIST_MAX_LENGTH = 5;
 
 function showInMap(lat, lng) {
     const mapContainer = document.getElementById('map'); // 지도를 표시할 div 
@@ -40,6 +41,7 @@ function error() {
 
 
 function showRelation(data) {
+    console.log("쇼 릴레이션");
     const relationContainer = document.querySelector('.relation-container');
     const api_data = data.documents;
 
@@ -57,38 +59,43 @@ function showRelation(data) {
 
 // 연관 단어를 클릭하면 바로 검색결과 나타나게 하는 함수
 function clickRelation(e) {
-    const addr = e.target.innerText;
+    const relation = e.target.innerText;
     const currentLocation = document.querySelector('.current-location');
 
-    findCoordsByAddr(addr);
+    findCoordsByAddr(relation);
     closeSearchBar();
-    currentLocation.innerText = addr;
-
+    currentLocation.innerText = relation;
 }
 
 function showHistory() {
+    console.log("쇼 히스토리");
     const historyContainer = document.querySelector('.history-container');
+
     while (historyContainer.hasChildNodes()) {
         historyContainer.removeChild(historyContainer.firstChild);
     }
+
     historyList.forEach(history => {
         let html = `<div class="history"><i class="fa-solid fa-location-dot"></i>${history}</div>`
         historyContainer.insertAdjacentHTML('beforeend', html);
     })
+
     historyContainer.addEventListener('click', clickHistory);
 }
 
-function clickHistory() {
-    console.log(e.target);
+function clickHistory(e) {
+    const history = e.target.innerText;
+    const currentLocation = document.querySelector('.current-location');
+
+    findCoordsByAddr(history);
+    closeSearchBar();
+    currentLocation.innerText = history;
 }
 
 function setHistoryList(history) {
-    // 값이 중복이 아니면 push , 배열의 크기가 5면 shift
+    // 값이 중복이 아닐 경우 push , 배열이 이미 최대크기면 shift
     if (historyList.find(_history => history === _history) === undefined) {
-
-        if (historyList.length === 5) {
-            historyList.shift();
-        }
+        if (historyList.length === HISTORY_LIST_MAX_LENGTH) historyList.shift();
 
         historyList.push(history);
     }
@@ -116,18 +123,38 @@ function findCoordsByKeyword(keyword) {
 }
 
 function closeSearchBar() {
-    console.log("실행");
     const listContainer = document.querySelector('.list-container');
     const searchBar = document.querySelector('.search-bar');
-    listContainer.classList.add('hide');
+    const historyContainer =document.querySelector('.history-container');
+    const relationContainer = document.querySelector('.relation-container');
+
     searchBar.style.borderRadius = "15px";
+    listContainer.classList.add('hide');
+    historyContainer.classList.add('hide');
+    relationContainer.classList.add('hide');
 }
 
 function openSearchBar() {
+    console.log("오픈 서치바");
     const listContainer = document.querySelector('.list-container');
     const searchBar = document.querySelector('.search-bar');
+
     listContainer.classList.remove('hide');
     searchBar.style.borderRadius = "15px 15px 0px 0px";
+}
+
+function openSearchBar_relation() {
+    console.log("오픈 서치바_릴레이션");
+    const relationContainer = document.querySelector('.relation-container');
+    
+    relationContainer.classList.remove('hide');
+}
+
+function openSearchBar_histroy() {
+    console.log("오픈 서치바_히스토리");
+    const historyContainer =document.querySelector('.history-container');
+
+    historyContainer.classList.remove('hide');
 }
 
 function init() {
@@ -158,14 +185,27 @@ searchInput.addEventListener('input', e => {
     })
         .then((response) => response.json())
         .then((data) => {
-            if(data.documents.length !== 0) {
-                showRelation(data);
+            showRelation(data);
+            showHistory();
+            if(data.documents.length !==0 || historyList.length !==0){
                 openSearchBar();
             } else {
-                // showRelation(data);
                 closeSearchBar();
-            }
-            if (historyList.length !== 0) showHistory();
+            } 
+            openSearchBar_relation();
+            openSearchBar_histroy();
+            // if(data.documents.length !== 0) {
+            //     showRelation(data);
+            //     openSearchBar();
+            //     openSearchBar_relation();
+            // } 
+            // else {
+            //     closeSearchBar();
+            // }
+            // if (historyList.length !== 0) {
+            //     showHistory();
+            //     openSearchBar();
+            // }
         })
         .catch((error) => console.log("error:" + error));
 })
@@ -177,11 +217,21 @@ searchInput.addEventListener('click', e => {
         })
             .then((response) => response.json())
             .then((data) => {
+                console.log(data);
                 showRelation(data);
-                if (historyList.length !== 0) showHistory();
+                showHistory();
                 openSearchBar();
+                openSearchBar_relation();
+                openSearchBar_histroy();
             })
             .catch((error) => console.log("error:" + error));
+    }
+    else {
+        if(historyList.length !== 0){
+            showHistory();
+            openSearchBar();
+            openSearchBar_histroy();
+        }
     }
 })
 
