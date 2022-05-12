@@ -22,17 +22,44 @@ function showInMap(lat, lng) {
 
 }
 
+/**
+ * getCurrentPosition 함수의 콜백으로 넣을 함수명 
+ * 현재 위치를 얻어온다. 얻은 위치의 주소를 찾는다.
+ * 현재 위치를 얻어온다. 얻은 위치를 기반으로 키워드를 찾는다.
+ */
 
-// 내 위치 정보를 얻어 지도에 표시한다.
-function findUserLocation() {
-    if (navigator.geolocation) navigator.geolocation.getCurrentPosition(success, error);
-    else { throw "위치 정보가 지원되지 않습니다."; }
+function getUserLocation(callback, event) {
+    navigator.geolocation.getCurrentPosition(callback, error);
 }
 
-function success(position) {
+function findAddress(position) {
     const lat = position.coords.latitude;
     const lng = position.coords.longitude;
     showInMap(lat, lng);
+}
+
+function findKeyword(position) {
+    const lat = position.coords.latitude;
+    const lng = position.coords.longitude;
+
+    // if (e.target.value === '') return; //value가 공백이 되면 query에러가 발생하여 넣은 코드
+    fetch(`https://dapi.kakao.com/v2/local/search/keyword.json?y=${lat}&x=${lng}&radius=20000&query=롯데리아`, {
+        headers: { Authorization: `KakaoAK 621a24687f9ad83f695acc0438558af2` }
+    })
+        .then((response) => response.json())
+        .then((data) => {
+            console.log(data);
+            // showRelation(data);
+            // showHistory();
+            // if (data.documents.length !== 0 || historyList.length !== 0) {
+            //     openSearchBar();
+            // } else {
+            //     closeSearchBar();
+            // }
+            // openSearchBar_relation();
+            // openSearchBar_histroy();
+        })
+        .catch((error) => console.log("error:" + error));
 }
 
 function error() {
@@ -41,7 +68,6 @@ function error() {
 
 
 function showRelation(data) {
-    console.log("쇼 릴레이션");
     const relationContainer = document.querySelector('.relation-container');
     const api_data = data.documents;
 
@@ -68,7 +94,6 @@ function clickRelation(e) {
 }
 
 function showHistory() {
-    console.log("쇼 히스토리");
     const historyContainer = document.querySelector('.history-container');
 
     while (historyContainer.hasChildNodes()) {
@@ -104,10 +129,8 @@ function setHistoryList(history) {
 function findCoordsByAddr(addr) {
     // 주소-좌표 변환 객체를 생성합니다
     var geocoder = new kakao.maps.services.Geocoder();
-
     // 주소로 좌표를 검색합니다
     geocoder.addressSearch(addr, function (result, status) {
-
         // 정상적으로 검색이 완료됐으면 
         if (status === kakao.maps.services.Status.OK) {
             const lat = result[0].y;
@@ -119,13 +142,54 @@ function findCoordsByAddr(addr) {
 }
 
 function findCoordsByKeyword(keyword) {
+    // 장소 검색 객체를 생성합니다
+    var ps = new kakao.maps.services.Places();
 
+    // 키워드로 장소를 검색합니다
+    ps.keywordSearch(keyword, placesSearchCB);
+}
+
+// 키워드 검색 완료 시 호출되는 콜백함수 입니다
+function placesSearchCB(data, status, pagination) {
+    if (status === kakao.maps.services.Status.OK) {
+
+        // 검색된 장소 위치를 기준으로 지도 범위를 재설정하기위해
+        // LatLngBounds 객체에 좌표를 추가합니다
+        var bounds = new kakao.maps.LatLngBounds();
+
+        for (var i = 0; i < data.length; i++) {
+            displayMarker(data[i]);
+            bounds.extend(new kakao.maps.LatLng(data[i].y, data[i].x));
+        }
+
+        // 검색된 장소 위치를 기준으로 지도 범위를 재설정합니다
+        map.setBounds(bounds);
+    }
+}
+
+// 지도에 마커를 표시하는 함수입니다
+function displayMarker(place) {
+    // 마커를 클릭하면 장소명을 표출할 인포윈도우 입니다
+    var infowindow = new kakao.maps.InfoWindow({ zIndex: 1 });
+
+    // 마커를 생성하고 지도에 표시합니다
+    var marker = new kakao.maps.Marker({
+        map: map,
+        position: new kakao.maps.LatLng(place.y, place.x)
+    });
+
+    // 마커에 클릭이벤트를 등록합니다
+    kakao.maps.event.addListener(marker, 'click', function () {
+        // 마커를 클릭하면 장소명이 인포윈도우에 표출됩니다
+        infowindow.setContent('<div style="padding:5px;font-size:12px;">' + place.place_name + '</div>');
+        infowindow.open(map, marker);
+    });
 }
 
 function closeSearchBar() {
     const listContainer = document.querySelector('.list-container');
     const searchBar = document.querySelector('.search-bar');
-    const historyContainer =document.querySelector('.history-container');
+    const historyContainer = document.querySelector('.history-container');
     const relationContainer = document.querySelector('.relation-container');
 
     searchBar.style.borderRadius = "15px";
@@ -135,7 +199,6 @@ function closeSearchBar() {
 }
 
 function openSearchBar() {
-    console.log("오픈 서치바");
     const listContainer = document.querySelector('.list-container');
     const searchBar = document.querySelector('.search-bar');
 
@@ -144,15 +207,13 @@ function openSearchBar() {
 }
 
 function openSearchBar_relation() {
-    console.log("오픈 서치바_릴레이션");
     const relationContainer = document.querySelector('.relation-container');
-    
+
     relationContainer.classList.remove('hide');
 }
 
 function openSearchBar_histroy() {
-    console.log("오픈 서치바_히스토리");
-    const historyContainer =document.querySelector('.history-container');
+    const historyContainer = document.querySelector('.history-container');
 
     historyContainer.classList.remove('hide');
 }
@@ -172,12 +233,12 @@ function init() {
      * 
      * 보여주기, 거리
      */
-    findUserLocation();
+    navigator.geolocation.getCurrentPosition(findAddress, error);
 }
 
 init();
 
-// 검색창에 값이 입력될 때마다 연관검색어를 보여주는 이벤트
+// 주소로 검색 - 검색창에 값이 입력될 때마다 연관검색어, 히스토리를 보여주는 이벤트
 searchInput.addEventListener('input', e => {
     if (e.target.value === '') return; //value가 공백이 되면 query에러가 발생하여 넣은 코드
     fetch(`https://dapi.kakao.com/v2/local/search/address.json?query=${e.target.value}&size=5`, {
@@ -187,27 +248,19 @@ searchInput.addEventListener('input', e => {
         .then((data) => {
             showRelation(data);
             showHistory();
-            if(data.documents.length !==0 || historyList.length !==0){
+            if (data.documents.length !== 0 || historyList.length !== 0) {
                 openSearchBar();
             } else {
                 closeSearchBar();
-            } 
+            }
             openSearchBar_relation();
             openSearchBar_histroy();
-            // if(data.documents.length !== 0) {
-            //     showRelation(data);
-            //     openSearchBar();
-            //     openSearchBar_relation();
-            // } 
-            // else {
-            //     closeSearchBar();
-            // }
-            // if (historyList.length !== 0) {
-            //     showHistory();
-            //     openSearchBar();
-            // }
         })
         .catch((error) => console.log("error:" + error));
+})
+// 키워드로 검색 - 검색창에 값이 입력될 때마다 연관검색어, 히스토리를 보여주는 이벤트
+searchInput.addEventListener('input', e => {
+    getUserLocation(findKeyword, e);
 })
 
 searchInput.addEventListener('click', e => {
@@ -227,7 +280,7 @@ searchInput.addEventListener('click', e => {
             .catch((error) => console.log("error:" + error));
     }
     else {
-        if(historyList.length !== 0){
+        if (historyList.length !== 0) {
             showHistory();
             openSearchBar();
             openSearchBar_histroy();
@@ -235,94 +288,8 @@ searchInput.addEventListener('click', e => {
     }
 })
 
-// 검색창 클릭시 연관검색어, 히스토리 리스트를 보여주는 이벤트
-// searchBar.addEventListener('click', openSearchBar);
-
 // e.target이 searchWrapper면 검색창을 유지하고, 그 외의 요소들이면 검색창 닫는 이벤트
 body.addEventListener('click', e => {
     if (e.target === searchBar || e.target.parentNode === searchBar) return;
     else closeSearchBar();
-    // if (e.target === searchBar ||
-    //     e.target.parentNode === searchBar ||
-    //     e.target.parentNode.parentNode === searchBar ||
-    //     e.target.parentNode.parentNode.parentNode === searchBar ||
-    //     e.target.parentNode.parentNode.parentNode.parentNode === searchBar) {
-    //     return;
-    // }
-    // else {
-    //     closeSearchBar();
-    // }
 });
-
-
-// // 주소 검색 객체를 생성합니다.
-// var geocoder = new kakao.maps.services.Geocoder();
-// // 장소 검색 객체를 생성합니다
-// var ps = new kakao.maps.services.Places();
-// // 장소 검색 옵션 객체
-// let coords = new kakao.maps.LatLng(37.566826, 126.9786567);
-
-
-
-// function a(address) {
-//     return new Promise((resolve, reject) => {
-//         geocoder.addressSearch(`${address}`, (result, status) => {
-//             if (status === kakao.maps.services.Status.OK) {
-//                 let coords = new kakao.maps.LatLng(result[0].y, result[0].x);
-//                 map.setCenter(coords);
-
-//                 // 결과값으로 받은 위치를 마커로 표시합니다
-//                 var marker = new kakao.maps.Marker({
-//                     map: map, // 추후 추가하려면 marker.setMap을 이용한다.
-//                     position: coords
-//                 });
-
-//                 // 인포윈도우로 장소에 대한 설명을 표시합니다
-//                 var infowindow = new kakao.maps.InfoWindow({
-//                     content: `<div style="width:150px;text-align:center;padding:6px 0;">${result[0].address_name}</div>`
-//                 });
-//                 infowindow.open(map, marker);
-
-//                 resolve(result[0]);
-//             } else {
-//                 const error = new Error();
-//                 error.name = "stateIsNotOk";
-//                 reject(error);
-//             }
-//         });
-//     })
-// }
-
-
-
-
-
-// function setMapType(maptype) {
-//     map.setMapTypeId(kakao.maps.MapTypeId[maptype]);
-// }
-
-// function addressSearchPopUp() {
-//     new daum.Postcode({
-//         oncomplete: function (data) {
-//             // 팝업에서 검색결과 항목을 클릭했을때 실행할 코드를 작성하는 부분.
-
-//             // 각 주소의 노출 규칙에 따라 주소를 조합한다.
-//             // 내려오는 변수가 값이 없는 경우엔 공백('')값을 가지므로, 이를 참고하여 분기 한다.
-//             var addr = ''; // 주소 변수
-//             //사용자가 선택한 주소 타입에 따라 해당 주소 값을 가져온다.
-//             if (data.userSelectedType === 'R') { // 사용자가 도로명 주소를 선택했을 경우
-//                 addr = data.roadAddress;
-//             } else { // 사용자가 지번 주소를 선택했을 경우(J)
-//                 addr = data.jibunAddress;
-//             }
-//             addressPopup = addr;
-//             console.log(addressPopup);
-//         }
-//     }).open();
-// }
-
-// inputButton.addEventListener('click', () => {
-//     a('서울시 광진구 구의동')
-//         .then(console.log)
-//         .catch(console.log);
-// })
