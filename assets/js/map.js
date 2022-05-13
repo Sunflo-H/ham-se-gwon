@@ -10,21 +10,23 @@ const HISTORY_LIST_MAX_LENGTH = 5;
  * setMap(lat, lng) : 좌표를 받아 지도를 만듬 , 좌표는 지도의 center
  * setMarker(lat, lng) : 좌표를 받아 마커를 지도에 띄움
  */
-function setMap(lat, lng , callbacks) {
-    // return new Promise(resolve => {
-
-    // })
-    console.log(lat, lng);
+function setMap(lat, lng) {
     const mapContainer = document.getElementById('map'); // 지도를 표시할 div 
     let mapOption = {
         center: new kakao.maps.LatLng(lat, lng), // 지도의 중심좌표
         level: 3, // 지도의 확대 레벨
     };
     let map = new kakao.maps.Map(mapContainer, mapOption);
-    setMarker_user(lat, lng, map);
+    let data = {
+        map: map,
+        lat: lat,
+        lng: lng
+    }
+    return data;
 }
 
-function setMarker_user(lat, lng, map) {
+function setMarker_user(data) {
+    const { map, lat, lng } = data;
     var coords = new kakao.maps.LatLng(lat, lng);
     var marker = new kakao.maps.Marker({
         position: coords
@@ -32,12 +34,6 @@ function setMarker_user(lat, lng, map) {
 
     marker.setMap(null);
     marker.setMap(map);
-}
-
-function makeMap(data) {
-    const lat = data.coords.latitude;
-    const lng = data.coords.longitude;
-    setMap(lat, lng);
 }
 
 /**
@@ -238,7 +234,7 @@ function openSearchBar_histroy() {
 }
 
 function enterKey(e) {
-    if(e.keyCode === 13) search();
+    if (e.keyCode === 13) search();
 }
 
 function search() {
@@ -248,27 +244,11 @@ function search() {
 
 
 function init() {
-    /**
-     * 현재 위치 정보 알아낸뒤 (getUserLocation -> success -> setMap)
-     * 현재 위치를 지도에 보여줘
-     * 
-     * 검색
-     * 검색해서 나온 data를 
-     * .relation-container, .history-container 안에
-     * .relation과 .history를 만들어서 보여주고, 
-     * 가장 마지막으로 출력된 data를 저장
-     * 만약 data를 검색한 적이 없으면 검색바는 모양이 달라지지 않는다.
-     * 
-     * 
-     * 보여주기, 거리
-     */
-    // navigator.geolocation.getCurrentPosition(findAddress, error);
     getUserLocation()
-    .then(data => {
-        const lat = data.coords.latitude;
-        const lng = data.coords.longitude;
-        setMap(lat, lng);
-    });
+        .then(data => setMap(data.coords.latitude, data.coords.longitude))
+        .then(data => {
+            setMarker_user(data);
+        })
 }
 
 init();
