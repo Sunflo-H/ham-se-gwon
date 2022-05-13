@@ -5,13 +5,26 @@ const body = document.querySelector('body');
 let historyList = [];
 const HISTORY_LIST_MAX_LENGTH = 5;
 
-function showInMap(lat, lng) {
+
+/**
+ * setMap(lat, lng) : 좌표를 받아 지도를 만듬 , 좌표는 지도의 center
+ * setMarker(lat, lng) : 좌표를 받아 마커를 지도에 띄움
+ */
+function setMap(lat, lng , callbacks) {
+    // return new Promise(resolve => {
+
+    // })
+    console.log(lat, lng);
     const mapContainer = document.getElementById('map'); // 지도를 표시할 div 
     let mapOption = {
         center: new kakao.maps.LatLng(lat, lng), // 지도의 중심좌표
         level: 3, // 지도의 확대 레벨
     };
     let map = new kakao.maps.Map(mapContainer, mapOption);
+    setMarker_user(lat, lng, map);
+}
+
+function setMarker_user(lat, lng, map) {
     var coords = new kakao.maps.LatLng(lat, lng);
     var marker = new kakao.maps.Marker({
         position: coords
@@ -19,7 +32,12 @@ function showInMap(lat, lng) {
 
     marker.setMap(null);
     marker.setMap(map);
+}
 
+function makeMap(data) {
+    const lat = data.coords.latitude;
+    const lng = data.coords.longitude;
+    setMap(lat, lng);
 }
 
 /**
@@ -29,20 +47,21 @@ function showInMap(lat, lng) {
  */
 
 function getUserLocation(callback, event) {
-    navigator.geolocation.getCurrentPosition(callback, error);
+    return new Promise((res, rej) => {
+        navigator.geolocation.getCurrentPosition(res, rej);
+    });
 }
 
 function findAddress(position) {
     const lat = position.coords.latitude;
     const lng = position.coords.longitude;
-    showInMap(lat, lng);
+    setMap(lat, lng);
 }
 
 function findKeyword(position) {
     const lat = position.coords.latitude;
     const lng = position.coords.longitude;
 
-    // if (e.target.value === '') return; //value가 공백이 되면 query에러가 발생하여 넣은 코드
     fetch(`https://dapi.kakao.com/v2/local/search/keyword.json?y=${lat}&x=${lng}&radius=20000&query=롯데리아`, {
         headers: { Authorization: `KakaoAK 621a24687f9ad83f695acc0438558af2` }
     })
@@ -135,7 +154,7 @@ function findCoordsByAddr(addr) {
         if (status === kakao.maps.services.Status.OK) {
             const lat = result[0].y;
             const lng = result[0].x;
-            showInMap(lat, lng);
+            setMap(lat, lng);
             setHistoryList(addr);
         }
     });
@@ -218,6 +237,16 @@ function openSearchBar_histroy() {
     historyContainer.classList.remove('hide');
 }
 
+function enterKey(e) {
+    if(e.keyCode === 13) search();
+}
+
+function search() {
+    console.log(searchInput.value);
+}
+
+
+
 function init() {
     /**
      * 현재 위치 정보 알아낸뒤 (getUserLocation -> success -> setMap)
@@ -233,7 +262,13 @@ function init() {
      * 
      * 보여주기, 거리
      */
-    navigator.geolocation.getCurrentPosition(findAddress, error);
+    // navigator.geolocation.getCurrentPosition(findAddress, error);
+    getUserLocation()
+    .then(data => {
+        const lat = data.coords.latitude;
+        const lng = data.coords.longitude;
+        setMap(lat, lng);
+    });
 }
 
 init();
@@ -287,6 +322,8 @@ searchInput.addEventListener('click', e => {
         }
     }
 })
+
+searchInput.addEventListener('keydown', enterKey);
 
 // e.target이 searchWrapper면 검색창을 유지하고, 그 외의 요소들이면 검색창 닫는 이벤트
 body.addEventListener('click', e => {

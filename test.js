@@ -10,19 +10,38 @@
 // .then((data) => console.log(data))
 // .catch((error) => console.log(error))
 
-function findUserLocation() {
-    navigator.geolocation.getCurrentPosition(success, error);
+function getPosition() {
+    return new Promise((res, rej) => {
+        navigator.geolocation.getCurrentPosition(res, rej);
+    });
 }
+
+function main() {
+    getPosition()
+    .then(result => {
+        console.log(result)
+        return result
+    })
+    .then(result => console.log(result.coords.latitude, result.coords.longitude))
+}
+
+main();
+
 function success(position) {
-    const lat = position.coords.latitude;
-    const lng = position.coords.longitude;
-    const coords = {lat : lat, lng : lng};
-    console.log(coords);
-    return coords;
+    return new Promise(resolve => {
+        const lat = position.coords.latitude;
+        const lng = position.coords.longitude;
+        const coords = {lat : lat, lng : lng};
+        resolve(coords);
+    })
 }
 
 function error() {
     alert('Sorry, no position available.');
 }
 
-findUserLocation();
+let position_data = navigator.geolocation.getCurrentPosition(success);
+
+function success(position) {
+    console.log(position);
+}
