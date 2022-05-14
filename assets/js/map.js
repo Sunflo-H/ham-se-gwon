@@ -2,13 +2,14 @@ const searchInput = document.querySelector('.search-bar input[type=text]');
 const searchBar = document.querySelector('.search-bar');
 const body = document.querySelector('body');
 
+let relationList = [];
 let historyList = [];
 const HISTORY_LIST_MAX_LENGTH = 5;
 
 
 /**
  * setMap(lat, lng) : 좌표를 받아 지도를 만듬 , 좌표는 지도의 center
- * setMarker(lat, lng) : 좌표를 받아 마커를 지도에 띄움
+ * setMarker({map, lat, lng}) : 좌표를 받아 마커를 지도에 띄움
  */
 function setMap(lat, lng) {
     const mapContainer = document.getElementById('map'); // 지도를 표시할 div 
@@ -25,7 +26,7 @@ function setMap(lat, lng) {
     return data;
 }
 
-function setMarker_user(data) {
+function setMarker(data) {
     const { map, lat, lng } = data;
     var coords = new kakao.maps.LatLng(lat, lng);
     var marker = new kakao.maps.Marker({
@@ -36,11 +37,9 @@ function setMarker_user(data) {
     marker.setMap(map);
 }
 
-/**
- * getCurrentPosition 함수의 콜백으로 넣을 함수명 
- * 현재 위치를 얻어온다. 얻은 위치의 주소를 찾는다.
- * 현재 위치를 얻어온다. 얻은 위치를 기반으로 키워드를 찾는다.
- */
+function setMarker_addr() {
+
+}
 
 function getUserLocation(callback, event) {
     return new Promise((res, rej) => {
@@ -64,8 +63,8 @@ function findKeyword(position) {
         .then((response) => response.json())
         .then((data) => {
             console.log(data);
-            // showRelation(data);
-            // showHistory();
+            // setRelation(data);
+            // setHistory();
             // if (data.documents.length !== 0 || historyList.length !== 0) {
             //     openSearchBar();
             // } else {
@@ -80,9 +79,21 @@ function findKeyword(position) {
 function error() {
     alert('Sorry, no position available.');
 }
+function getRestaurantList() {
+    fetch('/data/restaurant.json')
+        .then(res => {
+            console.log(res);
+            return res.json();
+        })
+        .then(data => {
+            console.log(data.results[0].items);
+            const restaurantList = data.result[0].items;
+            
+        })
+}
 
-
-function showRelation(data) {
+//* 검색창에 연관 검색어를 세팅하는 함수
+function setRelation(data) {
     const relationContainer = document.querySelector('.relation-container');
     const api_data = data.documents;
 
@@ -98,17 +109,9 @@ function showRelation(data) {
     relationContainer.addEventListener('click', clickRelation);
 }
 
-// 연관 단어를 클릭하면 바로 검색결과 나타나게 하는 함수
-function clickRelation(e) {
-    const relation = e.target.innerText;
-    const currentLocation = document.querySelector('.current-location');
 
-    findCoordsByAddr(relation);
-    closeSearchBar();
-    currentLocation.innerText = relation;
-}
-
-function showHistory() {
+//* 검색창에 히스토리를 세팅하는 함수
+function setHistory() {
     const historyContainer = document.querySelector('.history-container');
 
     while (historyContainer.hasChildNodes()) {
@@ -123,6 +126,17 @@ function showHistory() {
     historyContainer.addEventListener('click', clickHistory);
 }
 
+//* 연관 단어를 클릭하면 바로 검색결과 나타나게 하는 함수
+function clickRelation(e) {
+    const relation = e.target.innerText;
+    const currentLocation = document.querySelector('.current-location');
+
+    findCoordsByAddr(relation);
+    closeSearchBar();
+    currentLocation.innerText = relation;
+}
+
+//* 히스토리를 클릭하면 바로 검색결과 나타나게 하는 함수
 function clickHistory(e) {
     const history = e.target.innerText;
     const currentLocation = document.querySelector('.current-location');
@@ -132,10 +146,14 @@ function clickHistory(e) {
     currentLocation.innerText = history;
 }
 
+
+
 function setHistoryList(history) {
     // 값이 중복이 아닐 경우 push , 배열이 이미 최대크기면 shift
     if (historyList.find(_history => history === _history) === undefined) {
-        if (historyList.length === HISTORY_LIST_MAX_LENGTH) historyList.shift();
+        if (historyList.length === HISTORY_LIST_MAX_LENGTH) {
+            historyList.shift();
+        }
 
         historyList.push(history);
     }
@@ -144,16 +162,23 @@ function setHistoryList(history) {
 function findCoordsByAddr(addr) {
     // 주소-좌표 변환 객체를 생성합니다
     var geocoder = new kakao.maps.services.Geocoder();
+
     // 주소로 좌표를 검색합니다
-    geocoder.addressSearch(addr, function (result, status) {
-        // 정상적으로 검색이 완료됐으면 
-        if (status === kakao.maps.services.Status.OK) {
-            const lat = result[0].y;
-            const lng = result[0].x;
-            setMap(lat, lng);
+    let result = new Promise((resolve, reject) => {
+        geocoder.addressSearch(addr, (result, status) => {
+            // 정상적으로 검색이 완료됐으면 
+            if (status === kakao.maps.services.Status.OK) {
+                resolve(result);
+            }
+        });
+    })
+
+    result
+        .then(data => {
             setHistoryList(addr);
-        }
-    });
+            return setMap(data[0].y, data[0].x);
+        })
+        .then(data => setMarker(data));
 }
 
 function findCoordsByKeyword(keyword) {
@@ -182,7 +207,7 @@ function placesSearchCB(data, status, pagination) {
     }
 }
 
-// 지도에 마커를 표시하는 함수입니다
+//* 지도에 마커를 표시하는 함수입니다
 function displayMarker(place) {
     // 마커를 클릭하면 장소명을 표출할 인포윈도우 입니다
     var infowindow = new kakao.maps.InfoWindow({ zIndex: 1 });
@@ -201,6 +226,28 @@ function displayMarker(place) {
     });
 }
 
+
+
+function enterKey(e) {
+    if (e.keyCode === 13) search();
+}
+
+function search() {
+    console.log(searchInput.value);
+}
+
+
+
+function init() {
+    getUserLocation()
+        .then(data => setMap(data.coords.latitude, data.coords.longitude))
+        .then(data => {
+            setMarker(data);
+        })
+}
+
+
+//* css를 조작하는 함수들 
 function closeSearchBar() {
     const listContainer = document.querySelector('.list-container');
     const searchBar = document.querySelector('.search-bar');
@@ -233,25 +280,7 @@ function openSearchBar_histroy() {
     historyContainer.classList.remove('hide');
 }
 
-function enterKey(e) {
-    if (e.keyCode === 13) search();
-}
 
-function search() {
-    console.log(searchInput.value);
-}
-
-
-
-function init() {
-    getUserLocation()
-        .then(data => setMap(data.coords.latitude, data.coords.longitude))
-        .then(data => {
-            setMarker_user(data);
-        })
-}
-
-init();
 
 // 주소로 검색 - 검색창에 값이 입력될 때마다 연관검색어, 히스토리를 보여주는 이벤트
 searchInput.addEventListener('input', e => {
@@ -261,8 +290,6 @@ searchInput.addEventListener('input', e => {
     })
         .then((response) => response.json())
         .then((data) => {
-            showRelation(data);
-            showHistory();
             if (data.documents.length !== 0 || historyList.length !== 0) {
                 openSearchBar();
             } else {
@@ -270,6 +297,8 @@ searchInput.addEventListener('input', e => {
             }
             openSearchBar_relation();
             openSearchBar_histroy();
+            setRelation(data);
+            setHistory();
         })
         .catch((error) => console.log("error:" + error));
 })
@@ -285,18 +314,17 @@ searchInput.addEventListener('click', e => {
         })
             .then((response) => response.json())
             .then((data) => {
-                console.log(data);
-                showRelation(data);
-                showHistory();
                 openSearchBar();
                 openSearchBar_relation();
                 openSearchBar_histroy();
+                setRelation(data);
+                setHistory();
             })
             .catch((error) => console.log("error:" + error));
     }
     else {
         if (historyList.length !== 0) {
-            showHistory();
+            setHistory();
             openSearchBar();
             openSearchBar_histroy();
         }
@@ -310,3 +338,5 @@ body.addEventListener('click', e => {
     if (e.target === searchBar || e.target.parentNode === searchBar) return;
     else closeSearchBar();
 });
+
+init();
