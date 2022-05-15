@@ -94,19 +94,39 @@ function error() {
  */
 
 
+// ! 이 함수들 비동기함수로 변환될수 있대. 누르면 async await코드로 바뀜 공부하고 스스로 바꾸자
 function getAddrList(keyword) {
     return fetch(`https://dapi.kakao.com/v2/local/search/address.json?query=${keyword}&size=5`, {
         headers: { Authorization: `KakaoAK 621a24687f9ad83f695acc0438558af2` }
     })
         .then(res => res.json())
-        .then(data => data.documents);
+        .then(data => {
+            let list = [];
+            //forEach 안의 data는 배열, data[0].address_name
+            data.documents.forEach(data => {
+                let obj = { 
+                    type : "address" ,
+                    name : data.address_name
+                }
+                list.push(obj);
+            })
+            return list;
+        });
 }
 function getRestList(keyword) {
     return fetch('/data/restaurant.json')
         .then(res => res.json())
         .then(data => {
+            let list = [];
             // let restList = data.result[0].items; // restList[index].name
-            const list = data.results[0].items.filter(rest => rest.name.substring(0, keyword.length) === keyword);
+            const restList = data.results[0].items.filter(restaurant => restaurant.name.substring(0, keyword.length) === keyword);
+            restList.forEach(data => {
+                let obj = {
+                    type : "restaurant",
+                    name : data.name
+                }
+                list.push(obj);
+            })
             return list;
         })
 }
@@ -121,12 +141,12 @@ function setRelation(relationList) {
 
     relationList.forEach(data => {
         // 만약 data.address_name이 없으면 data.name
-        // const relation = data.address_name;
-        // const relation = data.name;
+        // let relation = data.address_name;
+        // let relation = data.name;
         let relation;
-        if(data.address_name === undefined) relation = data.name;
-        else relation = data.address_name; 
-        
+        if (data.address_name === undefined) relation = data.name;
+        else relation = data.address_name;
+
         let html = `<div class="relation">${relation}</div>`
         relationContainer.insertAdjacentHTML('beforeend', html);
     });
@@ -153,9 +173,12 @@ function setHistory() {
 
 //* 연관 단어를 클릭하면 바로 검색결과 나타나게 하는 함수
 function clickRelation(e) {
+    console.log("실행");
     const relation = e.target.innerText;
     const currentLocation = document.querySelector('.current-location');
 
+    // relation이 주소면 findCoordsByAddr
+    // 키워드면 findCoordsByKeyword
     findCoordsByAddr(relation);
     closeSearchBar();
     currentLocation.innerText = relation;
@@ -312,13 +335,12 @@ searchInput.addEventListener('input', e => {
     if (e.target.value === '') return; //value가 공백이 되면 query에러가 발생하여 넣은 코드
     // if (e.target.value ===)
     const promise1 = getAddrList(e.target.value);
-    console.log(promise1);
     const promise2 = getRestList(e.target.value);
     Promise.all([promise1, promise2]).then(data => {
         //! 이후 검색 데이터가 더 추가되면 그때 relationList에 배열을 합치는 코드를 바꿔주자
         //! 일단 이렇게 두개의 데이터만 두고 짜
-        let relationList = data[0].concat(data[1]).slice(0,10);
-        if(relationList.length === 0){
+        let relationList = data[0].concat(data[1]).slice(0, 10);
+        if (relationList.length === 0) {
             closeSearchBar();
         } else {
             openSearchBar();
@@ -353,18 +375,20 @@ searchInput.addEventListener('input', e => {
 
 searchInput.addEventListener('click', e => {
     if (searchInput.value !== '') {
-        fetch(`https://dapi.kakao.com/v2/local/search/address.json?query=${e.target.value}&size=5`, {
-            headers: { Authorization: `KakaoAK 621a24687f9ad83f695acc0438558af2` }
-        })
-            .then((response) => response.json())
-            .then((data) => {
+        const promise1 = getAddrList(e.target.value);
+        const promise2 = getRestList(e.target.value);
+        Promise.all([promise1, promise2]).then(data => {
+            let relationList = data[0].concat(data[1]).slice(0, 10);
+            if (relationList.length === 0) {
+                closeSearchBar();
+            } else {
                 openSearchBar();
                 openSearchBar_relation();
                 openSearchBar_histroy();
-                setRelation(data);
+                setRelation(relationList);
                 setHistory();
-            })
-            .catch((error) => console.log("error:" + error));
+            }
+        })
     }
     else {
         if (historyList.length !== 0) {
