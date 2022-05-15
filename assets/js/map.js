@@ -1,10 +1,12 @@
+const HISTORY_LIST_MAX_LENGTH = 5;
+const ADMINISTRATIVE_DISTRICT = ['서울특별시', '대구광역시', '광주광역시', '울산광역시', '경기도', '충청북도', '전라북도', '경상북도', '제주특별자치도', '부산광역시', '인천광역시', '대전광역시', '세종특별자치시', '강원도', '충청남도', '전라남도', '경상남도'];
+
 const searchInput = document.querySelector('.search-bar input[type=text]');
 const searchBar = document.querySelector('.search-bar');
 const body = document.querySelector('body');
 
-let relationList = [];
 let historyList = [];
-const HISTORY_LIST_MAX_LENGTH = 5;
+
 
 
 /**
@@ -79,30 +81,53 @@ function findKeyword(position) {
 function error() {
     alert('Sorry, no position available.');
 }
-function getRestaurantList() {
-    fetch('/data/restaurant.json')
-        .then(res => {
-            console.log(res);
-            return res.json();
-        })
+
+
+/**
+ * 입력된 값이 "서울" or "서울특별시" 면 주소로 검색 
+ * => str.substring(0,2) === arr[0].substring(0,2) 주소로 검색
+ * str.startsWith(arr[0], 0) === true 면 주소로 검색
+ * 
+ * 입력했을때 연관된 주소 먼저 보여주고, 연관된 키워드들을 보여줘
+ * 주소 + 키워드 = 최대 10까지
+ * &여기서 fetch를 여러개 사용하니까 fetch 여러개 사용하는 방법 알아보자
+ */
+
+
+function getAddrList(keyword) {
+    return fetch(`https://dapi.kakao.com/v2/local/search/address.json?query=${keyword}&size=5`, {
+        headers: { Authorization: `KakaoAK 621a24687f9ad83f695acc0438558af2` }
+    })
+        .then(res => res.json())
+        .then(data => data.documents);
+}
+function getRestList(keyword) {
+    return fetch('/data/restaurant.json')
+        .then(res => res.json())
         .then(data => {
-            console.log(data.results[0].items);
-            const restaurantList = data.result[0].items;
-            
+            // let restList = data.result[0].items; // restList[index].name
+            const list = data.results[0].items.filter(rest => rest.name.substring(0, keyword.length) === keyword);
+            return list;
         })
 }
 
 //* 검색창에 연관 검색어를 세팅하는 함수
-function setRelation(data) {
+function setRelation(relationList) {
     const relationContainer = document.querySelector('.relation-container');
-    const api_data = data.documents;
 
     while (relationContainer.hasChildNodes()) {
         relationContainer.removeChild(relationContainer.firstChild);
     }
 
-    api_data.forEach(data => {
-        let html = `<div class="relation">${data.address_name}</div>`
+    relationList.forEach(data => {
+        // 만약 data.address_name이 없으면 data.name
+        // const relation = data.address_name;
+        // const relation = data.name;
+        let relation;
+        if(data.address_name === undefined) relation = data.name;
+        else relation = data.address_name; 
+        
+        let html = `<div class="relation">${relation}</div>`
         relationContainer.insertAdjacentHTML('beforeend', html);
     });
 
@@ -285,22 +310,41 @@ function openSearchBar_histroy() {
 // 주소로 검색 - 검색창에 값이 입력될 때마다 연관검색어, 히스토리를 보여주는 이벤트
 searchInput.addEventListener('input', e => {
     if (e.target.value === '') return; //value가 공백이 되면 query에러가 발생하여 넣은 코드
-    fetch(`https://dapi.kakao.com/v2/local/search/address.json?query=${e.target.value}&size=5`, {
-        headers: { Authorization: `KakaoAK 621a24687f9ad83f695acc0438558af2` }
-    })
-        .then((response) => response.json())
-        .then((data) => {
-            if (data.documents.length !== 0 || historyList.length !== 0) {
-                openSearchBar();
-            } else {
-                closeSearchBar();
-            }
+    // if (e.target.value ===)
+    const promise1 = getAddrList(e.target.value);
+    console.log(promise1);
+    const promise2 = getRestList(e.target.value);
+    Promise.all([promise1, promise2]).then(data => {
+        //! 이후 검색 데이터가 더 추가되면 그때 relationList에 배열을 합치는 코드를 바꿔주자
+        //! 일단 이렇게 두개의 데이터만 두고 짜
+        let relationList = data[0].concat(data[1]).slice(0,10);
+        if(relationList.length === 0){
+            closeSearchBar();
+        } else {
+            openSearchBar();
             openSearchBar_relation();
             openSearchBar_histroy();
-            setRelation(data);
+            setRelation(relationList);
             setHistory();
-        })
-        .catch((error) => console.log("error:" + error));
+        }
+
+    });
+    // fetch(`https://dapi.kakao.com/v2/local/search/address.json?query=${e.target.value}&size=5`, {
+    //     headers: { Authorization: `KakaoAK 621a24687f9ad83f695acc0438558af2` }
+    // })
+    //     .then((response) => response.json())
+    //     .then((data) => {
+    //         if (data.documents.length !== 0 || historyList.length !== 0) {
+    //             openSearchBar();
+    //         } else {
+    //             closeSearchBar();
+    //         }
+    //         openSearchBar_relation();
+    //         openSearchBar_histroy();
+    //         setRelation(data);
+    //         setHistory();
+    //     })
+    //     .catch((error) => console.log("error:" + error));
 })
 // 키워드로 검색 - 검색창에 값이 입력될 때마다 연관검색어, 히스토리를 보여주는 이벤트
 searchInput.addEventListener('input', e => {
