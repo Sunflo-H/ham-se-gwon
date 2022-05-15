@@ -65,8 +65,8 @@ function findKeyword(position) {
         .then((response) => response.json())
         .then((data) => {
             console.log(data);
-            // setRelation(data);
-            // setHistory();
+            // setHtmlRelation(data);
+            // setHtmlHistory();
             // if (data.documents.length !== 0 || historyList.length !== 0) {
             //     openSearchBar();
             // } else {
@@ -81,18 +81,6 @@ function findKeyword(position) {
 function error() {
     alert('Sorry, no position available.');
 }
-
-
-/**
- * 입력된 값이 "서울" or "서울특별시" 면 주소로 검색 
- * => str.substring(0,2) === arr[0].substring(0,2) 주소로 검색
- * str.startsWith(arr[0], 0) === true 면 주소로 검색
- * 
- * 입력했을때 연관된 주소 먼저 보여주고, 연관된 키워드들을 보여줘
- * 주소 + 키워드 = 최대 10까지
- * &여기서 fetch를 여러개 사용하니까 fetch 여러개 사용하는 방법 알아보자
- */
-
 
 // ! 이 함수들 비동기함수로 변환될수 있대. 누르면 async await코드로 바뀜 공부하고 스스로 바꾸자
 function getAddrList(keyword) {
@@ -132,9 +120,9 @@ function getRestList(keyword) {
 }
 
 //* 검색창에 연관 검색어를 세팅하는 함수
-function setRelation(relationList) {
+function setHtmlRelation(relationList) {
     const relationContainer = document.querySelector('.relation-container');
-
+    console.log(relationList);
     while (relationContainer.hasChildNodes()) {
         relationContainer.removeChild(relationContainer.firstChild);
     }
@@ -143,11 +131,8 @@ function setRelation(relationList) {
         // 만약 data.address_name이 없으면 data.name
         // let relation = data.address_name;
         // let relation = data.name;
-        let relation;
-        if (data.address_name === undefined) relation = data.name;
-        else relation = data.address_name;
 
-        let html = `<div class="relation">${relation}</div>`
+        let html = `<div class="relation" data-type=${data.type}>${data.name}</div>`
         relationContainer.insertAdjacentHTML('beforeend', html);
     });
 
@@ -156,7 +141,7 @@ function setRelation(relationList) {
 
 
 //* 검색창에 히스토리를 세팅하는 함수
-function setHistory() {
+function setHtmlHistory() {
     const historyContainer = document.querySelector('.history-container');
 
     while (historyContainer.hasChildNodes()) {
@@ -174,13 +159,17 @@ function setHistory() {
 //* 연관 단어를 클릭하면 바로 검색결과 나타나게 하는 함수
 function clickRelation(e) {
     console.log("실행");
+    console.log(e.target);
     const relation = e.target.innerText;
+    const type = e.target.getAttribute("data-type");
     const currentLocation = document.querySelector('.current-location');
 
     // relation이 주소면 findCoordsByAddr
     // 키워드면 findCoordsByKeyword
-    findCoordsByAddr(relation);
-    closeSearchBar();
+    switch (type) {
+        case "address" : findCoordsByAddr(relation); break;
+        case "restaurant" : findCoordsByKeyword(relation); break;
+    }
     currentLocation.innerText = relation;
 }
 
@@ -196,7 +185,7 @@ function clickHistory(e) {
 
 
 
-function setHistoryList(history) {
+function setHtmlHistoryList(history) {
     // 값이 중복이 아닐 경우 push , 배열이 이미 최대크기면 shift
     if (historyList.find(_history => history === _history) === undefined) {
         if (historyList.length === HISTORY_LIST_MAX_LENGTH) {
@@ -223,7 +212,7 @@ function findCoordsByAddr(addr) {
 
     result
         .then(data => {
-            setHistoryList(addr);
+            setHtmlHistoryList(addr);
             return setMap(data[0].y, data[0].x);
         })
         .then(data => setMarker(data));
@@ -346,8 +335,8 @@ searchInput.addEventListener('input', e => {
             openSearchBar();
             openSearchBar_relation();
             openSearchBar_histroy();
-            setRelation(relationList);
-            setHistory();
+            setHtmlRelation(relationList);
+            setHtmlHistory();
         }
 
     });
@@ -363,8 +352,8 @@ searchInput.addEventListener('input', e => {
     //         }
     //         openSearchBar_relation();
     //         openSearchBar_histroy();
-    //         setRelation(data);
-    //         setHistory();
+    //         setHtmlRelation(data);
+    //         setHtmlHistory();
     //     })
     //     .catch((error) => console.log("error:" + error));
 })
@@ -385,14 +374,14 @@ searchInput.addEventListener('click', e => {
                 openSearchBar();
                 openSearchBar_relation();
                 openSearchBar_histroy();
-                setRelation(relationList);
-                setHistory();
+                setHtmlRelation(relationList);
+                setHtmlHistory();
             }
         })
     }
     else {
         if (historyList.length !== 0) {
-            setHistory();
+            setHtmlHistory();
             openSearchBar();
             openSearchBar_histroy();
         }
