@@ -82,6 +82,13 @@ function error() {
     alert('Sorry, no position available.');
 }
 
+/**
+ ** 검색 함수들 적용 순서
+ * 값 입력 => getAddrList() or getRestList()로 데이터를 받아와 type와 name의 객체를 Promise로 리턴
+ * 이렇게 얻은 Promise데이터를 연관검색어로 보여준다. setHtmlRelation()
+ * 
+ * 연관검색어 클릭 => clickRelation() 실행 => 클릭한 데이터의 type에 따라 각각 함수실행 findCoordsByAddr(), findCoordsByKeyword()
+ */
 // ! 이 함수들 비동기함수로 변환될수 있대. 누르면 async await코드로 바뀜 공부하고 스스로 바꾸자
 function getAddrList(keyword) {
     return fetch(`https://dapi.kakao.com/v2/local/search/address.json?query=${keyword}&size=5`, {
@@ -128,10 +135,6 @@ function setHtmlRelation(relationList) {
     }
 
     relationList.forEach(data => {
-        // 만약 data.address_name이 없으면 data.name
-        // let relation = data.address_name;
-        // let relation = data.name;
-
         let html = `<div class="relation" data-type=${data.type}>${data.name}</div>`
         relationContainer.insertAdjacentHTML('beforeend', html);
     });
@@ -164,8 +167,6 @@ function clickRelation(e) {
     const type = e.target.getAttribute("data-type");
     const currentLocation = document.querySelector('.current-location');
 
-    // relation이 주소면 findCoordsByAddr
-    // 키워드면 findCoordsByKeyword
     switch (type) {
         case "address" : findCoordsByAddr(relation); break;
         case "restaurant" : findCoordsByKeyword(relation); break;
@@ -219,6 +220,16 @@ function findCoordsByAddr(addr) {
 }
 
 function findCoordsByKeyword(keyword) {
+    // 
+    // 
+    // 
+    /**
+     * 여러 데이터를 찾게 될텐데
+     * 첫번째 데이터로 map.setCenter()를 정하고
+     * 좌측에 모달만들어서 ~로 검색한 결과 글씨와 그 리스트를 띄워줘
+     * 
+     */
+
     // 장소 검색 객체를 생성합니다
     var ps = new kakao.maps.services.Places();
 
@@ -229,18 +240,18 @@ function findCoordsByKeyword(keyword) {
 // 키워드 검색 완료 시 호출되는 콜백함수 입니다
 function placesSearchCB(data, status, pagination) {
     if (status === kakao.maps.services.Status.OK) {
-
+        console.log(data);
         // 검색된 장소 위치를 기준으로 지도 범위를 재설정하기위해
         // LatLngBounds 객체에 좌표를 추가합니다
         var bounds = new kakao.maps.LatLngBounds();
 
         for (var i = 0; i < data.length; i++) {
-            displayMarker(data[i]);
+            // displayMarker(data[i]);
             bounds.extend(new kakao.maps.LatLng(data[i].y, data[i].x));
         }
 
         // 검색된 장소 위치를 기준으로 지도 범위를 재설정합니다
-        map.setBounds(bounds);
+        // map.setBounds(bounds);
     }
 }
 
