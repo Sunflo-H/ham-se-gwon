@@ -14,7 +14,7 @@ let map;
  * setMap(lat, lng) : 좌표를 받아 지도를 만듬 , 좌표는 지도의 center
  * setMarker({map, lat, lng}) : 좌표를 받아 마커를 지도에 띄움
  */
-function setMap(lat, lng) {
+function displayMap(lat, lng) {
     console.log(lat, lng);
     const mapContainer = document.getElementById('map'); // 지도를 표시할 div 
     let mapOption = {
@@ -54,7 +54,7 @@ function getUserLocation() {
 function findAddress(position) {
     const lat = position.coords.latitude;
     const lng = position.coords.longitude;
-    setMap(lat, lng);
+    displayMap(lat, lng);
 }
 
 function getKeywordList() {
@@ -215,7 +215,7 @@ function findCoordsByAddr(addr) {
     result
         .then(data => {
             setHtmlHistoryList(addr);
-            return setMap(data[0].y, data[0].x);
+            return displayMap(data[0].y, data[0].x);
         })
         .then(data => setMarker(data));
 }
@@ -245,7 +245,7 @@ function findCoordsByKeyword(keyword) {
     var ps = new kakao.maps.services.Places();
 
     // 키워드로 장소를 검색합니다
-    ps.keywordSearch(keyword, placesSearchCB);
+    // ps.keywordSearch(keyword, placesSearchCB);
 
     //! 키워드로 찾되 조건을 걸고싶어
     //! center를 기준으로 주변에 있으면 주변꺼 보여주고
@@ -305,7 +305,7 @@ function search() {
 
 function init() {
     getUserLocation()
-        .then(data => setMap(data.coords.latitude, data.coords.longitude))
+        .then(data => displayMap(data.coords.latitude, data.coords.longitude))
         .then(data => {
             setMarker(data);
         })
