@@ -92,6 +92,10 @@ function removeMarker(){
     markerList = [];
 }
 
+function mapSetting(placeList, lat, lng){
+    map.setCenter(new kakao.maps.LatLng(lat, lng));
+    displayMarker(placeList);
+}
 // 앱의 초기단계에서 사용자의 위치를 받는 함수
 function getUserLocation() {
     return new Promise((res, rej) => {
@@ -220,20 +224,12 @@ function clickRelation(e) {
     switch (type) {
         case "address": searchByAddr(relation)
                             .then(placeList => {
-                                console.log("이거 실행 됐니?");
-                                console.log(placeList);
-                                let lat = placeList[0].y;
-                                let lng = placeList[0].x;
-                                map.setCenter(new kakao.maps.LatLng(lat, lng));
-                                displayMarker(placeList);
+                                mapSetting(placeList, placeList[0].y, placeList[0].x);
                             });
                         break;
         case "restaurant": searchByKeyword(relation)
                             .then(placeList => {
-                                let lat = placeList[0].y;
-                                let lng = placeList[0].x;
-                                map.setCenter(new kakao.maps.LatLng(lat, lng));
-                                displayMarker(placeList);
+                                mapSetting(placeList, placeList[0].y, placeList[0].x);
                             })
                             break;
     }
@@ -362,19 +358,9 @@ function search() {
     // let promise1 = searchByAddr(searchInput.value);
     // let promise2 = searchByKeyword(searchInput.value);
     Promise.all([searchByAddr(searchInput.value), searchByKeyword(searchInput.value)])
-        .then(data => {
-            //* data는 배열로 나오게끔 코드를 짰다. x,y 를 얻어 함수에 적용하면 된다.
-            if(data[0].length === 0) {
-                let lat = data[1][0].y;
-                let lng = data[1][0].x;
-                map.setCenter(new kakao.maps.LatLng(lat, lng));
-                displayMarker(data[1]);
-            } else {
-                lat = data[0][0].y;
-                lng = data[0][0].x;
-                map.setCenter(new kakao.maps.LatLng(lat, lng));
-                displayMarker(data[0]);
-            }
+        .then(data => { //* data[0], data[1]들은 배열(placeList)로 나오게끔 코드를 짰다. x,y 를 얻어 함수에 적용하면 된다.
+            if(data[0].length === 0) mapSetting(data[1], data[1][0].y, data[1][0].x);
+            else mapSetting(data[0], data[0][0].y, data[0][0].x);
         })
 }
 
