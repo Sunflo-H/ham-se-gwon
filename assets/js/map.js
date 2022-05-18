@@ -10,11 +10,11 @@ const searchInput = document.querySelector('.search-bar input[type=text]');
 const searchBar = document.querySelector('.search-bar');
 const body = document.querySelector('body');
 
-let coordsList = [];
 let historyList = [];
+let markerList = [];
 
 let map;
-let marker;
+// let marker;
 
 
 /**
@@ -39,23 +39,35 @@ function displayMap(lat, lng) {
 function displayMarkerByCoords(coords) {
     const { lat, lng } = coords;
     let position = new kakao.maps.LatLng(lat, lng);
-    marker = new kakao.maps.Marker({
+    let marker = new kakao.maps.Marker({
         position: position
     });
+    // // 마커를 클릭하면 장소명을 표출할 인포윈도우 입니다
+    // var infowindow = new kakao.maps.InfoWindow({ zIndex: 1 });
+    // // 마커에 클릭이벤트를 등록합니다
+    // kakao.maps.event.addListener(marker, 'click', function () {
+    //     // 마커를 클릭하면 장소명이 인포윈도우에 표출됩니다
+    //     let placeName = place.place_name;
+    //     if(placeName === undefined) placeName = place.address_name;
 
-    coordsList.push(coords);
+    //     infowindow.setContent('<div style="padding:5px;font-size:12px;">' + placeName + '</div>');
+    //     infowindow.open(map, marker);
+    // });
 
     marker.setMap(map);
+
+    markerList.push(marker);
 }
 
 function displayMarker(placeList) {
+    removeMarker();
     // 마커를 클릭하면 장소명을 표출할 인포윈도우 입니다
     var infowindow = new kakao.maps.InfoWindow({ zIndex: 1 });
     // 마커를 생성하고 지도에 표시합니다
     console.log("마커 실행");
 
     placeList.forEach(place => {
-        marker = new kakao.maps.Marker({
+        let marker = new kakao.maps.Marker({
             map: map,
             position: new kakao.maps.LatLng(place.y, place.x)
         });
@@ -68,21 +80,17 @@ function displayMarker(placeList) {
             infowindow.setContent('<div style="padding:5px;font-size:12px;">' + placeName + '</div>');
             infowindow.open(map, marker);
         });
+        markerList.push(marker);
     })
 }
 
-function resetMarker(){
-    // coordsList.forEach(coords => {
-    //     console.log(coords);
-    //     marker = new kakao.maps.Marker({
-    //         map : map,
-    //         position : new kakao.maps.LatLng(coords.lat, coords.lng)
-    //     });
-    //     marker.setMap(null)
-    // })
-    marker.setMap(null);
+function removeMarker(){
+    markerList.forEach(marker => {
+        console.log(marker);
+        marker.setMap(null);
+    })
+    markerList = [];
 }
-
 
 // 앱의 초기단계에서 사용자의 위치를 받는 함수
 function getUserLocation() {
@@ -213,7 +221,7 @@ function clickRelation(e) {
         case "address": searchByAddr(relation)
                             .then(placeList => {
                                 console.log("이거 실행 됐니?");
-                                resetMarker();
+                                // marker.setMap(null);
                                 displayMarker(placeList);
                             });
                         break;
@@ -342,22 +350,22 @@ function search() {
      * search.value 가 주소냐 키워드냐를 따져봐야대
      */
     console.log("엔터로 검색 시작");
-    let promise1 = searchByAddr(searchInput.value);
-    let promise2 = searchByKeyword(searchInput.value);
-    Promise.all([promise1, promise2])
+    // let promise1 = searchByAddr(searchInput.value);
+    // let promise2 = searchByKeyword(searchInput.value);
+    Promise.all([searchByAddr(searchInput.value), searchByKeyword(searchInput.value)])
         .then(data => {
             //* data는 배열로 나오게끔 코드를 짰다. x,y 를 얻어 함수에 적용하면 된다.
             if(data[0].length === 0) {
                 let lat = data[1][0].y;
                 let lng = data[1][0].x;
                 map.setCenter(new kakao.maps.LatLng(lat, lng));
-                resetMarker();
+                // marker.setMap(null);
                 displayMarker(data[1]);
             } else {
                 lat = data[0][0].y;
                 lng = data[0][0].x;
                 map.setCenter(new kakao.maps.LatLng(lat, lng));
-                resetMarker();
+                // marker.setMap(null);
                 displayMarker(data[0]);
             }
         })
