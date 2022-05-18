@@ -9,6 +9,7 @@ const RADIUS = {
 const searchInput = document.querySelector('.search-bar input[type=text]');
 const searchBar = document.querySelector('.search-bar');
 const body = document.querySelector('body');
+const searchIcon = document.querySelector('.fa-search');
 
 let historyList = [];
 let markerList = [];
@@ -462,5 +463,7 @@ body.addEventListener('click', e => {
     if (e.target === searchBar || e.target.parentNode === searchBar) return;
     else closeSearchBar();
 });
+
+searchIcon.addEventListener('click', search);
 
 init();

@@ -115,6 +115,9 @@ header {
     margin-right: 10px;
 }
 
+.search-container .fa-search {
+    cursor: pointer;
+}
 
 
 
