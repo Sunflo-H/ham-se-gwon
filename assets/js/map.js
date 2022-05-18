@@ -10,9 +10,11 @@ const searchInput = document.querySelector('.search-bar input[type=text]');
 const searchBar = document.querySelector('.search-bar');
 const body = document.querySelector('body');
 
+let coordsList = [];
 let historyList = [];
 
 let map;
+let marker;
 
 
 /**
@@ -20,6 +22,7 @@ let map;
  * displayMarker({map, lat, lng}) : 좌표를 받아 마커를 지도에 띄움
  */
 function displayMap(lat, lng) {
+    console.log(lat, lng);
     const mapContainer = document.getElementById('map'); // 지도를 표시할 div 
     let mapOption = {
         center: new kakao.maps.LatLng(lat, lng), // 지도의 중심좌표
@@ -40,7 +43,8 @@ function displayMarkerByCoords(coords) {
         position: position
     });
 
-    marker.setMap(null);
+    coordsList.push(coords);
+
     marker.setMap(map);
 }
 
@@ -58,15 +62,25 @@ function displayMarker(placeList) {
         // 마커에 클릭이벤트를 등록합니다
         kakao.maps.event.addListener(marker, 'click', function () {
             // 마커를 클릭하면 장소명이 인포윈도우에 표출됩니다
-            infowindow.setContent('<div style="padding:5px;font-size:12px;">' + place.place_name + '</div>');
+            let placeName = place.place_name;
+            if(placeName === undefined) placeName = place.address_name;
+
+            infowindow.setContent('<div style="padding:5px;font-size:12px;">' + placeName + '</div>');
             infowindow.open(map, marker);
         });
     })
 }
 
 function resetMarker(){
-    let marker = new kakao.maps.Marker();
-    marker.setMap(null)
+    // coordsList.forEach(coords => {
+    //     console.log(coords);
+    //     let marker = new kakao.maps.Marker({
+    //         map : map,
+    //         position : new kakao.maps.LatLng(coords.lat, coords.lng)
+    //     });
+    //     marker.setMap(null)
+    // })
+    marker.setMap(null);
 }
 
 
@@ -166,6 +180,7 @@ function setHtmlRelation(relationList) {
         relationContainer.insertAdjacentHTML('beforeend', html);
     });
 
+    // relationContainer.addEventListener('click', clickRelation);
     relationContainer.addEventListener('click', clickRelation);
 }
 
@@ -195,9 +210,15 @@ function clickRelation(e) {
     const currentLocation = document.querySelector('.current-location');
 
     switch (type) {
-        case "address": searchByAddr(relation);
-            break;
-        case "restaurant": searchByKeyword(relation); break;
+        case "address": searchByAddr(relation)
+                            .then(placeList => {
+                                console.log("이거 실행 됐니?");
+                                resetMarker();
+                                displayMarker(placeList);
+                            });
+                        break;
+        case "restaurant": searchByKeyword(relation); 
+                            break;
     }
     currentLocation.innerText = relation;
 }
@@ -228,12 +249,12 @@ function setHtmlHistoryList(history) {
 function searchByAddr(searchInput) {
     // 주소 형식의 데이터로만 검색이 가능합니다.
     console.log("주소로 검색 실행");
-    console.log("검색어 : ", searchInput);
+    console.log("검색어 :", searchInput);
     // 주소-좌표 변환 객체를 생성합니다
     var geocoder = new kakao.maps.services.Geocoder();
 
     // 주소로 좌표를 검색합니다
-    let addrList = new Promise((resolve, reject) => {
+    let placeList = new Promise((resolve, reject) => {
         geocoder.addressSearch(searchInput, (result, status) => {
             // 정상적으로 검색이 완료됐으면 
             if (status === kakao.maps.services.Status.OK) {
@@ -251,7 +272,7 @@ function searchByAddr(searchInput) {
     //         return displayMap(data[0].y, data[0].x);
     //     })
     //     .then(coords => displayMarker(coords));
-    return addrList;
+    return placeList;
 }
 
 function searchByKeyword(searchInput) {
@@ -266,7 +287,7 @@ function searchByKeyword(searchInput) {
     const lat = Ma;
     const lng = La;
 
-    let addrList = fetch(`https://dapi.kakao.com/v2/local/search/keyword.json?y=${lat}&x=${lng}&radius=${RADIUS.LV1}&query=${searchInput}`, {
+    let placeList = fetch(`https://dapi.kakao.com/v2/local/search/keyword.json?y=${lat}&x=${lng}&radius=${RADIUS.LV1}&query=${searchInput}`, {
                         headers: { Authorization: `KakaoAK 621a24687f9ad83f695acc0438558af2` }
                     })
                         .then((response) => response.json())
@@ -288,7 +309,7 @@ function searchByKeyword(searchInput) {
                             return data.documents;
                         })
                         .catch((error) => console.log("error:" + error));
-    return addrList;
+    return placeList;
 }
 
 // 키워드 검색 완료 시 호출되는 콜백함수 입니다
@@ -321,11 +342,6 @@ function search() {
      * search.value 가 주소냐 키워드냐를 따져봐야대
      */
     console.log("엔터로 검색 시작");
-    // searchByAddr(searchInput.value)
-    //     .then(result => {
-    //         console.log("엔터 검색 결과 :", result);
-    //     })
-    // searchByKeyword(searchInput.value);
     let promise1 = searchByAddr(searchInput.value);
     let promise2 = searchByKeyword(searchInput.value);
     Promise.all([promise1, promise2])
