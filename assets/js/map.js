@@ -61,6 +61,7 @@ function displayMarkerByCoords(coords) {
 
 function displayMarker(placeList) {
     removeMarker();
+
     // 마커를 클릭하면 장소명을 표출할 인포윈도우 입니다
     var infowindow = new kakao.maps.InfoWindow({ zIndex: 1 });
     // 마커를 생성하고 지도에 표시합니다
@@ -86,7 +87,6 @@ function displayMarker(placeList) {
 
 function removeMarker(){
     markerList.forEach(marker => {
-        console.log(marker);
         marker.setMap(null);
     })
     markerList = [];
@@ -221,11 +221,20 @@ function clickRelation(e) {
         case "address": searchByAddr(relation)
                             .then(placeList => {
                                 console.log("이거 실행 됐니?");
-                                // marker.setMap(null);
+                                console.log(placeList);
+                                let lat = placeList[0].y;
+                                let lng = placeList[0].x;
+                                map.setCenter(new kakao.maps.LatLng(lat, lng));
                                 displayMarker(placeList);
                             });
                         break;
-        case "restaurant": searchByKeyword(relation); 
+        case "restaurant": searchByKeyword(relation)
+                            .then(placeList => {
+                                let lat = placeList[0].y;
+                                let lng = placeList[0].x;
+                                map.setCenter(new kakao.maps.LatLng(lat, lng));
+                                displayMarker(placeList);
+                            })
                             break;
     }
     currentLocation.innerText = relation;
@@ -359,13 +368,11 @@ function search() {
                 let lat = data[1][0].y;
                 let lng = data[1][0].x;
                 map.setCenter(new kakao.maps.LatLng(lat, lng));
-                // marker.setMap(null);
                 displayMarker(data[1]);
             } else {
                 lat = data[0][0].y;
                 lng = data[0][0].x;
                 map.setCenter(new kakao.maps.LatLng(lat, lng));
-                // marker.setMap(null);
                 displayMarker(data[0]);
             }
         })
