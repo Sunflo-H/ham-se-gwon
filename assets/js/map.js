@@ -39,7 +39,7 @@ function displayMap(lat, lng) {
 function displayMarkerByCoords(coords) {
     const { lat, lng } = coords;
     let position = new kakao.maps.LatLng(lat, lng);
-    let marker = new kakao.maps.Marker({
+    marker = new kakao.maps.Marker({
         position: position
     });
 
@@ -55,7 +55,7 @@ function displayMarker(placeList) {
     console.log("마커 실행");
 
     placeList.forEach(place => {
-        let marker = new kakao.maps.Marker({
+        marker = new kakao.maps.Marker({
             map: map,
             position: new kakao.maps.LatLng(place.y, place.x)
         });
@@ -74,7 +74,7 @@ function displayMarker(placeList) {
 function resetMarker(){
     // coordsList.forEach(coords => {
     //     console.log(coords);
-    //     let marker = new kakao.maps.Marker({
+    //     marker = new kakao.maps.Marker({
     //         map : map,
     //         position : new kakao.maps.LatLng(coords.lat, coords.lng)
     //     });
