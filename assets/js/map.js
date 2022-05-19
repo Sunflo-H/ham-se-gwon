@@ -10,6 +10,7 @@ const searchInput = document.querySelector('.search-bar input[type=text]');
 const searchBar = document.querySelector('.search-bar');
 const body = document.querySelector('body');
 const searchIcon = document.querySelector('.fa-search');
+const listContainer = document.querySelector('.list-container');
 
 let historyList = [];
 let markerList = [];
@@ -351,6 +352,19 @@ function enterKey(e) {
     if (e.keyCode === 13) search();
 }
 
+function upAndDown(e) {
+    console.log(e.keyCode);
+    // 38 up, 40 down
+}
+
+function mouseOver(e) {
+    e.target.classList.add('focus');
+}
+
+function mouseOut(e) {
+    e.target.classList.remove('focus');
+}
+
 function search() {
     /**
      * search.value 가 주소냐 키워드냐를 따져봐야대
@@ -457,6 +471,9 @@ searchInput.addEventListener('click', e => {
 })
 
 searchInput.addEventListener('keydown', enterKey);
+searchInput.addEventListener('keydown', upAndDown);
+listContainer.addEventListener('mouseover', mouseOver);
+listContainer.addEventListener('mouseout', mouseOut);
 
 // e.target이 searchWrapper면 검색창을 유지하고, 그 외의 요소들이면 검색창 닫는 이벤트
 body.addEventListener('click', e => {

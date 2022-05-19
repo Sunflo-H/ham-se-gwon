@@ -17,8 +17,13 @@ body, html {
 body {
     position: relative;
 }
+
 .hide {
     display: none !important;
+}
+
+.focus {
+    background-color: #e4e4e4;
 }
 
 header {
@@ -88,10 +93,6 @@ header {
     box-sizing: border-box;
 }
 
-.relation-container .relation:hover{
-    background-color: #e4e4e4;
-}
-
 .history-container{
     border-top: 1px solid #e4e4e4;
 }
@@ -118,9 +119,6 @@ header {
 .search-container .fa-search {
     cursor: pointer;
 }
-
-
-
 
 header .hamberger-container {
     height: 30px;

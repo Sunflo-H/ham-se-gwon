@@ -1,10 +1,12 @@
-/* 지도 페이지 */
 #cocoa-map {
     display: flex;
     width: calc(100% - 40px);
     height: 100%;
     margin: 0 20px;
 }
+
+
+
 /* 액션 박스 */
 .action-container {
     position: relative;
@@ -16,23 +18,30 @@
     margin-right: 20px;
     box-shadow:  1px 1px 5px #dedede,
              -1px -1px 5px #ffffff;
+    overflow: hidden;
+    
 }
+
 .action-container .current-location-info-container {
     width: 100%;
     margin-top: 20px;
     border-bottom: 1px solid #e4e4e4;
 }
+
 .action-container .current-location-info-container p{
     margin-bottom: 10px;
     margin-left: 20px;
 }
+
 .action-container .current-location-info-container p:nth-child(1){
     font-size: 14px;
     font-weight: bold;
 }
+
 .action-container .current-location-info-container p:nth-child(2){
     font-size: 12px;
 }
+
 .action-container .current-location-info-container p:nth-child(2) span{
     color: var(--blue);
 }
@@ -43,22 +52,26 @@
     height: 250px;
     margin: 10px 20px;
 }
+
 .action-container .sub-title {
     font-weight: bold;
     font-size: 16px;
     margin-bottom: 10px;
 }
+
 .action-container .category-container {
     width: 100%;
     display: flex;
     flex-wrap: wrap;
     justify-content: space-around;
 }
+
 .action-container .category{
     width: 25%;
     height: 50px;
     margin-bottom: 20px;
 }
+
 .action-container .category-circle {
     position: relative;
     border: 1px solid rgba(237, 237, 237, 0.98);
@@ -74,10 +87,12 @@
     box-sizing: border-box;
     cursor: pointer;
 }
+
 .action-container .category-circle > i {
     transition: all 0.5s;
     font-weight: 900;
 }
+
 .action-container .category-circle .wave-top {
     position: absolute;
     left: 0;
@@ -89,9 +104,11 @@
     background-color: white;
     z-index: -2;
 }
+
 .action-container .category-circle:hover .wave-top { 
     z-index: 1;
 }
+
 .action-container .category-circle .wave-bot {
     content: "";
     position: absolute;
@@ -101,20 +118,54 @@
     height: 200%;
     transition-duration: 0.5s;
 }
+
 .action-container .category-circle:hover{
     color: white;
 }
+
 .action-container .category-circle:hover .wave-bot {
     background-color: var(--blue2);
     transform: translate(0px, calc(0px - var(--category-circle-w)));
     z-index: -2;
 }
+
 .action-container .category-name{
     display: block;
     font-size: 12px;
     text-align: center;
     cursor: pointer;
     color: rgba(152, 152, 152, 0.98);
+}
+
+.action-container .search-result-container {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 50%;
+    background-color: red;
+    z-index: 2;
+}
+
+.action-container .title {
+    width: 100%;
+    height: 50px;
+    background-color: white;
+    border: 1px solid red;
+    line-height: 50px;
+    padding-left: 10px;
+    box-sizing: border-box;
+    font-size: 14px;
+}
+
+.action-container .title span {
+    color: var(--blue);
+}
+
+.action-container .result {
+    width: 100%;
+    height: 20%;
+    background-color: green;
 }
 
 /* 지도 박스 */
