@@ -184,6 +184,7 @@ function getRestList(keyword) {
 
 //* 검색창에 연관 검색어를 세팅하는 함수
 function setHtmlRelation(relationList) {
+    console.log(relationList);
     const relationContainer = document.querySelector('.relation-container');
     while (relationContainer.hasChildNodes()) {
         relationContainer.removeChild(relationContainer.firstChild);
@@ -196,6 +197,7 @@ function setHtmlRelation(relationList) {
 
     // relationContainer.addEventListener('click', clickRelation);
     relationContainer.addEventListener('click', clickRelation);
+    searchInput.addEventListener('keydown', upAndDown);
 }
 
 
@@ -213,6 +215,7 @@ function setHtmlHistory() {
     })
 
     historyContainer.addEventListener('click', clickHistory);
+    searchInput.addEventListener('keydown', upAndDown);
 }
 
 //* 연관 단어를 클릭하면 바로 검색결과 나타나게 하는 함수
@@ -353,8 +356,16 @@ function enterKey(e) {
 }
 
 function upAndDown(e) {
-    console.log(e.keyCode);
     // 38 up, 40 down
+    const relationContainer = document.querySelector('.relation-container');
+    const historyContainer = document.querySelector('.history-container');
+    // console.log(relationContainer.childElementCount);
+    // console.log(relationContainer.childNodes);
+    switch (e.keyCode) {
+        case 38 : break;
+        case 40 : relationContainer.firstElementChild.classList.add('focus');
+                 break;//if(relationContainer.firstElementChild.classList.containes(focus))
+    }
 }
 
 function mouseOver(e) {
@@ -423,6 +434,9 @@ function openSearchBar_histroy() {
 
 // 검색창에 값이 입력될 때마다 연관검색어, 히스토리를 보여주는 이벤트
 searchInput.addEventListener('input', e => {
+    console.log("인풋 이벤트 실행");
+    //! 인풋 이벤트 말고 keydown으로 가야하나?
+    
     if (e.target.value === '') return; //value가 공백이 되면 query에러가 발생하여 넣은 코드
     // if (e.target.value ===)
     const promise1 = getAddrList(e.target.value);
@@ -471,7 +485,7 @@ searchInput.addEventListener('click', e => {
 })
 
 searchInput.addEventListener('keydown', enterKey);
-searchInput.addEventListener('keydown', upAndDown);
+
 listContainer.addEventListener('mouseover', mouseOver);
 listContainer.addEventListener('mouseout', mouseOut);
 
