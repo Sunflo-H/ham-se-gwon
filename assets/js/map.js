@@ -353,24 +353,27 @@ function placesSearchCB(data, status, pagination) {
 
 function enterKey(e) {
     search();
+    closeSearchBar();
 }
 
 function upKey(e) {
-    console.log(searchInput.getSelection());
+    // const end = searchInput.value.length;
+    // searchInput.setSelectionRange(end, end);
+    // searchInput.focus();
+
     const relationContainer = document.querySelector('.relation-container');
     let activeChild = relationContainer.lastElementChild;
     let isActive = false;
 
-    // searchInput.focus();
     for(let i = 0; i<relationContainer.childElementCount; i++) {        
         if(activeChild.classList.contains('active') === true){
             activeChild.classList.remove('active');
+
             if(activeChild.previousElementSibling !== null) {
                 console.log("액티브가 있고 다음 자식이 있어요 다음 자식에게 액티브를 줍니다.");
                 activeChild = activeChild.previousElementSibling;
                 activeChild.classList.add('active');
                 searchInput.value = activeChild.innerText;
-                
             }
             else if(activeChild.previousElementSibling === null) {
                 console.log("히스토리로 넘어가야 하는 상태");
@@ -389,17 +392,13 @@ function upKey(e) {
         activeChild = relationContainer.lastElementChild;
         activeChild.classList.add('active');
         searchInput.value = activeChild.innerText;
-        searchInput.focus();
     }
 }
 
 function downKey(e) {
-    console.log(searchInput.value.getSelection());
     const relationContainer = document.querySelector('.relation-container');
-    const historyContainer = document.querySelector('.history-container');
     let activeChild = relationContainer.firstElementChild;
     let isActive = false;
-    // const hisFirstChild = historyContainer.firstElementChild;
     for(let i = 0; i<relationContainer.childElementCount; i++) {        
         if(activeChild.classList.contains('active') === true){
             activeChild.classList.remove('active');
@@ -517,6 +516,13 @@ searchInput.addEventListener('keyup', e => {
             }
         });
     }
+})
+
+searchInput.addEventListener('keydown', e => {
+    if(e.keyCode === 38) e.preventDefault();
+    else if(e.keyCode === 40) e.preventDefault(); 
+    
+
 })
 
 searchInput.addEventListener('click', e => {
