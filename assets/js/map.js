@@ -352,31 +352,80 @@ function placesSearchCB(data, status, pagination) {
 }
 
 function enterKey(e) {
-    if (e.keyCode === 13) search();
-}
-
-function upAndDown(e) {
-    // 38 up, 40 down
-    console.log(e.keyCode);
-    const relationContainer = document.querySelector('.relation-container');
-    const historyContainer = document.querySelector('.history-container');
-    switch (e.keyCode) {
-        case 38: break;
-        case 40: relationContainer.firstElementChild.classList.add('active');
-            console.log(relationContainer.firstElementChild);
-            console.log(relationContainer.firstElementChild.classList.contains);
-            break;
-    }
+    search();
 }
 
 function upKey(e) {
-    
+    console.log(searchInput.getSelection());
+    const relationContainer = document.querySelector('.relation-container');
+    let activeChild = relationContainer.lastElementChild;
+    let isActive = false;
+
+    // searchInput.focus();
+    for(let i = 0; i<relationContainer.childElementCount; i++) {        
+        if(activeChild.classList.contains('active') === true){
+            activeChild.classList.remove('active');
+            if(activeChild.previousElementSibling !== null) {
+                console.log("액티브가 있고 다음 자식이 있어요 다음 자식에게 액티브를 줍니다.");
+                activeChild = activeChild.previousElementSibling;
+                activeChild.classList.add('active');
+                searchInput.value = activeChild.innerText;
+                
+            }
+            else if(activeChild.previousElementSibling === null) {
+                console.log("히스토리로 넘어가야 하는 상태");
+            }
+            
+            isActive = true;
+            return;
+        } else {
+            console.log("액티브가 없어요 다음 자식으로 옮깁니다.");
+            activeChild = activeChild.previousElementSibling;
+        }
+    }
+
+    if(isActive === false) {
+        console.log("액티브가 없어서 마지막 자식에게 부여");
+        activeChild = relationContainer.lastElementChild;
+        activeChild.classList.add('active');
+        searchInput.value = activeChild.innerText;
+        searchInput.focus();
+    }
 }
 
 function downKey(e) {
+    console.log(searchInput.value.getSelection());
     const relationContainer = document.querySelector('.relation-container');
     const historyContainer = document.querySelector('.history-container');
-    relationContainer.firstElementChild.classList.add('active');
+    let activeChild = relationContainer.firstElementChild;
+    let isActive = false;
+    // const hisFirstChild = historyContainer.firstElementChild;
+    for(let i = 0; i<relationContainer.childElementCount; i++) {        
+        if(activeChild.classList.contains('active') === true){
+            activeChild.classList.remove('active');
+            if(activeChild.nextElementSibling !== null) {
+                console.log("액티브가 있고 다음 자식이 있어요 다음 자식에게 액티브를 줍니다.");
+                activeChild = activeChild.nextElementSibling;
+                activeChild.classList.add('active');
+                searchInput.value = activeChild.innerText;
+            }
+            else if(activeChild.nextElementSibling === null) {
+                console.log("히스토리로 넘어가야 하는 상태");
+            }
+            
+            isActive = true;
+            return;
+        } else {
+            console.log("액티브가 없어요 다음 자식으로 옮깁니다.");
+            activeChild = activeChild.nextElementSibling;
+        }
+    }
+    if(isActive === false) {
+        console.log("액티브가 없어서 첫번째 자식에게 부여");
+        activeChild = relationContainer.firstElementChild;
+        activeChild.classList.add('active');
+        searchInput.value = activeChild.innerText;
+    }
 }
 
 function mouseOver(e) {
@@ -445,27 +494,11 @@ function openSearchBar_histroy() {
 
 // 검색창에 값이 입력될 때마다 연관검색어, 히스토리를 보여주는 이벤트
 searchInput.addEventListener('keyup', e => {
-    console.log("눌린 키" , e.keyCode);
-    console.log("현재 검색어 :", searchInput.value);
-    console.log(e.isComposing);
-    if (e.keyCode === 13) {
-        enterKey(e);
-    }
-    else if (e.keyCode === 38) {
-        console.log("위키 누름");
-        upKey(e);
-    }
-    else if (e.keyCode === 40) {
-        console.log("아래키 누름");
-        downKey(e);
-        // const relationContainer = document.querySelector('.relation-container');
-        // console.log(relationContainer.firstElementChild);
-    }
-    else if(e.isComposing === false){
-        console.log("com false");
-    }
+    if (e.keyCode === 13) enterKey(e);
+    else if (e.keyCode === 38) upKey(e);
+    else if (e.keyCode === 40) downKey(e);
+    else if(e.isComposing === false) return;
     else {
-        console.log("인풋 이벤트 실행", e.keyCode);
         if (searchInput.value === '') return; //value가 공백이 되면 query에러가 발생하여 넣은 코드
         const promise1 = getAddrList(searchInput.value);
         const promise2 = getRestList(searchInput.value);
@@ -481,11 +514,9 @@ searchInput.addEventListener('keyup', e => {
                 openSearchBar_histroy();
                 setHtmlRelation(relationList);
                 setHtmlHistory();
-                // searchInput.addEventListener('keyup', upAndDown);
             }
         });
     }
-                // e.nativeEvent.isComposing 
 })
 
 searchInput.addEventListener('click', e => {
