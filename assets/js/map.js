@@ -78,7 +78,7 @@ function displayMarker(placeList) {
         kakao.maps.event.addListener(marker, 'click', function () {
             // 마커를 클릭하면 장소명이 인포윈도우에 표출됩니다
             let placeName = place.place_name;
-            if(placeName === undefined) placeName = place.address_name;
+            if (placeName === undefined) placeName = place.address_name;
 
             infowindow.setContent('<div style="padding:5px;font-size:12px;">' + placeName + '</div>');
             infowindow.open(map, marker);
@@ -87,14 +87,14 @@ function displayMarker(placeList) {
     })
 }
 
-function removeMarker(){
+function removeMarker() {
     markerList.forEach(marker => {
         marker.setMap(null);
     })
     markerList = [];
 }
 
-function mapSetting(placeList, lat, lng){
+function mapSetting(placeList, lat, lng) {
     map.setCenter(new kakao.maps.LatLng(lat, lng));
     displayMarker(placeList);
 }
@@ -184,6 +184,7 @@ function getRestList(keyword) {
 
 //* 검색창에 연관 검색어를 세팅하는 함수
 function setHtmlRelation(relationList) {
+    console.log("릴레이션 세팅");
     console.log(relationList);
     const relationContainer = document.querySelector('.relation-container');
     while (relationContainer.hasChildNodes()) {
@@ -197,7 +198,6 @@ function setHtmlRelation(relationList) {
 
     // relationContainer.addEventListener('click', clickRelation);
     relationContainer.addEventListener('click', clickRelation);
-    searchInput.addEventListener('keydown', upAndDown);
 }
 
 
@@ -215,7 +215,7 @@ function setHtmlHistory() {
     })
 
     historyContainer.addEventListener('click', clickHistory);
-    searchInput.addEventListener('keydown', upAndDown);
+
 }
 
 //* 연관 단어를 클릭하면 바로 검색결과 나타나게 하는 함수
@@ -228,15 +228,15 @@ function clickRelation(e) {
 
     switch (type) {
         case "address": searchByAddr(relation)
-                            .then(placeList => {
-                                mapSetting(placeList, placeList[0].y, placeList[0].x);
-                            });
-                        break;
+            .then(placeList => {
+                mapSetting(placeList, placeList[0].y, placeList[0].x);
+            });
+            break;
         case "restaurant": searchByKeyword(relation)
-                            .then(placeList => {
-                                mapSetting(placeList, placeList[0].y, placeList[0].x);
-                            })
-                            break;
+            .then(placeList => {
+                mapSetting(placeList, placeList[0].y, placeList[0].x);
+            })
+            break;
     }
     currentLocation.innerText = relation;
 }
@@ -306,27 +306,27 @@ function searchByKeyword(searchInput) {
     const lng = La;
 
     let placeList = fetch(`https://dapi.kakao.com/v2/local/search/keyword.json?y=${lat}&x=${lng}&radius=${RADIUS.LV1}&query=${searchInput}`, {
-                        headers: { Authorization: `KakaoAK 621a24687f9ad83f695acc0438558af2` }
-                    })
-                        .then((response) => response.json())
-                        .then((data) => {
-                            //! 원래 코드인데 이 then절을 함수를 호출한 쪽에서  사용하려고 주석함
-                            // if(data.documents.length === 0){ // 주변에서 검색결과가 없다면 범위를 확장하여 다시 검색합니다
-                            //     // 장소 검색 객체를 생성합니다
-                            //     var ps = new kakao.maps.services.Places();
+        headers: { Authorization: `KakaoAK 621a24687f9ad83f695acc0438558af2` }
+    })
+        .then((response) => response.json())
+        .then((data) => {
+            //! 원래 코드인데 이 then절을 함수를 호출한 쪽에서  사용하려고 주석함
+            // if(data.documents.length === 0){ // 주변에서 검색결과가 없다면 범위를 확장하여 다시 검색합니다
+            //     // 장소 검색 객체를 생성합니다
+            //     var ps = new kakao.maps.services.Places();
 
-                            //     // 키워드로 장소를 검색합니다
-                            //     ps.keywordSearch(searchInput, placesSearchCB);
-                            // }
-                            // else {
-                            //     console.log("키워드로 검색 결과 : ", data);
-                            //     map.setCenter(new kakao.maps.LatLng(data.documents[0].y, data.documents[0].x));
-                            //     displayMarker(data.documents);
-                            // }
-                            console.log("키워드로 검색 결과 :", data);
-                            return data.documents;
-                        })
-                        .catch((error) => console.log("error:" + error));
+            //     // 키워드로 장소를 검색합니다
+            //     ps.keywordSearch(searchInput, placesSearchCB);
+            // }
+            // else {
+            //     console.log("키워드로 검색 결과 : ", data);
+            //     map.setCenter(new kakao.maps.LatLng(data.documents[0].y, data.documents[0].x));
+            //     displayMarker(data.documents);
+            // }
+            console.log("키워드로 검색 결과 :", data);
+            return data.documents;
+        })
+        .catch((error) => console.log("error:" + error));
     return placeList;
 }
 
@@ -357,23 +357,34 @@ function enterKey(e) {
 
 function upAndDown(e) {
     // 38 up, 40 down
+    console.log(e.keyCode);
     const relationContainer = document.querySelector('.relation-container');
     const historyContainer = document.querySelector('.history-container');
-    // console.log(relationContainer.childElementCount);
-    // console.log(relationContainer.childNodes);
     switch (e.keyCode) {
-        case 38 : break;
-        case 40 : relationContainer.firstElementChild.classList.add('focus');
-                 break;//if(relationContainer.firstElementChild.classList.containes(focus))
+        case 38: break;
+        case 40: relationContainer.firstElementChild.classList.add('active');
+            console.log(relationContainer.firstElementChild);
+            console.log(relationContainer.firstElementChild.classList.contains);
+            break;
     }
 }
 
+function upKey(e) {
+    
+}
+
+function downKey(e) {
+    const relationContainer = document.querySelector('.relation-container');
+    const historyContainer = document.querySelector('.history-container');
+    relationContainer.firstElementChild.classList.add('active');
+}
+
 function mouseOver(e) {
-    e.target.classList.add('focus');
+    e.target.classList.add('active');
 }
 
 function mouseOut(e) {
-    e.target.classList.remove('focus');
+    e.target.classList.remove('active');
 }
 
 function search() {
@@ -385,7 +396,7 @@ function search() {
     // let promise2 = searchByKeyword(searchInput.value);
     Promise.all([searchByAddr(searchInput.value), searchByKeyword(searchInput.value)])
         .then(data => { //* data[0], data[1]들은 배열(placeList)로 나오게끔 코드를 짰다. x,y 를 얻어 함수에 적용하면 된다.
-            if(data[0].length === 0) mapSetting(data[1], data[1][0].y, data[1][0].x);
+            if (data[0].length === 0) mapSetting(data[1], data[1][0].y, data[1][0].x);
             else mapSetting(data[0], data[0][0].y, data[0][0].x);
         })
 }
@@ -433,29 +444,48 @@ function openSearchBar_histroy() {
 
 
 // 검색창에 값이 입력될 때마다 연관검색어, 히스토리를 보여주는 이벤트
-searchInput.addEventListener('input', e => {
-    console.log("인풋 이벤트 실행");
-    //! 인풋 이벤트 말고 keydown으로 가야하나?
-    
-    if (e.target.value === '') return; //value가 공백이 되면 query에러가 발생하여 넣은 코드
-    // if (e.target.value ===)
-    const promise1 = getAddrList(e.target.value);
-    const promise2 = getRestList(e.target.value);
-    Promise.all([promise1, promise2]).then(data => {
-        //! 이후 검색 데이터가 더 추가되면 그때 relationList에 배열을 합치는 코드를 바꿔주자
-        //! 일단 이렇게 두개의 데이터만 두고 짜
-        let relationList = data[0].concat(data[1]).slice(0, 10);
-        if (relationList.length === 0) {
-            closeSearchBar();
-        } else {
-            openSearchBar();
-            openSearchBar_relation();
-            openSearchBar_histroy();
-            setHtmlRelation(relationList);
-            setHtmlHistory();
-        }
-
-    });
+searchInput.addEventListener('keyup', e => {
+    console.log("눌린 키" , e.keyCode);
+    console.log("현재 검색어 :", searchInput.value);
+    console.log(e.isComposing);
+    if (e.keyCode === 13) {
+        enterKey(e);
+    }
+    else if (e.keyCode === 38) {
+        console.log("위키 누름");
+        upKey(e);
+    }
+    else if (e.keyCode === 40) {
+        console.log("아래키 누름");
+        downKey(e);
+        // const relationContainer = document.querySelector('.relation-container');
+        // console.log(relationContainer.firstElementChild);
+    }
+    else if(e.isComposing === false){
+        console.log("com false");
+    }
+    else {
+        console.log("인풋 이벤트 실행", e.keyCode);
+        if (searchInput.value === '') return; //value가 공백이 되면 query에러가 발생하여 넣은 코드
+        const promise1 = getAddrList(searchInput.value);
+        const promise2 = getRestList(searchInput.value);
+        Promise.all([promise1, promise2]).then(data => {
+            //! 이후 검색 데이터가 더 추가되면 그때 relationList에 배열을 합치는 코드를 바꿔주자
+            //! 일단 이렇게 두개의 데이터만 두고 짜
+            let relationList = data[0].concat(data[1]).slice(0, 10);
+            if (relationList.length === 0) {
+                closeSearchBar();
+            } else {
+                openSearchBar();
+                openSearchBar_relation();
+                openSearchBar_histroy();
+                setHtmlRelation(relationList);
+                setHtmlHistory();
+                // searchInput.addEventListener('keyup', upAndDown);
+            }
+        });
+    }
+                // e.nativeEvent.isComposing 
 })
 
 searchInput.addEventListener('click', e => {
@@ -483,8 +513,6 @@ searchInput.addEventListener('click', e => {
         }
     }
 })
-
-searchInput.addEventListener('keydown', enterKey);
 
 listContainer.addEventListener('mouseover', mouseOver);
 listContainer.addEventListener('mouseout', mouseOut);

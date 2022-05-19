@@ -22,7 +22,7 @@ body {
     display: none !important;
 }
 
-.focus {
+.active {
     background-color: #e4e4e4;
 }
 
