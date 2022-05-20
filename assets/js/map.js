@@ -12,11 +12,10 @@ const body = document.querySelector('body');
 const searchIcon = document.querySelector('.fa-search');
 const listContainer = document.querySelector('.list-container');
 
+let map;
 let historyList = [];
 let markerList = [];
-
-let map;
-// let marker;
+let isOpen = false;
 
 
 /**
@@ -467,6 +466,8 @@ function closeSearchBar() {
     listContainer.classList.add('hide');
     historyContainer.classList.add('hide');
     relationContainer.classList.add('hide');
+
+    isOpen = false;
 }
 
 function openSearchBar() {
@@ -475,6 +476,8 @@ function openSearchBar() {
 
     listContainer.classList.remove('hide');
     searchBar.style.borderRadius = "15px 15px 0px 0px";
+
+    isOpen = true;
 }
 
 function openSearchBar_relation() {
@@ -494,8 +497,12 @@ function openSearchBar_histroy() {
 // 검색창에 값이 입력될 때마다 연관검색어, 히스토리를 보여주는 이벤트
 searchInput.addEventListener('keyup', e => {
     if (e.keyCode === 13) enterKey(e);
-    else if (e.keyCode === 38) upKey(e);
-    else if (e.keyCode === 40) downKey(e);
+    else if (e.keyCode === 38) {
+        if(isOpen === true) upKey(e);
+    }
+    else if (e.keyCode === 40) {
+        if(isOpen === true) downKey(e);
+    }
     else if(e.isComposing === false) return;
     else {
         if (searchInput.value === '') return; //value가 공백이 되면 query에러가 발생하여 넣은 코드

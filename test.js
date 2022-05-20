@@ -1,9 +1,8 @@
-const city = document.querySelector('#city');
+// console.log(apple);
 
-console.log(city);
+// apple = "사과";
+// console.log(apple);
 
-city.addEventListener('keyup', e => {
-    if(e.keyCode === 38) return;
-    if(e.keyCode === 40) return;
-    console.log(city.value);
-})
+let apple;
+console.log(apple);
+
