@@ -23,7 +23,7 @@ let isOpen = false;
  * displayMarker({map, lat, lng}) : 좌표를 받아 마커를 지도에 띄움
  */
 function displayMap(lat, lng) {
-    console.log(lat, lng);
+    console.log("현재 위치로 맵을 띄웁니다." , lat, lng);
     const mapContainer = document.getElementById('map'); // 지도를 표시할 div 
     let mapOption = {
         center: new kakao.maps.LatLng(lat, lng), // 지도의 중심좌표
@@ -62,9 +62,9 @@ function displayMarkerByCoords(coords) {
 
 function displayMarker(placeList) {
     removeMarker();
-
+    // displayInfoWindow();
     // 마커를 클릭하면 장소명을 표출할 인포윈도우 입니다
-    var infowindow = new kakao.maps.InfoWindow({ zIndex: 1 });
+    var infowindow = new kakao.maps.InfoWindow();
     // 마커를 생성하고 지도에 표시합니다
     console.log("마커 실행");
 
@@ -79,7 +79,7 @@ function displayMarker(placeList) {
             let placeName = place.place_name;
             if (placeName === undefined) placeName = place.address_name;
 
-            infowindow.setContent('<div style="padding:5px;font-size:12px;">' + placeName + '</div>');
+            infowindow.setContent('<div class="infowindow">' + placeName + '</div>');
             infowindow.open(map, marker);
         });
         markerList.push(marker);
@@ -91,6 +91,19 @@ function removeMarker() {
         marker.setMap(null);
     })
     markerList = [];
+}
+
+function displayInfoWindow() {
+    let content = '<div>내용</div>';
+    let position = new kakao.maps.LatLng(lat, lng);
+    let removable = false;
+
+    let infoWindow = new kakao.maps.InfoWindow({
+        map: map,
+        position: position,
+        content: content,
+        removable: removable
+    })
 }
 
 function mapSetting(placeList, lat, lng) {
@@ -163,6 +176,7 @@ function getAddrList(keyword) {
             return list;
         });
 }
+
 function getRestList(keyword) {
     return fetch('/data/restaurant.json')
         .then(res => res.json())
@@ -198,7 +212,6 @@ function setHtmlRelation(relationList) {
     // relationContainer.addEventListener('click', clickRelation);
     relationContainer.addEventListener('click', clickRelation);
 }
-
 
 //* 검색창에 히스토리를 세팅하는 함수
 function setHtmlHistory() {
@@ -568,5 +581,7 @@ body.addEventListener('click', e => {
 });
 
 searchIcon.addEventListener('click', search);
+
+// kakao.maps.addListener(marker, 'click', displayInfoWindow);
 
 init();

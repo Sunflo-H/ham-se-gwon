@@ -187,6 +187,11 @@
     아니면 바로 맵을 보여줄지
  */
 
+ .infowindow {
+    padding:5px;
+    font-size:12px;
+ }
+
 
 
 
