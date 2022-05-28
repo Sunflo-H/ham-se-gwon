@@ -17,6 +17,8 @@ let historyList = [];
 let markerList = [];
 let isOpen = false;
 
+//! 장소 데이터는 [{address_name : ㅁ, x: 1 , y: 1 } , {}] 의 형태의 placeList를 만들어서 파라미터로 사용하자
+
 
 /**
  * setMap(lat, lng) : 좌표를 받아 지도를 만듬 , 좌표는 지도의 center
@@ -37,23 +39,22 @@ function displayMap(lat, lng) {
     return coords;
 }
 
-function displayMarkerByCoords(coords) {
-    const { lat, lng } = coords;
+// 사이트 접속시 내 좌표 정보만으로 마커를 생성한다. 이때만 쓰인다.
+function createMarkerByCoords(lat, lng) {
     let position = new kakao.maps.LatLng(lat, lng);
     let marker = new kakao.maps.Marker({
         position: position
     });
-    // // 마커를 클릭하면 장소명을 표출할 인포윈도우 입니다
-    // var infowindow = new kakao.maps.InfoWindow({ zIndex: 1 });
-    // // 마커에 클릭이벤트를 등록합니다
-    // kakao.maps.event.addListener(marker, 'click', function () {
-    //     // 마커를 클릭하면 장소명이 인포윈도우에 표출됩니다
-    //     let placeName = place.place_name;
-    //     if(placeName === undefined) placeName = place.address_name;
+    let placeList = [{
+        address_name : "내 위치",
+        x : lng,
+        y : lat
+    }]
 
-    //     infowindow.setContent('<div style="padding:5px;font-size:12px;">' + placeName + '</div>');
-    //     infowindow.open(map, marker);
-    // });
+    markerList.push(marker);
+
+    // 마커에 클릭이벤트를 등록합니다
+    kakao.maps.event.addListener(marker, 'click', () => displayCustomOverlay(placeList));
 
     marker.setMap(map);
 
@@ -62,7 +63,6 @@ function displayMarkerByCoords(coords) {
 
 function displayMarker(placeList) {
     removeMarker();
-    // displayInfoWindow();
     // 마커를 클릭하면 장소명을 표출할 인포윈도우 입니다
     var infowindow = new kakao.maps.InfoWindow();
     // 마커를 생성하고 지도에 표시합니다
@@ -73,13 +73,14 @@ function displayMarker(placeList) {
             map: map,
             position: new kakao.maps.LatLng(place.y, place.x)
         });
+        kakao.maps.addListener(marker, 'click', displayInfoWindow);
         // 마커에 클릭이벤트를 등록합니다
         kakao.maps.event.addListener(marker, 'click', function () {
             // 마커를 클릭하면 장소명이 인포윈도우에 표출됩니다
             let placeName = place.place_name;
             if (placeName === undefined) placeName = place.address_name;
 
-            infowindow.setContent('<div class="infowindow">' + placeName + '</div>');
+            infowindow.setContent('<div class="customOverlay">' + placeName + '</div>');
             infowindow.open(map, marker);
         });
         markerList.push(marker);
@@ -93,16 +94,22 @@ function removeMarker() {
     markerList = [];
 }
 
-function displayInfoWindow() {
-    let content = '<div>내용</div>';
-    let position = new kakao.maps.LatLng(lat, lng);
-    let removable = false;
-
-    let infoWindow = new kakao.maps.InfoWindow({
-        map: map,
-        position: position,
-        content: content,
-        removable: removable
+function displayCustomOverlay(placeList) {
+    placeList.forEach(place => {
+        let content = `<div class="customOverlay">${place.address_name}</div>`;
+        let position = new kakao.maps.LatLng(place.y, place.x);
+    
+        var customOverlay = new kakao.maps.CustomOverlay({
+            map: map,
+            clickable: true,
+            content: content,
+            position: position,
+            xAnchor: 0.5,
+            yAnchor: 2.7,
+            zIndex: 3
+        });
+        customOverlay.setMap(null);
+        customOverlay.setMap(map);
     })
 }
 
@@ -463,8 +470,12 @@ function search() {
 
 function init() {
     getUserLocation()
-        .then(data => displayMap(data.coords.latitude, data.coords.longitude))
-        .then(coords => displayMarkerByCoords(coords))
+        .then(data => {
+            let lat = data.coords.latitude;
+            let lng = data.coords.longitude;
+            displayMap(lat, lng);
+            createMarkerByCoords(lat, lng);
+        })
 }
 
 
@@ -582,6 +593,6 @@ body.addEventListener('click', e => {
 
 searchIcon.addEventListener('click', search);
 
-// kakao.maps.addListener(marker, 'click', displayInfoWindow);
+
 
 init();

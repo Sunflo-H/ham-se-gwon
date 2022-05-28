@@ -187,9 +187,14 @@
     아니면 바로 맵을 보여줄지
  */
 
- .infowindow {
+ .customOverlay {
+    min-width: 50px;
+    border: 1px solid var(--blue2);
+    border-radius: 5px;
+    background-color: #fff;
     padding:5px;
     font-size:12px;
+    text-align: center;
  }
 
 
