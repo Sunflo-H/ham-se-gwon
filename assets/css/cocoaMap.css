@@ -183,9 +183,7 @@
     box-sizing: border-box;
     border-radius: 20px;
 }
-/* 한번 포장한뒤 맵을 보여줄지
-    아니면 바로 맵을 보여줄지
- */
+
 
  .customOverlay {
     min-width: 50px;
