@@ -6,11 +6,13 @@ const RADIUS = {
     LV3: 15000,
     LV4: 20000
 }
+
 const searchInput = document.querySelector('.search-bar input[type=text]');
 const searchBar = document.querySelector('.search-bar');
 const body = document.querySelector('body');
 const searchIcon = document.querySelector('.fa-search');
 const listContainer = document.querySelector('.list-container');
+const categories = document.querySelectorAll('.category');
 
 let map;
 let historyList = [];
@@ -18,10 +20,23 @@ let markerList = [];
 let customOverlay;
 let isOpen = false;
 
-/**
- * setMap(lat, lng) : 좌표를 받아 지도를 만듬 , 좌표는 지도의 center
- * createMarker({map, lat, lng}) : 좌표를 받아 마커를 지도에 띄움
- */
+
+categories.forEach(category => {
+    category.addEventListener('click', categorySearch);
+    category.addEventListener('click', categoryClickEvent);
+})
+
+
+function categorySearch(e) {
+    if(e.target.classList.contains('category')) return;
+    console.log(e.target);
+}
+function 카테고리아이콘을클릭한것처럼실행() {
+    //카테고리 아이콘을 누른것처럼 실행하라
+
+}
+
+
 function displayMap(lat, lng) {
     console.log("현재 위치로 맵을 띄웁니다." , lat, lng);
     const mapContainer = document.getElementById('map'); // 지도를 표시할 div 
@@ -46,7 +61,7 @@ function createMarkerByCoords(lat, lng) {
     let place = {
         address_name : "내 위치",
         x : lng,
-        y : lat
+        y : lat,
     }
 
     markerList.push(marker);
@@ -61,6 +76,7 @@ function createMarkerByCoords(lat, lng) {
 
 function createMarker(placeList) {
     removeMarker();
+    removeCustomOverlay();
     // 마커를 생성하고 지도에 표시합니다
     console.log("마커 실행");
 
@@ -88,10 +104,12 @@ function createCustomOverlay(place) {
      * 다른 마커를 클릭하면 기존에 있던 오버레이를 지도에서 지우고
      * 새 오버레이 생성
      */
-    // removeCustomOverlay();
-    if(customOverlay !== undefined) customOverlay.setMap(null);
+    removeCustomOverlay();
     console.log("디스플레이 커스텀 오버레이");
-    let content = `<div class="customOverlay">${place.address_name}</div>`;
+    let name = place.place_name;
+    if(name === undefined) name = place.address_name;
+
+    let content = `<div class="customOverlay">${name}</div>`;
     let position = new kakao.maps.LatLng(place.y, place.x);
 
     customOverlay = new kakao.maps.CustomOverlay({
@@ -107,17 +125,7 @@ function createCustomOverlay(place) {
 }
 
 function removeCustomOverlay() {
-    markerList.forEach(marker => {
-        let lat = marker.getPosition().La;
-        let lng = marker.getPosition().Ma;
-        let position = new kakao.maps.LatLng(lat, lng);
-        console.log(position);
-        customOverlay = new kakao.maps.CustomOverlay({
-            position: position
-        });
-        customOverlay.setMap(null);
-        
-    })
+    if(customOverlay !== undefined) customOverlay.setMap(null);
 }
 
 function mapSetting(placeList, lat, lng) {
@@ -127,33 +135,10 @@ function mapSetting(placeList, lat, lng) {
 
 // 앱의 초기단계에서 사용자의 위치를 받는 함수
 function getUserLocation() {
-    return new Promise((res, rej) => {
-        navigator.geolocation.getCurrentPosition(res, rej);
+    return new Promise((resolve, reject) => {
+        navigator.geolocation.getCurrentPosition(resolve, reject); // succes, error
+
     });
-}
-
-function findAddress(position) {
-    const lat = position.coords.latitude;
-    const lng = position.coords.longitude;
-    displayMap(lat, lng);
-}
-
-function getKeywordList() {
-    // const { La, Ma } = map.getCenter();
-    // const lat = Ma;
-    // const lng = La;
-    // console.log(lat);
-    // console.log(lng);
-
-
-    // fetch(`https://dapi.kakao.com/v2/local/search/keyword.json?y=${lat}&x=${lng}&radius=20000&query=롯데리아`, {
-    //     headers: { Authorization: `KakaoAK 621a24687f9ad83f695acc0438558af2` }
-    // })
-    //     .then((response) => response.json())
-    //     .then((data) => {
-    //         console.log(data);
-    //     })
-    //     .catch((error) => console.log("error:" + error));
 }
 
 function error() {
@@ -197,7 +182,6 @@ function getRestList(keyword) {
         .then(res => res.json())
         .then(data => {
             let list = [];
-            // let restList = data.result[0].items; // restList[index].name
             const restList = data.results[0].items.filter(restaurant => restaurant.name.substring(0, keyword.length) === keyword);
             restList.forEach(data => {
                 let obj = {
@@ -311,12 +295,6 @@ function searchByAddr(searchInput) {
             }
         });
     })
-    // addrList
-    //     .then(data => {
-    //         setHtmlHistoryList(addr);
-    //         return displayMap(data[0].y, data[0].x);
-    //     })
-    //     .then(coords => createMarker(coords));
     return placeList;
 }
 
