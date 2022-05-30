@@ -13,6 +13,7 @@ const body = document.querySelector('body');
 const searchIcon = document.querySelector('.fa-search');
 const listContainer = document.querySelector('.list-container');
 const categories = document.querySelectorAll('.category');
+const categoryCircles = document.querySelectorAll('.category-circle');
 
 let map;
 let historyList = [];
@@ -20,21 +21,34 @@ let markerList = [];
 let customOverlay;
 let isOpen = false;
 
-
-categories.forEach(category => {
-    category.addEventListener('click', categorySearch);
-    category.addEventListener('click', categoryClickEvent);
+categoryCircles.forEach(circle => {
+    circle.addEventListener('mouseenter', categoryMouseEnter);
+    circle.addEventListener('mouseleave', categoryMouseLeave);
+    circle.addEventListener('click', categoryClick);
 })
+
+function categoryMouseEnter(e) {
+    e.target.lastElementChild.classList.add('category-hover');
+}
+
+function categoryMouseLeave(e) {
+    if(e.target.lastElementChild.classList.contains('category-active') === false)
+        e.target.lastElementChild.classList.remove('category-hover');
+}
+
+function categoryClick(e) {
+    e.currentTarget.lastElementChild.classList.toggle('category-active');
+    categoryCircles.forEach(circle => {
+        circle
+    })
+}
 
 
 function categorySearch(e) {
     if(e.target.classList.contains('category')) return;
-    console.log(e.target);
+    // console.log(e.target);
 }
-function 카테고리아이콘을클릭한것처럼실행() {
-    //카테고리 아이콘을 누른것처럼 실행하라
 
-}
 
 
 function displayMap(lat, lng) {

@@ -91,6 +91,7 @@
 .action-container .category-circle > i {
     transition: all 0.5s;
     font-weight: 900;
+    /* border: 1px solid red; */
 }
 
 .action-container .category-circle .wave-top {
@@ -102,11 +103,6 @@
     border-radius: 15px;
     animation: wave 5000ms infinite linear;
     background-color: white;
-    z-index: -2;
-}
-
-.action-container .category-circle:hover .wave-top { 
-    z-index: 1;
 }
 
 .action-container .category-circle .wave-bot {
@@ -123,10 +119,10 @@
     color: white;
 }
 
-.action-container .category-circle:hover .wave-bot {
+.category-hover {
     background-color: var(--blue2);
     transform: translate(0px, calc(0px - var(--category-circle-w)));
-    z-index: -2;
+    z-index: -1;
 }
 
 .action-container .category-name{
