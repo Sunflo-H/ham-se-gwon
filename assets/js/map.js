@@ -21,11 +21,12 @@ let markerList = [];
 let customOverlay;
 let isOpen = false;
 
-categoryCircles.forEach(circle => {
+categoryCircles.forEach((circle, i) => {
     circle.addEventListener('mouseenter', categoryMouseEnter);
     circle.addEventListener('mouseleave', categoryMouseLeave);
-    circle.addEventListener('click', categoryClick);
+    circle.addEventListener('click', (event) => categoryClick(event, i));
 })
+
 
 function categoryMouseEnter(e) {
     e.target.lastElementChild.classList.add('category-hover');
@@ -36,13 +37,28 @@ function categoryMouseLeave(e) {
         e.target.lastElementChild.classList.remove('category-hover');
 }
 
-function categoryClick(e) {
+function categoryClick(e, i) {
+    if(categoryIsActive() !== undefined) {
+        let num = categoryIsActive();
+        categoryCircles[num].lastElementChild.classList.remove('category-active');
+        categoryCircles[num].lastElementChild.classList.remove('category-hover');
+
+        if(num === i) return; //활성화 중인것과, 내가 클릭한게 같은 카테고리면 remove만 하고 return
+    }    
+
     e.currentTarget.lastElementChild.classList.toggle('category-active');
-    categoryCircles.forEach(circle => {
-        circle
-    })
 }
 
+function categoryIsActive() { // return 값이 undefinded면 비활성화중, 숫자값이면 활성화중
+    let result;
+
+    categoryCircles.forEach((circle, i) => {
+        if(circle.lastElementChild.classList.contains('category-active'))
+            result = i;
+    })
+
+    return result;
+}
 
 function categorySearch(e) {
     if(e.target.classList.contains('category')) return;
