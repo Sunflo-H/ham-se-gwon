@@ -19,9 +19,10 @@ let map;
 let historyList = [];
 let markerList = [];
 let customOverlay;
-let isOpen = false;
+let searchbarIsOpen = false;
 
 categoryCircles.forEach((circle, i) => {
+    // 자식에게 이벤트가 전파되지 않는 enter와 leave를 사용
     circle.addEventListener('mouseenter', categoryMouseEnter);
     circle.addEventListener('mouseleave', categoryMouseLeave);
     circle.addEventListener('click', (event) => categoryClick(event, i));
@@ -38,15 +39,20 @@ function categoryMouseLeave(e) {
 }
 
 function categoryClick(e, i) {
+    // css를 조작하는 쪽과
+    // 카테고리별 주변 검색을 하는 쪽을 만들어야지
     if(categoryIsActive() !== undefined) {
         let num = categoryIsActive();
         categoryCircles[num].lastElementChild.classList.remove('category-active');
         categoryCircles[num].lastElementChild.classList.remove('category-hover');
-
+        removeMarker();
         if(num === i) return; //활성화 중인것과, 내가 클릭한게 같은 카테고리면 remove만 하고 return
     }    
 
     e.currentTarget.lastElementChild.classList.toggle('category-active');
+
+
+    categorySearch(e);
 }
 
 function categoryIsActive() { // return 값이 undefinded면 비활성화중, 숫자값이면 활성화중
@@ -61,11 +67,25 @@ function categoryIsActive() { // return 값이 undefinded면 비활성화중, �
 }
 
 function categorySearch(e) {
-    if(e.target.classList.contains('category')) return;
-    // console.log(e.target);
+    let position = map.getCenter(); 
+    let places = new kakao.maps.services.Places();
+    let category = e.currentTarget.parentNode.getAttribute('data-category');
+
+    // 카테고리 검색 결과를 받을 콜백 함수
+    let callback = function(result, status) {
+        if (status === kakao.maps.services.Status.OK) {
+            createMarker(result);
+        }
+    };
+
+    // 공공기관 코드 검색
+    places.categorySearch(category, callback, {
+        // Map 객체를 지정하지 않았으므로 좌표객체를 생성하여 넘겨준다.
+        location: position,
+        // useMapCenter : true
+    });
+    
 }
-
-
 
 function displayMap(lat, lng) {
     console.log("현재 위치로 맵을 띄웁니다." , lat, lng);
@@ -506,7 +526,7 @@ function closeSearchBar() {
     historyContainer.classList.add('hide');
     relationContainer.classList.add('hide');
 
-    isOpen = false;
+    searchbarIsOpen = false;
 }
 
 function openSearchBar() {
@@ -516,7 +536,7 @@ function openSearchBar() {
     listContainer.classList.remove('hide');
     searchBar.style.borderRadius = "15px 15px 0px 0px";
 
-    isOpen = true;
+    searchbarIsOpen = true;
 }
 
 function openSearchBar_relation() {
@@ -537,10 +557,10 @@ function openSearchBar_histroy() {
 searchInput.addEventListener('keyup', e => {
     if (e.keyCode === 13) enterKey(e);
     else if (e.keyCode === 38) {
-        if(isOpen === true) upKey(e);
+        if(searchbarIsOpen === true) upKey(e);
     }
     else if (e.keyCode === 40) {
-        if(isOpen === true) downKey(e);
+        if(searchbarIsOpen === true) downKey(e);
     }
     else if(e.isComposing === false) return;
     else {
