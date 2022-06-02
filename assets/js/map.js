@@ -18,6 +18,7 @@ const categoryCircles = document.querySelectorAll('.category-circle');
 let map;
 let historyList = [];
 let markerList = [];
+let categoryMarkerList = [];
 let customOverlay;
 let searchbarIsOpen = false;
 
@@ -28,63 +29,84 @@ categoryCircles.forEach((circle, i) => {
     circle.addEventListener('click', (event) => categoryClick(event, i));
 })
 
-
 function categoryMouseEnter(e) {
     e.target.lastElementChild.classList.add('category-hover');
+    e.target.style.color = 'white';
 }
 
 function categoryMouseLeave(e) {
-    if(e.target.lastElementChild.classList.contains('category-active') === false)
+    if(e.target.lastElementChild.classList.contains('category-active') === false){
         e.target.lastElementChild.classList.remove('category-hover');
+        e.target.style.color = 'black';
+    }
+
 }
 
-function categoryClick(e, i) {
-    // css를 조작하는 쪽과
-    // 카테고리별 주변 검색을 하는 쪽을 만들어야지
-    if(categoryIsActive() !== undefined) {
-        let num = categoryIsActive();
+function categoryClick(e, index) {
+    let isActive = categoryIsActive(); // return {활성화된게 있는지 여부, 활성화된 인덱스}
+    
+    removeMarker();
+    removeCategoryMarker();
+    removeCustomOverlay();
+
+    if(isActive.state === true) { 
+        console.log("활성화 된 카테고리가 있습니다.");
+        let num = isActive.index;
+
+        if(e.currentTarget.lastElementChild.classList.contains('category-active') === false){
+            console.log("클릭한 카테고리는 활성화된 카테고리가 아닙니다. 활성화 시작합니다.");
+            e.currentTarget.lastElementChild.classList.add('category-active');
+            categorySearch(e);
+        } 
+        console.log("활성화된 카테고리를 비활성화 합니다.");
         categoryCircles[num].lastElementChild.classList.remove('category-active');
         categoryCircles[num].lastElementChild.classList.remove('category-hover');
-        removeMarker();
-        if(num === i) return; //활성화 중인것과, 내가 클릭한게 같은 카테고리면 remove만 하고 return
-    }    
+        categoryCircles[num].style.color = 'black';        
+    } 
+    else if(isActive.state === false) {
+        console.log("활성화된 카테고리가 없습니다.");
+        e.currentTarget.lastElementChild.classList.add('category-active');
+        categorySearch(e);
+        if(e.currentTarget.lastElementChild.classList.contains('category-hover') === false){
+            e.currentTarget.lastElementChild.classList.add('category-hover');
+            e.currentTarget.style.color = 'white';
+        }
+    }
 
-    e.currentTarget.lastElementChild.classList.toggle('category-active');
 
-
-    categorySearch(e);
 }
 
 function categoryIsActive() { // return 값이 undefinded면 비활성화중, 숫자값이면 활성화중
-    let result;
+    let result = {
+        state : false,
+        index : ''
+    };
 
     categoryCircles.forEach((circle, i) => {
-        if(circle.lastElementChild.classList.contains('category-active'))
-            result = i;
+        if(circle.lastElementChild.classList.contains('category-active')){
+            result.state = true;
+            result.index = i;
+        }
     })
 
     return result;
 }
 
 function categorySearch(e) {
-    let position = map.getCenter(); 
     let places = new kakao.maps.services.Places();
     let category = e.currentTarget.parentNode.getAttribute('data-category');
 
     // 카테고리 검색 결과를 받을 콜백 함수
     let callback = function(result, status) {
         if (status === kakao.maps.services.Status.OK) {
-            createMarker(result);
+            createCategoryMarker(result)
         }
     };
 
-    // 공공기관 코드 검색
+    // 공공기관 코드 검색, 찾은 placeList는 callback으로 전달한다.
     places.categorySearch(category, callback, {
-        // Map 객체를 지정하지 않았으므로 좌표객체를 생성하여 넘겨준다.
-        location: position,
-        // useMapCenter : true
+        location: map.getCenter()
     });
-    
 }
 
 function displayMap(lat, lng) {
@@ -116,19 +138,15 @@ function createMarkerByCoords(lat, lng) {
 
     markerList.push(marker);
 
-    // 마커에 클릭이벤트를 등록합니다
     kakao.maps.event.addListener(marker, 'click', () => createCustomOverlay(place));
 
     marker.setMap(map);
 
-    markerList.push(marker);
 }
 
 function createMarker(placeList) {
     removeMarker();
     removeCustomOverlay();
-    // 마커를 생성하고 지도에 표시합니다
-    console.log("마커 실행");
 
     placeList.forEach(place => {
         let marker = new kakao.maps.Marker({
@@ -137,7 +155,6 @@ function createMarker(placeList) {
         });
         markerList.push(marker);
         kakao.maps.event.addListener(marker, 'click', () => createCustomOverlay(place));
-        // 마커에 클릭이벤트를 등록합니다
     })
 }
 
@@ -148,12 +165,36 @@ function removeMarker() {
     markerList = [];
 }
 
+function createCategoryMarker(placeList) {
+    removeCategoryMarker();
+    console.log("카테고리 마커 생성");
+    placeList.forEach(place => {
+        let content = `<div class="category-marker-container"></div>`;
+        let position = new kakao.maps.LatLng(place.y, place.x);
+
+        let categoryMarker = new kakao.maps.CustomOverlay({
+            map: map,
+            clickable: true,
+            content: content,
+            position: position,
+            xAnchor: 0.5,
+            yAnchor: 2.7,
+            zIndex: 1
+        });
+        categoryMarkerList.push(categoryMarker);
+        categoryMarker.setMap(map);
+    })
+}
+
+function removeCategoryMarker() {
+    categoryMarkerList.forEach(marker => {
+        marker.setMap(null);
+    })
+    categoryMarkerList = [];
+}
+
+
 function createCustomOverlay(place) {
-    /**
-     * 마커를 클릭하면 오버레이 생성
-     * 다른 마커를 클릭하면 기존에 있던 오버레이를 지도에서 지우고
-     * 새 오버레이 생성
-     */
     removeCustomOverlay();
     console.log("디스플레이 커스텀 오버레이");
     let name = place.place_name;
