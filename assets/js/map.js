@@ -595,10 +595,17 @@ function openSearchBar_histroy() {
 //* 주변 탐색 카테고리를 열고 닫는 함수
 function aroundOpenAndClose() {
     const categoryContainer = document.querySelector('.category-container');
-    // categoryContainer.classList.toggle('category-close');
-    if(categoryContainer.style.height !== '0px') 
+    const arrow = document.querySelector('.fa-circle-chevron-up')
+    console.log(arrow);
+    if(categoryContainer.style.height !== '0px') {
         categoryContainer.style.height = '0px';
-    else categoryContainer.style.height = '250px';
+        arrow.style.transform = 'rotate(180deg)'
+    }
+    else {
+        categoryContainer.style.height = '210px';
+        arrow.style.transform = 'rotate(0deg)'
+    }
+
 
     //효과를 주자
 }

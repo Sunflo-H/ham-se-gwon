@@ -63,26 +63,19 @@
 }
 .action-container .around-title i {
     margin-left: 5px;
+    transition: 1s;
 }
 
-.category-close {
-    height: 0px;
-}
 
 .action-container .category-container {
     width: 100%;
+    height: 210px;
     display: flex;
     flex-wrap: wrap;
     justify-content: space-around;
     overflow: hidden;
-    border: 1px solid red;
-    transition-delay: 1s;
+    transition: 1s;
 }
-
-/* .action-container .category-container:hover{
-    color: white;
-    height: 0px;
-} */
 
 .action-container .category{
     width: 25%;
