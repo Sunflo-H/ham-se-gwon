@@ -592,6 +592,21 @@ function openSearchBar_histroy() {
     historyContainer.classList.remove('hide');
 }
 
+//* 주변 탐색 카테고리를 열고 닫는 함수
+function aroundOpenAndClose() {
+    const categoryContainer = document.querySelector('.category-container');
+    // categoryContainer.classList.toggle('category-close');
+    if(categoryContainer.style.height !== '0px') 
+        categoryContainer.style.height = '0px';
+    else categoryContainer.style.height = '250px';
+
+    //효과를 주자
+}
+
+const aroundTitle = document.querySelector('.around-title');
+aroundTitle.addEventListener('click', aroundOpenAndClose);
+
+
 
 
 // 검색창에 값이 입력될 때마다 연관검색어, 히스토리를 보여주는 이벤트
