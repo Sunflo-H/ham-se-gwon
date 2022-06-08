@@ -71,7 +71,12 @@
                     <p>맑음 <b>17도</b> 미세 <span>좋음</span> 황사 <span>좋음</span></p>
                 </div>
                 <div class="around-container">
-                    <div class="around-title"><span>주변 탐색 <i class="fa-solid fa-circle-chevron-up"></i></span></div>
+                    <div class="around-title">
+                        <span>
+                            주변 탐색 
+                            <i class="fa-solid fa-chevron-down"></i>
+                        </span>
+                    </div>
                     <div class="category-container">
                         <div class="category" data-category="FD6">
                             <div class="category-circle">
@@ -173,18 +178,33 @@
                     </div>
 
                 </div>
-                <div class="map-setting-container">
 
+                <!-- 검색결과리스트, 주변탐색결과리스트를 보여주는 곳  -->
+                <!-- 검색결과일때는 거리 안보이게 -->
+                <div class="searchList-container">
+                    <!-- 검색결과일때 -->
+                    <!-- <p>주소</p>
+                    <ul>
+                        <li>구의1동</li>
+                        <li>구의2동</li>
+                        <li>구의동</li>
+                    </ul> -->
+
+                    <!-- 주변탐색결과일때 -->
+                    <div>장소</div>
+                    <ul>
+                        <li>
+                            <div class="nameAndAddress">
+                                <!-- 이름 너무 길면 ...으로 대체 -->
+                                <div>롯데리아아차산아차</div>
+                                <div>구의동 1-2</div>
+                            </div> 
+                            <div class="distance">100m</div>
+                        </li>
+                        <li>롯데리아 구의동 1-2</li>
+                        <li>롯데리아 구의동 1-2</li>
+                    </ul>
                 </div>
-
-                <!-- <div class="search-result-container">
-                    <div class="title">
-                        <span>롯데리아</span> 검색결과
-                    </div>
-                    <div class="result">
-
-                    </div>
-                </div> -->
             </div>
             <div class="map-container">
                 <div id="map"></div>

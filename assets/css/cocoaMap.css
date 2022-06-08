@@ -7,7 +7,7 @@
 
 
 
-/* 액션 박스 */
+/* 액션 컨테이너 */
 .action-container {
     position: relative;
     max-width: var(--action-container-w);
@@ -46,23 +46,27 @@
     color: var(--blue);
 }
 
-/* 주변 탐색 박스*/
+/* 주변 탐색 컨테이너*/
 .action-container .around-container {
     width: calc(100% - 40px);
-    margin: 10px 20px;
+    padding: 10px 20px 0px;
+    /* border: 1px solid red; */
+    border-bottom: 1px solid rgba(237, 237, 237, 0.98);
 }
 
 .action-container .around-title {
     font-weight: bold;
-    font-size: 16px;
+    font-size: 12px;
     margin-bottom: 10px;
     text-align: center;
+    /* border: 1px solid rgba(237, 237, 237, 0.98); */
 }
 .action-container .around-title span {
     cursor: pointer;
+    
 }
 .action-container .around-title i {
-    margin-left: 5px;
+    margin-left: 105px;
     transition: 1s;
 }
 
@@ -131,7 +135,7 @@
     z-index: -1;
 }
 
-.action-container .category-name{
+.action-container .category-name {
     display: block;
     font-size: 12px;
     text-align: center;
@@ -139,36 +143,48 @@
     color: rgba(152, 152, 152, 0.98);
 }
 
-.action-container .search-result-container {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 50%;
-    background-color: red;
-    z-index: 2;
+/* 검색 결과 리스트 컨테이너 */
+.action-container .searchList-container {
+    /* border: 1px solid red; */
+    height: 100%;
 }
 
-.action-container .title {
+.action-container div:first-child {
+    text-align: center;
+}
+
+.action-container .searchList-container ul {
+    /* border: 1px solid blue; */
+}
+
+.action-container .searchList-container li {
+    display: flex;
+    justify-content: space-between;
+    border: 1px solid var(--blue2);
+    margin: 10px;
+    padding: 15px 10px;
+    cursor: pointer;
+    border-radius: 20px;
+}
+
+.action-container .nameAndAddress {
     width: 100%;
-    height: 50px;
-    background-color: white;
-    border: 1px solid red;
-    line-height: 50px;
-    padding-left: 10px;
-    box-sizing: border-box;
+    /* border: 1px solid red; */
+}
+
+.action-container .nameAndAddress div:first-child {
+    
+}
+
+.action-container .nameAndAddress div:last-child {
     font-size: 14px;
 }
 
-.action-container .title span {
-    color: var(--blue);
+.action-container .distance {
+    /* border: 1px solid green; */
+    font-size: 14px;
 }
 
-.action-container .result {
-    width: 100%;
-    height: 20%;
-    background-color: green;
-}
 
 /* 지도 박스 */
 .map-container {

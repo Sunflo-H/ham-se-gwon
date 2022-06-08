@@ -14,6 +14,7 @@ const searchIcon = document.querySelector('.fa-search');
 const listContainer = document.querySelector('.list-container');
 const categories = document.querySelectorAll('.category');
 const categoryCircles = document.querySelectorAll('.category-circle');
+const aroundTitle = document.querySelector('.around-title > span');
 
 let map;
 let historyList = [];
@@ -22,58 +23,63 @@ let categoryMarkerList = [];
 let customOverlay;
 let searchbarIsOpen = false;
 
-categoryCircles.forEach((circle, i) => {
-    // 자식에게 이벤트가 전파되지 않는 enter와 leave를 사용
-    circle.addEventListener('mouseenter', categoryMouseEnter);
-    circle.addEventListener('mouseleave', categoryMouseLeave);
-    circle.addEventListener('click', (event) => categoryClick(event, i));
-})
-
-function categoryMouseEnter(e) {
-    e.target.lastElementChild.classList.add('category-hover');
-    e.target.style.color = 'white';
-}
-
-function categoryMouseLeave(e) {
-    if(e.target.lastElementChild.classList.contains('category-active') === false){
-        e.target.lastElementChild.classList.remove('category-hover');
-        e.target.style.color = 'black';
-    }
-
-}
-
-function categoryClick(e, index) {
-    let isActive = categoryIsActive(); // return {활성화된게 있는지 여부, 활성화된 인덱스}
+function getDistance() {
+    //마커를 클릭하면 내 현재 위치와의 거리를 보여줘
     
-    removeMarker();
-    removeCategoryMarker();
-    removeCustomOverlay();
+    // 마우스로 클릭한 위치입니다 
+    var clickPosition = mouseEvent.latLng;
 
-    if(isActive.state === true) { 
-        console.log("활성화 된 카테고리가 있습니다.");
-        let num = isActive.index;
+  
 
-        if(e.currentTarget.lastElementChild.classList.contains('category-active') === false){
-            console.log("클릭한 카테고리는 활성화된 카테고리가 아닙니다. 활성화 시작합니다.");
-            e.currentTarget.lastElementChild.classList.add('category-active');
-            categorySearch(e);
-        } 
-        console.log("활성화된 카테고리를 비활성화 합니다.");
-        categoryCircles[num].lastElementChild.classList.remove('category-active');
-        categoryCircles[num].lastElementChild.classList.remove('category-hover');
-        categoryCircles[num].style.color = 'black';        
-    } 
-    else if(isActive.state === false) {
-        console.log("활성화된 카테고리가 없습니다.");
-        e.currentTarget.lastElementChild.classList.add('category-active');
-        categorySearch(e);
-        if(e.currentTarget.lastElementChild.classList.contains('category-hover') === false){
-            e.currentTarget.lastElementChild.classList.add('category-hover');
-            e.currentTarget.style.color = 'white';
-        }
-    }
+    // 상태를 true로, 선이 그리고있는 상태로 변경합니다
+    drawingFlag = true;
+    
+    // 지도 위에 선이 표시되고 있다면 지도에서 제거합니다
+    deleteClickLine();
+    
+    // 지도 위에 커스텀오버레이가 표시되고 있다면 지도에서 제거합니다
+    deleteDistnce();
+
+    // 지도 위에 선을 그리기 위해 클릭한 지점과 해당 지점의 거리정보가 표시되고 있다면 지도에서 제거합니다
+    deleteCircleDot();
+
+    // 클릭한 위치를 기준으로 선을 생성하고 지도위에 표시합니다
+    clickLine = new kakao.maps.Polyline({
+        map: map, // 선을 표시할 지도입니다 
+        path: [clickPosition], // 선을 구성하는 좌표 배열입니다 클릭한 위치를 넣어줍니다
+        strokeWeight: 3, // 선의 두께입니다 
+        strokeColor: '#db4040', // 선의 색깔입니다
+        strokeOpacity: 1, // 선의 불투명도입니다 0에서 1 사이값이며 0에 가까울수록 투명합니다
+        strokeStyle: 'solid' // 선의 스타일입니다
+    });
+    
+    // 선이 그려지고 있을 때 마우스 움직임에 따라 선이 그려질 위치를 표시할 선을 생성합니다
+    moveLine = new kakao.maps.Polyline({
+        strokeWeight: 3, // 선의 두께입니다 
+        strokeColor: '#db4040', // 선의 색깔입니다
+        strokeOpacity: 0.5, // 선의 불투명도입니다 0에서 1 사이값이며 0에 가까울수록 투명합니다
+        strokeStyle: 'solid' // 선의 스타일입니다    
+    });
+
+    // 클릭한 지점에 대한 정보를 지도에 표시합니다
+    displayCircleDot(clickPosition, 0);
+
+        
 
 
+    // 그려지고 있는 선의 좌표 배열을 얻어옵니다
+    var path = clickLine.getPath();
+
+    // 좌표 배열에 클릭한 위치를 추가합니다
+    path.push(clickPosition);
+    
+    // 다시 선에 좌표 배열을 설정하여 클릭 위치까지 선을 그리도록 설정합니다
+    clickLine.setPath(path);
+
+    var distance = Math.round(clickLine.getLength());
+    displayCircleDot(clickPosition, distance);
+    
+    
 }
 
 function categoryIsActive() { // return 값이 undefinded면 비활성화중, 숫자값이면 활성화중
@@ -553,9 +559,7 @@ function init() {
             createMarkerByCoords(lat, lng);
         })
 }
-
-
-//* 검색창의 css를 조작하는 함수들 
+//* css를 조작하는 함수들은 여기에 정리 @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 function closeSearchBar() {
     const listContainer = document.querySelector('.list-container');
     const searchBar = document.querySelector('.search-bar');
@@ -592,31 +596,82 @@ function openSearchBar_histroy() {
     historyContainer.classList.remove('hide');
 }
 
-//* 주변 탐색 카테고리를 열고 닫는 함수
-function aroundOpenAndClose() {
+function categoryOpenAndClose() {
     const categoryContainer = document.querySelector('.category-container');
-    const arrow = document.querySelector('.fa-circle-chevron-up')
-    console.log(arrow);
+    const aroundTitle = document.querySelector('.around-title');
+    const arrow = aroundTitle.querySelector('.fa-solid')
     if(categoryContainer.style.height !== '0px') {
         categoryContainer.style.height = '0px';
-        arrow.style.transform = 'rotate(180deg)'
+        arrow.style.transform = 'rotate(-180deg)'
+        // aroundTitle.style.marginBottom = '0px';
     }
     else {
         categoryContainer.style.height = '210px';
         arrow.style.transform = 'rotate(0deg)'
+        // aroundTitle.style.marginBottom = '10px';
     }
-
-
-    //효과를 주자
 }
 
-const aroundTitle = document.querySelector('.around-title');
-aroundTitle.addEventListener('click', aroundOpenAndClose);
+function categoryMouseEnter(e) {
+    e.target.lastElementChild.classList.add('category-hover');
+    e.target.style.color = 'white';
+}
+
+function categoryMouseLeave(e) {
+    if(e.target.lastElementChild.classList.contains('category-active') === false){
+        e.target.lastElementChild.classList.remove('category-hover');
+        e.target.style.color = 'black';
+    }
+
+}
+
+function categoryClick(e, index) {
+    let isActive = categoryIsActive(); // return {활성화된게 있는지 여부, 활성화된 인덱스}
+    
+    removeMarker();
+    removeCategoryMarker();
+    removeCustomOverlay();
+
+    if(isActive.state === true) { 
+        console.log("활성화 된 카테고리가 있습니다.");
+        let num = isActive.index;
+
+        if(e.currentTarget.lastElementChild.classList.contains('category-active') === false){
+            console.log("클릭한 카테고리는 활성화된 카테고리가 아닙니다. 활성화 시작합니다.");
+            e.currentTarget.lastElementChild.classList.add('category-active');
+            categorySearch(e);
+        } 
+        console.log("활성화된 카테고리를 비활성화 합니다.");
+        categoryCircles[num].lastElementChild.classList.remove('category-active');
+        categoryCircles[num].lastElementChild.classList.remove('category-hover');
+        categoryCircles[num].style.color = 'black';        
+    } 
+    else if(isActive.state === false) {
+        console.log("활성화된 카테고리가 없습니다.");
+        e.currentTarget.lastElementChild.classList.add('category-active');
+        categorySearch(e);
+        if(e.currentTarget.lastElementChild.classList.contains('category-hover') === false){
+            e.currentTarget.lastElementChild.classList.add('category-hover');
+            e.currentTarget.style.color = 'white';
+        }
+    }
+}
 
 
+//* 이벤트 리스너들 @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 
+
+categoryCircles.forEach((circle, i) => {
+    // 자식에게 이벤트가 전파되지 않는 enter와 leave를 사용
+    circle.addEventListener('mouseenter', categoryMouseEnter);
+    circle.addEventListener('mouseleave', categoryMouseLeave);
+    circle.addEventListener('click', (event) => categoryClick(event, i));
+})
+
+aroundTitle.addEventListener('click', categoryOpenAndClose);
 
 // 검색창에 값이 입력될 때마다 연관검색어, 히스토리를 보여주는 이벤트
+// ! 아직 조정할 내용이 남아있다.
 searchInput.addEventListener('keyup', e => {
     if (e.keyCode === 13) enterKey(e);
     else if (e.keyCode === 38) {
