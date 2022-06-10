@@ -22,6 +22,7 @@ let markerList = [];
 let categoryMarkerList = [];
 let customOverlay;
 let searchbarIsOpen = false;
+let searchList = [];
 
 function getDistance() {
     //마커를 클릭하면 내 현재 위치와의 거리를 보여줘
@@ -78,8 +79,18 @@ function getDistance() {
 
     var distance = Math.round(clickLine.getLength());
     displayCircleDot(clickPosition, distance);
-    
-    
+}
+
+function displaySearchList(placeList) {
+    let html = `<li>
+                    <div class="nameAndAddress">
+                        <div class="name"><span class="number">A</span>롯데리아아차산아차</div>
+                        <div class="roadName-address">아차산로 어쩌구</div>
+                        <div class="number-address">(지번) 구의동 1-2</div>
+                    </div> 
+                    <div class="distance">100<span class="meter">m</span></div>
+                    
+                </li>`
 }
 
 function categoryIsActive() { // return 값이 undefinded면 비활성화중, 숫자값이면 활성화중
@@ -225,7 +236,7 @@ function removeCustomOverlay() {
     if(customOverlay !== undefined) customOverlay.setMap(null);
 }
 
-function mapSetting(placeList, lat, lng) {
+function mapSetting(lat, lng, placeList) {
     map.setCenter(new kakao.maps.LatLng(lat, lng));
     createMarker(placeList);
 }
@@ -337,12 +348,12 @@ function clickRelation(e) {
     switch (type) {
         case "address": searchByAddr(relation)
             .then(placeList => {
-                mapSetting(placeList, placeList[0].y, placeList[0].x);
+                mapSetting(placeList[0].y, placeList[0].x, placeList);
             });
             break;
         case "restaurant": searchByKeyword(relation)
             .then(placeList => {
-                mapSetting(placeList, placeList[0].y, placeList[0].x);
+                mapSetting(placeList[0].y, placeList[0].x, placeList);
             })
             break;
     }
@@ -544,9 +555,9 @@ function search() {
     console.log("엔터로 검색 시작");
     Promise.all([searchByAddr(searchInput.value), searchByKeyword(searchInput.value)])
         .then(data => { 
-            //* data[0], data[1]들은 배열(placeList)로 나오게끔 코드를 짰다. x,y 를 얻어 함수에 적용하면 된다.
-            if (data[0].length === 0) mapSetting(data[1], data[1][0].y, data[1][0].x);
-            else mapSetting(data[0], data[0][0].y, data[0][0].x);
+            //data[0], data[1]들은 배열(placeList)로 나오게끔 코드를 짰다. x,y 를 얻어 함수에 적용하면 된다.
+            if (data[0].length === 0) mapSetting(data[1][0].y, data[1][0].x, data[1],);
+            else mapSetting(data[0][0].y, data[0][0].x, data[0]);
         })
 }
 
