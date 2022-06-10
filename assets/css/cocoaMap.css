@@ -48,9 +48,11 @@
 
 /* 주변 탐색 컨테이너*/
 .action-container .around-container {
-    width: calc(100% - 40px);
-    padding: 10px 20px 0px;
-    /* border: 1px solid red; */
+    /* width: calc(100% - 40px);
+    padding: 10px 20px 0px; */
+    width: 100%;
+    padding-top: 10px;
+    box-sizing: border-box;
     border-bottom: 1px solid rgba(237, 237, 237, 0.98);
 }
 
@@ -79,6 +81,9 @@
     justify-content: space-around;
     overflow: hidden;
     transition: 1s;
+    /* border: 1px solid blue; */
+    box-sizing: border-box;
+    padding: 0px 20px;
 }
 
 .action-container .category{
@@ -149,8 +154,18 @@
     height: 100%;
 }
 
-.action-container div:first-child {
-    text-align: center;
+.action-container .searchList-container .searchList-title {
+    /* text-align: center; */
+    margin: 10px 20px 10px;
+    /* border: 1px solid red; */
+    font-weight: bold;
+    font-size: 16px;
+
+}
+
+.action-container .searchList-container .searchList-title .list-count{
+    font-weight: normal;
+    font-size: 14px;
 }
 
 .action-container .searchList-container ul {
@@ -159,32 +174,54 @@
 
 .action-container .searchList-container li {
     display: flex;
+    height: 50px;
     justify-content: space-between;
-    border: 1px solid var(--blue2);
-    margin: 10px;
-    padding: 15px 10px;
+    border: 1px solid rgba(237, 237, 237, 0.98);
+    padding: 10px 5px 10px 10px;
     cursor: pointer;
-    border-radius: 20px;
 }
 
 .action-container .nameAndAddress {
     width: 100%;
-    /* border: 1px solid red; */
 }
 
-.action-container .nameAndAddress div:first-child {
-    
+.action-container .nameAndAddress .number{
+    font-weight: bold;
+    color: var(--blue2);
+    margin-right: 5px;
 }
 
-.action-container .nameAndAddress div:last-child {
+.action-container .nameAndAddress .name {
+    color: rgba(0, 0, 0, 0.888);
+}
+
+.action-container .nameAndAddress .roadName-address {
+    margin-top: 5px;
+    font-size: 12px;
+    color: rgba(0, 0, 0, 0.628);
+}
+
+.action-container .nameAndAddress .number-address {
+    margin-top: 5px;
+    font-size: 12px;
+    color: rgba(0, 0, 0, 0.628);
+}
+
+.action-container .distanceAndTime .distance {
     font-size: 14px;
+    min-width: 45px;
+    height: 16px;
+    background-color: var(--blue2);
+    color: white;
+    border-radius: 5px;
+    font-weight: bold;
+    text-align: center;
 }
 
-.action-container .distance {
-    /* border: 1px solid green; */
-    font-size: 14px;
+.action-container .distanceAndTime .distance .meter {
+    font-size: 12px;
+    margin-left: 1px;
 }
-
 
 /* 지도 박스 */
 .map-container {
