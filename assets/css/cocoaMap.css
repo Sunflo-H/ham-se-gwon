@@ -150,14 +150,11 @@
 
 /* 검색 결과 리스트 컨테이너 */
 .action-container .searchList-container {
-    /* border: 1px solid red; */
     height: 100%;
 }
 
 .action-container .searchList-container .searchList-title {
-    /* text-align: center; */
     margin: 10px 20px 10px;
-    /* border: 1px solid red; */
     font-weight: bold;
     font-size: 16px;
 
@@ -207,7 +204,7 @@
     color: rgba(0, 0, 0, 0.628);
 }
 
-.action-container .distanceAndTime .distance {
+.action-container .distance {
     font-size: 14px;
     min-width: 45px;
     height: 16px;
@@ -218,7 +215,7 @@
     text-align: center;
 }
 
-.action-container .distanceAndTime .distance .meter {
+.action-container .distance .meter {
     font-size: 12px;
     margin-left: 1px;
 }

@@ -82,15 +82,18 @@ function getDistance() {
 }
 
 function displaySearchList(placeList) {
-    let html = `<li>
+    console.log("검색 리스트 보여주기 실행");
+    let element = `<li>
                     <div class="nameAndAddress">
                         <div class="name"><span class="number">A</span>롯데리아아차산아차</div>
                         <div class="roadName-address">아차산로 어쩌구</div>
                         <div class="number-address">(지번) 구의동 1-2</div>
                     </div> 
                     <div class="distance">100<span class="meter">m</span></div>
-                    
                 </li>`
+    const ul = document.querySelector('.searchList-container > ul');
+    ul.insertAdjacentHTML('beforeend', element);
+    console.log(ul);
 }
 
 function categoryIsActive() { // return 값이 undefinded면 비활성화중, 숫자값이면 활성화중
@@ -236,11 +239,6 @@ function removeCustomOverlay() {
     if(customOverlay !== undefined) customOverlay.setMap(null);
 }
 
-function mapSetting(lat, lng, placeList) {
-    map.setCenter(new kakao.maps.LatLng(lat, lng));
-    createMarker(placeList);
-}
-
 // 앱의 초기단계에서 사용자의 위치를 받는 함수
 function getUserLocation() {
     return new Promise((resolve, reject) => {
@@ -256,9 +254,9 @@ function error() {
 /**
  * & 검색 함수들 적용 설명
  * 값 입력 => getAddrList() or getRestList()로 데이터를 받아와 {type, name} 객체를 Promise로 리턴
- * 이렇게 얻은 Promise데이터를 setHtmlRelation()함수를 실행하여 연관검색어로 보여준다. 
+ * 이렇게 얻은 Promise데이터를 displayRelation()함수를 실행하여 연관검색어로 보여준다. 
  * 
- * 연관검색어 클릭 => clickRelation() 실행 => 
+ * 연관검색어 클릭 => clickSearch() 실행 => 
  * 클릭한 데이터의 {type : 주소 또는 키워드}에 따라 각각 함수실행 searchByAddr(), searchByKeyword()
  * 
  * type이 키워드인 경우
@@ -303,7 +301,7 @@ function getRestList(keyword) {
 }
 
 //* 검색창에 연관 검색어를 세팅하는 함수
-function setHtmlRelation(relationList) {
+function displayRelation(relationList) {
     console.log("릴레이션 세팅");
     console.log(relationList);
     const relationContainer = document.querySelector('.relation-container');
@@ -316,8 +314,7 @@ function setHtmlRelation(relationList) {
         relationContainer.insertAdjacentHTML('beforeend', html);
     });
 
-    // relationContainer.addEventListener('click', clickRelation);
-    relationContainer.addEventListener('click', clickRelation);
+    relationContainer.addEventListener('click', clickSearch);
 }
 
 //* 검색창에 히스토리를 세팅하는 함수
@@ -337,23 +334,30 @@ function setHtmlHistory() {
 
 }
 
-//* 연관 단어를 클릭하면 바로 검색결과 나타나게 하는 함수
-function clickRelation(e) {
-    console.log("연관검색어 클릭");
+function clickSearch(e) {
+    console.log("클릭해서 검색을 실행합니다.");
     console.log(e.target);
     const relation = e.target.innerText;
     const type = e.target.getAttribute("data-type");
     const currentLocation = document.querySelector('.current-location');
 
+    // ! clickSearch로 바꿈으로써 히스토리가 클릭되었을때도 생각해야되는 함수가 되었다.
     switch (type) {
-        case "address": searchByAddr(relation)
+        case "address": 
+            console.log("주소로 검색 분기");
+            searchByAddr(relation)
             .then(placeList => {
-                mapSetting(placeList[0].y, placeList[0].x, placeList);
+                map.setCenter(new kakao.maps.LatLng(placeList[0].y, placeList[0].x));
+                createMarker(placeList);
+                displaySearchList(placeList);
             });
             break;
-        case "restaurant": searchByKeyword(relation)
+        case "restaurant": 
+            console.log("키워드로 검색 분기");
+            searchByKeyword(relation)
             .then(placeList => {
-                mapSetting(placeList[0].y, placeList[0].x, placeList);
+                map.setCenter(new kakao.maps.LatLng(placeList[0].y, placeList[0].x));
+                createMarker(placeList);
             })
             break;
     }
@@ -556,8 +560,14 @@ function search() {
     Promise.all([searchByAddr(searchInput.value), searchByKeyword(searchInput.value)])
         .then(data => { 
             //data[0], data[1]들은 배열(placeList)로 나오게끔 코드를 짰다. x,y 를 얻어 함수에 적용하면 된다.
-            if (data[0].length === 0) mapSetting(data[1][0].y, data[1][0].x, data[1],);
-            else mapSetting(data[0][0].y, data[0][0].x, data[0]);
+            if (data[0].length === 0) {
+                map.setCenter(new kakao.maps.LatLng(data[1][0].y, data[1][0].x));
+                createMarker(data[1]);
+            }
+            else {
+                map.setCenter(new kakao.maps.LatLng(data[0][0].y, data[0][0].x));
+                createMarker(data[0]);
+            }
         })
 }
 
@@ -693,7 +703,9 @@ searchInput.addEventListener('keyup', e => {
     }
     else if(e.isComposing === false) return;
     else {
-        if (searchInput.value === '') return; //value가 공백이 되면 query에러가 발생하여 넣은 코드
+        //value가 공백이 되면 query에러가 발생하여 넣은 코드
+        if (searchInput.value === '') return; 
+
         const promise1 = getAddrList(searchInput.value);
         const promise2 = getRestList(searchInput.value);
         Promise.all([promise1, promise2]).then(data => {
@@ -706,7 +718,7 @@ searchInput.addEventListener('keyup', e => {
                 openSearchBar();
                 openSearchBar_relation();
                 openSearchBar_histroy();
-                setHtmlRelation(relationList);
+                displayRelation(relationList);
                 setHtmlHistory();
             }
         });
@@ -732,7 +744,7 @@ searchInput.addEventListener('click', e => {
                 openSearchBar();
                 openSearchBar_relation();
                 openSearchBar_histroy();
-                setHtmlRelation(relationList);
+                displayRelation(relationList);
                 setHtmlHistory();
             }
         })
