@@ -26,18 +26,18 @@ let searchList = [];
 
 function getDistance() {
     //마커를 클릭하면 내 현재 위치와의 거리를 보여줘
-    
+
     // 마우스로 클릭한 위치입니다 
     var clickPosition = mouseEvent.latLng;
 
-  
+
 
     // 상태를 true로, 선이 그리고있는 상태로 변경합니다
     drawingFlag = true;
-    
+
     // 지도 위에 선이 표시되고 있다면 지도에서 제거합니다
     deleteClickLine();
-    
+
     // 지도 위에 커스텀오버레이가 표시되고 있다면 지도에서 제거합니다
     deleteDistnce();
 
@@ -53,7 +53,7 @@ function getDistance() {
         strokeOpacity: 1, // 선의 불투명도입니다 0에서 1 사이값이며 0에 가까울수록 투명합니다
         strokeStyle: 'solid' // 선의 스타일입니다
     });
-    
+
     // 선이 그려지고 있을 때 마우스 움직임에 따라 선이 그려질 위치를 표시할 선을 생성합니다
     moveLine = new kakao.maps.Polyline({
         strokeWeight: 3, // 선의 두께입니다 
@@ -65,7 +65,7 @@ function getDistance() {
     // 클릭한 지점에 대한 정보를 지도에 표시합니다
     displayCircleDot(clickPosition, 0);
 
-        
+
 
 
     // 그려지고 있는 선의 좌표 배열을 얻어옵니다
@@ -73,7 +73,7 @@ function getDistance() {
 
     // 좌표 배열에 클릭한 위치를 추가합니다
     path.push(clickPosition);
-    
+
     // 다시 선에 좌표 배열을 설정하여 클릭 위치까지 선을 그리도록 설정합니다
     clickLine.setPath(path);
 
@@ -83,27 +83,56 @@ function getDistance() {
 
 function displaySearchList(placeList) {
     console.log("검색 리스트 보여주기 실행");
-    let element = `<li>
-                    <div class="nameAndAddress">
-                        <div class="name"><span class="number">A</span>롯데리아아차산아차</div>
-                        <div class="roadName-address">아차산로 어쩌구</div>
-                        <div class="number-address">(지번) 구의동 1-2</div>
-                    </div> 
-                    <div class="distance">100<span class="meter">m</span></div>
-                </li>`
-    const ul = document.querySelector('.searchList-container > ul');
-    ul.insertAdjacentHTML('beforeend', element);
-    console.log(ul);
+    console.log(placeList);
+    placeList.forEach((place, i) => {
+        // i === 0 이니까 +65를해서 대문자 A가 나오게 한다.
+        let number = String.fromCharCode(i + 65);
+        
+        let element;
+        // place.address.address_name  지번주소
+        // place.address.road_address  도로명
+        // place.address.place_name    장소명
+
+        console.log(place);
+        if (place.place_name === undefined) {// 주소로 검색했다는 뜻 
+            let addressName = place.address_name;
+            if(addressName === undefined) addressName = place.road_address;
+            
+            element = `<li>
+                            <div class="nameAndAddress">
+                                <div class="name"><span class="number">${number}</span>${addressName}</div>
+                            </div> 
+                            <div class="distance">100<span class="meter">m</span></div>
+                        </li>`
+        }
+        else {
+            let placeName = place.place_name;
+            let address = place.address_name;
+            let roadAddress = place.road_address_name;
+            element = `<li>
+                            <div class="nameAndAddress">
+                                <div class="name"><span class="number">${number}</span>${placeName}</div>
+                                <div class="roadName-address">${roadAddress}</div>
+                                <div class="number-address">(지번) ${address}</div>
+                            </div> 
+                            <div class="distance">100<span class="meter">m</span></div>
+                        </li>`
+        }
+
+
+        const ul = document.querySelector('.searchList-container > ul');
+        ul.insertAdjacentHTML('beforeend', element);
+    })
 }
 
 function categoryIsActive() { // return 값이 undefinded면 비활성화중, 숫자값이면 활성화중
     let result = {
-        state : false,
-        index : ''
+        state: false,
+        index: ''
     };
 
     categoryCircles.forEach((circle, i) => {
-        if(circle.lastElementChild.classList.contains('category-active')){
+        if (circle.lastElementChild.classList.contains('category-active')) {
             result.state = true;
             result.index = i;
         }
@@ -117,7 +146,7 @@ function categorySearch(e) {
     let category = e.currentTarget.parentNode.getAttribute('data-category');
 
     // 카테고리 검색 결과를 받을 콜백 함수
-    let callback = function(result, status) {
+    let callback = function (result, status) {
         if (status === kakao.maps.services.Status.OK) {
             createCategoryMarker(result)
         }
@@ -130,7 +159,7 @@ function categorySearch(e) {
 }
 
 function displayMap(lat, lng) {
-    console.log("현재 위치로 맵을 띄웁니다." , lat, lng);
+    console.log("현재 위치로 맵을 띄웁니다.", lat, lng);
     const mapContainer = document.getElementById('map'); // 지도를 표시할 div 
     let mapOption = {
         center: new kakao.maps.LatLng(lat, lng), // 지도의 중심좌표
@@ -151,9 +180,9 @@ function createMarkerByCoords(lat, lng) {
         position: position
     });
     let place = {
-        address_name : "내 위치",
-        x : lng,
-        y : lat,
+        address_name: "내 위치",
+        x: lng,
+        y: lat,
     }
 
     markerList.push(marker);
@@ -218,7 +247,7 @@ function createCustomOverlay(place) {
     removeCustomOverlay();
     console.log("디스플레이 커스텀 오버레이");
     let name = place.place_name;
-    if(name === undefined) name = place.address_name;
+    if (name === undefined) name = place.address_name;
 
     let content = `<div class="customOverlay">${name}</div>`;
     let position = new kakao.maps.LatLng(place.y, place.x);
@@ -236,7 +265,7 @@ function createCustomOverlay(place) {
 }
 
 function removeCustomOverlay() {
-    if(customOverlay !== undefined) customOverlay.setMap(null);
+    if (customOverlay !== undefined) customOverlay.setMap(null);
 }
 
 // 앱의 초기단계에서 사용자의 위치를 받는 함수
@@ -343,22 +372,23 @@ function clickSearch(e) {
 
     // ! clickSearch로 바꿈으로써 히스토리가 클릭되었을때도 생각해야되는 함수가 되었다.
     switch (type) {
-        case "address": 
+        case "address":
             console.log("주소로 검색 분기");
             searchByAddr(relation)
-            .then(placeList => {
-                map.setCenter(new kakao.maps.LatLng(placeList[0].y, placeList[0].x));
-                createMarker(placeList);
-                displaySearchList(placeList);
-            });
+                .then(placeList => {
+                    map.setCenter(new kakao.maps.LatLng(placeList[0].y, placeList[0].x));
+                    createMarker(placeList);
+                    displaySearchList(placeList);
+                });
             break;
-        case "restaurant": 
+        case "restaurant":
             console.log("키워드로 검색 분기");
             searchByKeyword(relation)
-            .then(placeList => {
-                map.setCenter(new kakao.maps.LatLng(placeList[0].y, placeList[0].x));
-                createMarker(placeList);
-            })
+                .then(placeList => {
+                    map.setCenter(new kakao.maps.LatLng(placeList[0].y, placeList[0].x));
+                    createMarker(placeList);
+                    displaySearchList(placeList);
+                })
             break;
     }
     currentLocation.innerText = relation;
@@ -482,20 +512,20 @@ function upKey(e) {
     let activeChild = relationContainer.lastElementChild;
     let isActive = false;
 
-    for(let i = 0; i<relationContainer.childElementCount; i++) {        
-        if(activeChild.classList.contains('active') === true){
+    for (let i = 0; i < relationContainer.childElementCount; i++) {
+        if (activeChild.classList.contains('active') === true) {
             activeChild.classList.remove('active');
 
-            if(activeChild.previousElementSibling !== null) {
+            if (activeChild.previousElementSibling !== null) {
                 console.log("액티브가 있고 다음 자식이 있어요 다음 자식에게 액티브를 줍니다.");
                 activeChild = activeChild.previousElementSibling;
                 activeChild.classList.add('active');
                 searchInput.value = activeChild.innerText;
             }
-            else if(activeChild.previousElementSibling === null) {
+            else if (activeChild.previousElementSibling === null) {
                 console.log("히스토리로 넘어가야 하는 상태");
             }
-            
+
             isActive = true;
             return;
         } else {
@@ -504,7 +534,7 @@ function upKey(e) {
         }
     }
 
-    if(isActive === false) {
+    if (isActive === false) {
         console.log("액티브가 없어서 마지막 자식에게 부여");
         activeChild = relationContainer.lastElementChild;
         activeChild.classList.add('active');
@@ -516,19 +546,19 @@ function downKey(e) {
     const relationContainer = document.querySelector('.relation-container');
     let activeChild = relationContainer.firstElementChild;
     let isActive = false;
-    for(let i = 0; i<relationContainer.childElementCount; i++) {        
-        if(activeChild.classList.contains('active') === true){
+    for (let i = 0; i < relationContainer.childElementCount; i++) {
+        if (activeChild.classList.contains('active') === true) {
             activeChild.classList.remove('active');
-            if(activeChild.nextElementSibling !== null) {
+            if (activeChild.nextElementSibling !== null) {
                 console.log("액티브가 있고 다음 자식이 있어요 다음 자식에게 액티브를 줍니다.");
                 activeChild = activeChild.nextElementSibling;
                 activeChild.classList.add('active');
                 searchInput.value = activeChild.innerText;
             }
-            else if(activeChild.nextElementSibling === null) {
+            else if (activeChild.nextElementSibling === null) {
                 console.log("히스토리로 넘어가야 하는 상태");
             }
-            
+
             isActive = true;
             return;
         } else {
@@ -536,7 +566,7 @@ function downKey(e) {
             activeChild = activeChild.nextElementSibling;
         }
     }
-    if(isActive === false) {
+    if (isActive === false) {
         console.log("액티브가 없어서 첫번째 자식에게 부여");
         activeChild = relationContainer.firstElementChild;
         activeChild.classList.add('active');
@@ -558,7 +588,7 @@ function search() {
      */
     console.log("엔터로 검색 시작");
     Promise.all([searchByAddr(searchInput.value), searchByKeyword(searchInput.value)])
-        .then(data => { 
+        .then(data => {
             //data[0], data[1]들은 배열(placeList)로 나오게끔 코드를 짰다. x,y 를 얻어 함수에 적용하면 된다.
             if (data[0].length === 0) {
                 map.setCenter(new kakao.maps.LatLng(data[1][0].y, data[1][0].x));
@@ -621,7 +651,7 @@ function categoryOpenAndClose() {
     const categoryContainer = document.querySelector('.category-container');
     const aroundTitle = document.querySelector('.around-title');
     const arrow = aroundTitle.querySelector('.fa-solid')
-    if(categoryContainer.style.height !== '0px') {
+    if (categoryContainer.style.height !== '0px') {
         categoryContainer.style.height = '0px';
         arrow.style.transform = 'rotate(-180deg)'
         // aroundTitle.style.marginBottom = '0px';
@@ -639,7 +669,7 @@ function categoryMouseEnter(e) {
 }
 
 function categoryMouseLeave(e) {
-    if(e.target.lastElementChild.classList.contains('category-active') === false){
+    if (e.target.lastElementChild.classList.contains('category-active') === false) {
         e.target.lastElementChild.classList.remove('category-hover');
         e.target.style.color = 'black';
     }
@@ -648,30 +678,30 @@ function categoryMouseLeave(e) {
 
 function categoryClick(e, index) {
     let isActive = categoryIsActive(); // return {활성화된게 있는지 여부, 활성화된 인덱스}
-    
+
     removeMarker();
     removeCategoryMarker();
     removeCustomOverlay();
 
-    if(isActive.state === true) { 
+    if (isActive.state === true) {
         console.log("활성화 된 카테고리가 있습니다.");
         let num = isActive.index;
 
-        if(e.currentTarget.lastElementChild.classList.contains('category-active') === false){
+        if (e.currentTarget.lastElementChild.classList.contains('category-active') === false) {
             console.log("클릭한 카테고리는 활성화된 카테고리가 아닙니다. 활성화 시작합니다.");
             e.currentTarget.lastElementChild.classList.add('category-active');
             categorySearch(e);
-        } 
+        }
         console.log("활성화된 카테고리를 비활성화 합니다.");
         categoryCircles[num].lastElementChild.classList.remove('category-active');
         categoryCircles[num].lastElementChild.classList.remove('category-hover');
-        categoryCircles[num].style.color = 'black';        
-    } 
-    else if(isActive.state === false) {
+        categoryCircles[num].style.color = 'black';
+    }
+    else if (isActive.state === false) {
         console.log("활성화된 카테고리가 없습니다.");
         e.currentTarget.lastElementChild.classList.add('category-active');
         categorySearch(e);
-        if(e.currentTarget.lastElementChild.classList.contains('category-hover') === false){
+        if (e.currentTarget.lastElementChild.classList.contains('category-hover') === false) {
             e.currentTarget.lastElementChild.classList.add('category-hover');
             e.currentTarget.style.color = 'white';
         }
@@ -696,15 +726,15 @@ aroundTitle.addEventListener('click', categoryOpenAndClose);
 searchInput.addEventListener('keyup', e => {
     if (e.keyCode === 13) enterKey(e);
     else if (e.keyCode === 38) {
-        if(searchbarIsOpen === true) upKey(e);
+        if (searchbarIsOpen === true) upKey(e);
     }
     else if (e.keyCode === 40) {
-        if(searchbarIsOpen === true) downKey(e);
+        if (searchbarIsOpen === true) downKey(e);
     }
-    else if(e.isComposing === false) return;
+    else if (e.isComposing === false) return;
     else {
         //value가 공백이 되면 query에러가 발생하여 넣은 코드
-        if (searchInput.value === '') return; 
+        if (searchInput.value === '') return;
 
         const promise1 = getAddrList(searchInput.value);
         const promise2 = getRestList(searchInput.value);
@@ -726,9 +756,9 @@ searchInput.addEventListener('keyup', e => {
 })
 
 searchInput.addEventListener('keydown', e => {
-    if(e.keyCode === 38) e.preventDefault();
-    else if(e.keyCode === 40) e.preventDefault(); 
-    
+    if (e.keyCode === 38) e.preventDefault();
+    else if (e.keyCode === 40) e.preventDefault();
+
 
 })
 
