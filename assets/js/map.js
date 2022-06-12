@@ -383,7 +383,7 @@ function clickSearch(e) {
     console.log(e.target);
     const relation = e.target.innerText;
     const type = e.target.getAttribute("data-type");
-    const currentLocation = document.querySelector('.current-location');
+    const currentLocationName = document.querySelector('.current-location');
 
     // ! clickSearch로 바꿈으로써 히스토리가 클릭되었을때도 생각해야되는 함수가 되었다.
     switch (type) {
@@ -406,7 +406,7 @@ function clickSearch(e) {
                 })
             break;
     }
-    currentLocation.innerText = relation;
+    currentLocationName.innerText = relation;
 }
 
 //* 히스토리를 클릭하면 바로 검색결과 나타나게 하는 함수
@@ -513,12 +513,12 @@ function placesSearchCB(data, status, pagination) {
     }
 }
 
-function enterKey(e) {
+function enterKey() {
     search();
     closeSearchBar();
 }
 
-function upKey(e) {
+function upKey() {
     // const end = searchInput.value.length;
     // searchInput.setSelectionRange(end, end);
     // searchInput.focus();
@@ -557,7 +557,7 @@ function upKey(e) {
     }
 }
 
-function downKey(e) {
+function downKey() {
     const relationContainer = document.querySelector('.relation-container');
     let activeChild = relationContainer.firstElementChild;
     let isActive = false;
@@ -598,20 +598,23 @@ function mouseOut(e) {
 }
 
 function search() {
-    /**
-     * search.value 가 주소냐 키워드냐를 따져봐야대
-     */
+    // * searchInput의 이벤트중 엔터키가 눌렸을때 '현재 텍스트'로 검색하는 함수
+    // keyup 이벤트라서 검색어 정보를 event.target으로는 불러올수 없기때문에
+    // 연관검색어를 클릭하여 검색하는 기능과 엔터키를 눌러 검색하는 기능을 나누어서 만들었다.
     console.log("엔터로 검색 시작");
     Promise.all([searchByAddr(searchInput.value), searchByKeyword(searchInput.value)])
         .then(data => {
             //data[0], data[1]들은 배열(placeList)로 나오게끔 코드를 짰다. x,y 를 얻어 함수에 적용하면 된다.
+            console.log(data);
             if (data[0].length === 0) {
                 map.setCenter(new kakao.maps.LatLng(data[1][0].y, data[1][0].x));
                 createMarker(data[1]);
+                displaySearchList(data[1]);
             }
             else {
                 map.setCenter(new kakao.maps.LatLng(data[0][0].y, data[0][0].x));
                 createMarker(data[0]);
+                displaySearchList(data[0]);
             }
         })
 }
@@ -739,12 +742,12 @@ aroundTitle.addEventListener('click', categoryOpenAndClose);
 // 검색창에 값이 입력될 때마다 연관검색어, 히스토리를 보여주는 이벤트
 // ! 아직 조정할 내용이 남아있다.
 searchInput.addEventListener('keyup', e => {
-    if (e.keyCode === 13) enterKey(e);
+    if (e.keyCode === 13) enterKey();
     else if (e.keyCode === 38) {
-        if (searchbarIsOpen === true) upKey(e);
+        if (searchbarIsOpen === true) upKey();
     }
     else if (e.keyCode === 40) {
-        if (searchbarIsOpen === true) downKey(e);
+        if (searchbarIsOpen === true) downKey();
     }
     else if (e.isComposing === false) return;
     else {
