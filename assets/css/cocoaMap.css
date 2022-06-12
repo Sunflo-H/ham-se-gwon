@@ -184,6 +184,10 @@
     cursor: pointer;
 }
 
+.action-container .searchList-container li:hover {
+    background-color: #fafcff;
+}
+
 .action-container .nameAndAddress {
     max-width: 170px;
 }
@@ -194,7 +198,13 @@
     white-space: nowrap;
     text-overflow: ellipsis;
     /* font-weight: bold; */
+    cursor: pointer;
 }
+
+.action-container .nameAndAddress .number + span:hover{
+    text-decoration: underline;
+}
+
 
 .action-container .nameAndAddress .number{
     font-weight: bold;

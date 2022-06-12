@@ -115,9 +115,8 @@ function displaySearchList(placeList) {
             
             listElement = `<li>
                             <div class="nameAndAddress">
-                                <div class="name"><span class="number">${number}</span>${addressName}</div>
+                                <div class="name"><span class="number">${number}</span><span>${addressName}<span></div>
                             </div> 
-                            <div class="distance">100<span class="meter">m</span></div>
                         </li>`
         }
         else {
@@ -129,7 +128,7 @@ function displaySearchList(placeList) {
             
             listElement = `<li>
                             <div class="nameAndAddress">
-                                <div class="name"><span class="number">${number}</span>${placeName}</div>
+                                <div class="name"><span class="number">${number}</span><span>${placeName}<span></div>
                                 <div class="roadName-address">${roadAddress}</div>
                                 <div class="number-address">(지번) ${address}</div>
                             </div> 
