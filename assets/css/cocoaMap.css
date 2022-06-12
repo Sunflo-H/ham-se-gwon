@@ -81,7 +81,6 @@
     justify-content: space-around;
     overflow: hidden;
     transition: 1s;
-    /* border: 1px solid blue; */
     box-sizing: border-box;
     padding: 0px 20px;
 }
@@ -154,9 +153,10 @@
 }
 
 .action-container .searchList-container .searchList-title {
-    margin: 10px 20px 10px;
+    padding: 10px 20px 10px;
     font-weight: bold;
     font-size: 16px;
+    border-bottom: 1px solid rgba(237, 237, 237, 0.98);
 
 }
 
@@ -166,42 +166,62 @@
 }
 
 .action-container .searchList-container ul {
-    /* border: 1px solid blue; */
+    height: 100%;
+    overflow: scroll;
+}
+
+.searchList-container ul::-webkit-scrollbar {
+    display: none;
 }
 
 .action-container .searchList-container li {
     display: flex;
-    height: 50px;
+    max-height: 50px;
     justify-content: space-between;
-    border: 1px solid rgba(237, 237, 237, 0.98);
+    /* border-top: 1px solid rgba(237, 237, 237, 0.98); */
+    border-bottom: 1px solid rgba(237, 237, 237, 0.98);
     padding: 10px 5px 10px 10px;
     cursor: pointer;
 }
 
 .action-container .nameAndAddress {
-    width: 100%;
+    max-width: 170px;
+}
+
+.action-container .nameAndAddress .name {
+    color: rgba(0, 0, 0, 0.888);
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    /* font-weight: bold; */
 }
 
 .action-container .nameAndAddress .number{
     font-weight: bold;
     color: var(--blue2);
-    margin-right: 5px;
+    margin-right: 8px;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
 }
 
-.action-container .nameAndAddress .name {
-    color: rgba(0, 0, 0, 0.888);
-}
 
 .action-container .nameAndAddress .roadName-address {
     margin-top: 5px;
     font-size: 12px;
     color: rgba(0, 0, 0, 0.628);
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
 }
 
 .action-container .nameAndAddress .number-address {
     margin-top: 5px;
     font-size: 12px;
     color: rgba(0, 0, 0, 0.628);
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
 }
 
 .action-container .distance {

@@ -83,22 +83,37 @@ function getDistance() {
 
 function displaySearchList(placeList) {
     console.log("검색 리스트 보여주기 실행");
-    console.log(placeList);
+    const searchListContainer = document.querySelector('.searchList-container');
+    const title = document.createElement('div');//document.querySelector('.searchList-title');
+    const ul = document.createElement('ul');
+
+    while (searchListContainer.hasChildNodes() )
+    {
+        searchListContainer.removeChild(searchListContainer.firstChild );
+    }
+
+    title.classList.add('searchList-title');
+    searchListContainer.appendChild(title);
+    searchListContainer.appendChild(ul);
+
     placeList.forEach((place, i) => {
         // i === 0 이니까 +65를해서 대문자 A가 나오게 한다.
         let number = String.fromCharCode(i + 65);
         
-        let element;
+        let listElement;
         // place.address.address_name  지번주소
         // place.address.road_address  도로명
         // place.address.place_name    장소명
 
-        console.log(place);
-        if (place.place_name === undefined) {// 주소로 검색했다는 뜻 
+        if (place.place_name === undefined) { // 장소명이 undefined면 주소 검색입니다.
             let addressName = place.address_name;
+
             if(addressName === undefined) addressName = place.road_address;
+
+            title.innerHTML = `주소<span class="list-count"> ${placeList.length}</span>`
             
-            element = `<li>
+            
+            listElement = `<li>
                             <div class="nameAndAddress">
                                 <div class="name"><span class="number">${number}</span>${addressName}</div>
                             </div> 
@@ -109,7 +124,10 @@ function displaySearchList(placeList) {
             let placeName = place.place_name;
             let address = place.address_name;
             let roadAddress = place.road_address_name;
-            element = `<li>
+
+            title.innerHTML = `장소<span class="list-count"> ${placeList.length}</span>`
+            
+            listElement = `<li>
                             <div class="nameAndAddress">
                                 <div class="name"><span class="number">${number}</span>${placeName}</div>
                                 <div class="roadName-address">${roadAddress}</div>
@@ -117,11 +135,8 @@ function displaySearchList(placeList) {
                             </div> 
                             <div class="distance">100<span class="meter">m</span></div>
                         </li>`
-        }
-
-
-        const ul = document.querySelector('.searchList-container > ul');
-        ul.insertAdjacentHTML('beforeend', element);
+        }        
+        ul.insertAdjacentHTML('beforeend', listElement);
     })
 }
 
