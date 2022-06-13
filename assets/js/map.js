@@ -23,64 +23,30 @@ let categoryMarkerList = [];
 let customOverlay;
 let searchbarIsOpen = false;
 let searchList = [];
+let polylineList = [];
 
-function getDistance() {
-    //마커를 클릭하면 내 현재 위치와의 거리를 보여줘
+// place data에 distance를 추가하여 반환하는 함수
+function addDistance(placeList){
+    placeList.forEach(place => {
+        polyline = new kakao.maps.Polyline({
+            map: map,
+            path: [
+                new kakao.maps.LatLng(place.y, place.x),
+                map.getCenter()
+                // 센터말고 다른기준이 필요해
+            ],
+            strokeWeight: 2,
+            strokeColor: '#FF00FF',
+            strokeOpacity: 0.8,
+            strokeStyle: 'dashed'
+        });
 
-    // 마우스로 클릭한 위치입니다 
-    var clickPosition = mouseEvent.latLng;
+        polylineList.push(polyline);
 
-
-
-    // 상태를 true로, 선이 그리고있는 상태로 변경합니다
-    drawingFlag = true;
-
-    // 지도 위에 선이 표시되고 있다면 지도에서 제거합니다
-    deleteClickLine();
-
-    // 지도 위에 커스텀오버레이가 표시되고 있다면 지도에서 제거합니다
-    deleteDistnce();
-
-    // 지도 위에 선을 그리기 위해 클릭한 지점과 해당 지점의 거리정보가 표시되고 있다면 지도에서 제거합니다
-    deleteCircleDot();
-
-    // 클릭한 위치를 기준으로 선을 생성하고 지도위에 표시합니다
-    clickLine = new kakao.maps.Polyline({
-        map: map, // 선을 표시할 지도입니다 
-        path: [clickPosition], // 선을 구성하는 좌표 배열입니다 클릭한 위치를 넣어줍니다
-        strokeWeight: 3, // 선의 두께입니다 
-        strokeColor: '#db4040', // 선의 색깔입니다
-        strokeOpacity: 1, // 선의 불투명도입니다 0에서 1 사이값이며 0에 가까울수록 투명합니다
-        strokeStyle: 'solid' // 선의 스타일입니다
-    });
-
-    // 선이 그려지고 있을 때 마우스 움직임에 따라 선이 그려질 위치를 표시할 선을 생성합니다
-    moveLine = new kakao.maps.Polyline({
-        strokeWeight: 3, // 선의 두께입니다 
-        strokeColor: '#db4040', // 선의 색깔입니다
-        strokeOpacity: 0.5, // 선의 불투명도입니다 0에서 1 사이값이며 0에 가까울수록 투명합니다
-        strokeStyle: 'solid' // 선의 스타일입니다    
-    });
-
-    // 클릭한 지점에 대한 정보를 지도에 표시합니다
-    displayCircleDot(clickPosition, 0);
-
-
-
-
-    // 그려지고 있는 선의 좌표 배열을 얻어옵니다
-    var path = clickLine.getPath();
-
-    // 좌표 배열에 클릭한 위치를 추가합니다
-    path.push(clickPosition);
-
-    // 다시 선에 좌표 배열을 설정하여 클릭 위치까지 선을 그리도록 설정합니다
-    clickLine.setPath(path);
-
-    var distance = Math.round(clickLine.getLength());
-    displayCircleDot(clickPosition, distance);
+        let distance = Math.round(polyline.getLength());
+        place.distance = distance;
+    })
 }
-
 function displaySearchList(placeList) {
     console.log("검색 리스트 보여주기 실행");
     const searchListContainer = document.querySelector('.searchList-container');
@@ -101,9 +67,10 @@ function displaySearchList(placeList) {
         let number = String.fromCharCode(i + 65);
         
         let listElement;
-        // place.address.address_name  지번주소
-        // place.address.road_address  도로명
-        // place.address.place_name    장소명
+        // place.address_name  지번주소
+        // place.road_address  도로명
+        // place.place_name    장소명
+        // place.address_type 지번(region)과 도로명(road)의 각 타입
 
         if (place.place_name === undefined) { // 장소명이 undefined면 주소 검색입니다.
             let addressName = place.address_name;
@@ -130,7 +97,7 @@ function displaySearchList(placeList) {
                             <div class="nameAndAddress">
                                 <div class="name"><span class="number">${number}</span><span>${placeName}<span></div>
                                 <div class="roadName-address">${roadAddress}</div>
-                                <div class="number-address">(지번) ${address}</div>
+                                <div class="region-address">(지번) ${address}</div>
                             </div> 
                             <div class="distance">100<span class="meter">m</span></div>
                         </li>`
@@ -162,7 +129,12 @@ function categorySearch(e) {
     // 카테고리 검색 결과를 받을 콜백 함수
     let callback = function (result, status) {
         if (status === kakao.maps.services.Status.OK) {
-            createCategoryMarker(result)
+            console.log(result);
+            createCategoryMarker(result);
+            polylineList.forEach(polyline => polyline.setMap(null));
+            // addDistance(result);
+            addDistance(result);
+            console.log(result);
         }
     };
 
@@ -296,7 +268,9 @@ function error() {
 
 /**
  * & 검색 함수들 적용 설명
- * 값 입력 => getAddrList() or getRestList()로 데이터를 받아와 {type, name} 객체를 Promise로 리턴
+ * 값 입력 => getAddrList() or getRestList()로 자동완성에 사용할 데이터를 받아온다
+ * {type, name} 객체를 Promise로 리턴한다.
+ * 
  * 이렇게 얻은 Promise데이터를 displayRelation()함수를 실행하여 연관검색어로 보여준다. 
  * 
  * 연관검색어 클릭 => clickSearch() 실행 => 
@@ -308,6 +282,7 @@ function error() {
  */
 // ! 이 함수들 비동기함수로 변환될수 있대. 누르면 async await코드로 바뀜 공부하고 스스로 바꾸자
 function getAddrList(keyword) {
+    console.log("겟 어드레스 리스트");
     return fetch(`https://dapi.kakao.com/v2/local/search/address.json?query=${keyword}&size=5`, {
         headers: { Authorization: `KakaoAK 621a24687f9ad83f695acc0438558af2` }
     })
@@ -431,12 +406,13 @@ function setHtmlHistoryList(history) {
     }
 }
 
+// 주소를 입력하여 검색하는 함수입니다.
 function searchByAddr(searchInput) {
-    // 주소 형식의 데이터로만 검색이 가능합니다.
     console.log("주소로 검색 실행");
     console.log("검색어 :", searchInput);
     // 주소-좌표 변환 객체를 생성합니다
     var geocoder = new kakao.maps.services.Geocoder();
+    polylineList.forEach(polyline => polyline.setMap(null));
 
     // 주소로 좌표를 검색합니다
     let placeList = new Promise((resolve, reject) => {
@@ -444,7 +420,30 @@ function searchByAddr(searchInput) {
             // 정상적으로 검색이 완료됐으면 
             if (status === kakao.maps.services.Status.OK) {
                 console.log("주소로 검색 결과 : ", result);
+
+                //거리 구해서 데이터에 추가하기
+                result.forEach(address => {
+                    polyline = new kakao.maps.Polyline({
+                        map: map,
+                        path: [
+                            new kakao.maps.LatLng(address.y, address.x),
+                            map.getCenter()
+                            // 센터말고 다른기준이 필요해
+                        ],
+                        strokeWeight: 2,
+                        strokeColor: '#FF00FF',
+                        strokeOpacity: 0.8,
+                        strokeStyle: 'dashed'
+                    });
+
+                    polylineList.push(polyline);
+
+                    let distance = Math.round(polyline.getLength());
+                    address.distance = distance;
+                })
+
                 resolve(result);
+
             } else {
                 console.log("검색 실패 주소가 아닙니다. reulst는 공백입니다.");
                 resolve(result);
@@ -471,19 +470,6 @@ function searchByKeyword(searchInput) {
     })
         .then((response) => response.json())
         .then((data) => {
-            //! 원래 코드인데 이 then절을 함수를 호출한 쪽에서  사용하려고 주석함
-            // if(data.documents.length === 0){ // 주변에서 검색결과가 없다면 범위를 확장하여 다시 검색합니다
-            //     // 장소 검색 객체를 생성합니다
-            //     var ps = new kakao.maps.services.Places();
-
-            //     // 키워드로 장소를 검색합니다
-            //     ps.keywordSearch(searchInput, placesSearchCB);
-            // }
-            // else {
-            //     console.log("키워드로 검색 결과 : ", data);
-            //     map.setCenter(new kakao.maps.LatLng(data.documents[0].y, data.documents[0].x));
-            //     createMarker(data.documents);
-            // }
             console.log("키워드로 검색 결과 :", data);
             return data.documents;
         })
@@ -741,6 +727,7 @@ aroundTitle.addEventListener('click', categoryOpenAndClose);
 // 검색창에 값이 입력될 때마다 연관검색어, 히스토리를 보여주는 이벤트
 // ! 아직 조정할 내용이 남아있다.
 searchInput.addEventListener('keyup', e => {
+    console.log("키가 눌렸습니다.");
     if (e.keyCode === 13) enterKey();
     else if (e.keyCode === 38) {
         if (searchbarIsOpen === true) upKey();

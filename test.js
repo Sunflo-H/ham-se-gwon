@@ -12,3 +12,9 @@ click.addEventListener('click',(e) => {
     }
 });
 
+let bat = {
+    name: 'bruce'
+}
+console.log(bat);
+bat.power = 'rich';
+console.log(bat);

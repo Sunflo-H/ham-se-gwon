@@ -197,7 +197,6 @@
     overflow: hidden;
     white-space: nowrap;
     text-overflow: ellipsis;
-    /* font-weight: bold; */
     cursor: pointer;
 }
 
@@ -225,7 +224,7 @@
     text-overflow: ellipsis;
 }
 
-.action-container .nameAndAddress .number-address {
+.action-container .nameAndAddress .region-address {
     margin-top: 5px;
     font-size: 12px;
     color: rgba(0, 0, 0, 0.628);
