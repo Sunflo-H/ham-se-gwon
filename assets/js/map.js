@@ -26,27 +26,29 @@ let searchList = [];
 let polylineList = [];
 
 // place data에 distance를 추가하여 반환하는 함수
-function addDistance(placeList){
-    placeList.forEach(place => {
-        polyline = new kakao.maps.Polyline({
-            map: map,
-            path: [
-                new kakao.maps.LatLng(place.y, place.x),
-                map.getCenter()
-                // 센터말고 다른기준이 필요해
-            ],
-            strokeWeight: 2,
-            strokeColor: '#FF00FF',
-            strokeOpacity: 0.8,
-            strokeStyle: 'dashed'
-        });
+// function addDistanceData(placeList, color = 'none'){
+//     console.log("거리를 추가합니다.");
+//     placeList.forEach(place => {
+//         polyline = new kakao.maps.Polyline({
+//             map: map,
+//             path: [
+//                 new kakao.maps.LatLng(place.y, place.x),
+//                 map.getCenter()
+//                 // 센터말고 다른기준이 필요해
+//             ],
+//             strokeWeight: 2,
+//             strokeColor: color,
+//             strokeOpacity: 0.8,
+//             strokeStyle: 'dashed'
+//         });
 
-        polylineList.push(polyline);
+//         polylineList.push(polyline);
 
-        let distance = Math.round(polyline.getLength());
-        place.distance = distance;
-    })
-}
+//         let distance = Math.round(polyline.getLength());
+//         console.log("거리:",  distance.length);
+//         place.distance = distance;
+//     })
+// }
 function displaySearchList(placeList) {
     console.log("검색 리스트 보여주기 실행");
     const searchListContainer = document.querySelector('.searchList-container');
@@ -65,12 +67,7 @@ function displaySearchList(placeList) {
     placeList.forEach((place, i) => {
         // i === 0 이니까 +65를해서 대문자 A가 나오게 한다.
         let number = String.fromCharCode(i + 65);
-        
         let listElement;
-        // place.address_name  지번주소
-        // place.road_address  도로명
-        // place.place_name    장소명
-        // place.address_type 지번(region)과 도로명(road)의 각 타입
 
         if (place.place_name === undefined) { // 장소명이 undefined면 주소 검색입니다.
             let addressName = place.address_name;
@@ -90,6 +87,7 @@ function displaySearchList(placeList) {
             let placeName = place.place_name;
             let address = place.address_name;
             let roadAddress = place.road_address_name;
+            let distance = place.distance;
 
             title.innerHTML = `장소<span class="list-count"> ${placeList.length}</span>`
             
@@ -99,7 +97,7 @@ function displaySearchList(placeList) {
                                 <div class="roadName-address">${roadAddress}</div>
                                 <div class="region-address">(지번) ${address}</div>
                             </div> 
-                            <div class="distance">100<span class="meter">m</span></div>
+                            <div class="distance">${distance}</div>
                         </li>`
         }        
         ul.insertAdjacentHTML('beforeend', listElement);
@@ -123,18 +121,16 @@ function categoryIsActive() { // return 값이 undefinded면 비활성화중, �
 }
 
 function categorySearch(e) {
+    console.log("카테고리를 눌렀습니다. 카테고리 검색을 실행합니다.");
     let places = new kakao.maps.services.Places();
     let category = e.currentTarget.parentNode.getAttribute('data-category');
 
     // 카테고리 검색 결과를 받을 콜백 함수
     let callback = function (result, status) {
         if (status === kakao.maps.services.Status.OK) {
-            console.log(result);
             createCategoryMarker(result);
             polylineList.forEach(polyline => polyline.setMap(null));
-            // addDistance(result);
-            addDistance(result);
-            console.log(result);
+            // addDistanceData(result, '#FF00FF');
         }
     };
 
@@ -412,7 +408,6 @@ function searchByAddr(searchInput) {
     console.log("검색어 :", searchInput);
     // 주소-좌표 변환 객체를 생성합니다
     var geocoder = new kakao.maps.services.Geocoder();
-    polylineList.forEach(polyline => polyline.setMap(null));
 
     // 주소로 좌표를 검색합니다
     let placeList = new Promise((resolve, reject) => {
@@ -420,27 +415,8 @@ function searchByAddr(searchInput) {
             // 정상적으로 검색이 완료됐으면 
             if (status === kakao.maps.services.Status.OK) {
                 console.log("주소로 검색 결과 : ", result);
-
-                //거리 구해서 데이터에 추가하기
-                result.forEach(address => {
-                    polyline = new kakao.maps.Polyline({
-                        map: map,
-                        path: [
-                            new kakao.maps.LatLng(address.y, address.x),
-                            map.getCenter()
-                            // 센터말고 다른기준이 필요해
-                        ],
-                        strokeWeight: 2,
-                        strokeColor: '#FF00FF',
-                        strokeOpacity: 0.8,
-                        strokeStyle: 'dashed'
-                    });
-
-                    polylineList.push(polyline);
-
-                    let distance = Math.round(polyline.getLength());
-                    address.distance = distance;
-                })
+                // addDistanceData(result);
+                console.log(result);
 
                 resolve(result);
 
@@ -454,13 +430,7 @@ function searchByAddr(searchInput) {
 }
 
 function searchByKeyword(searchInput) {
-
-    /**
-     * 여러 데이터를 찾게 될텐데
-     * 첫번째 데이터로 map.setCenter()를 정하고
-     * 좌측에 모달만들어서 ~로 검색한 결과 글씨와 그 리스트를 띄워줘
-     * 
-     */
+    console.log("키워드로 검색 실행합니다.");
     const { La, Ma } = map.getCenter();
     const lat = Ma;
     const lng = La;
@@ -477,7 +447,8 @@ function searchByKeyword(searchInput) {
     return placeList;
 }
 
-// 키워드 검색 완료 시 호출되는 콜백함수 입니다
+//! 안쓰이는 함수인데 키워드 검색후 지도 범위 변경 때문에 남겨둔 코드
+// 키워드 검색 완료 시 호출되는 콜백함수 입니다 
 function placesSearchCB(data, status, pagination) {
     if (status === kakao.maps.services.Status.OK) {
         //data = 객체 배열, 객체에서 x,y or address_name을 꺼내면 될듯

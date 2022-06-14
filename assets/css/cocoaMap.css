@@ -244,11 +244,6 @@
     text-align: center;
 }
 
-.action-container .distance .meter {
-    font-size: 12px;
-    margin-left: 1px;
-}
-
 /* 지도 박스 */
 .map-container {
     width: calc(100% - 200px);
