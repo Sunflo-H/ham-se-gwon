@@ -69,6 +69,14 @@
                 <div class="current-location-info-container">
                     <p class="current-location">서울 광진구 구의동</p>
                     <p>맑음 <b>17도</b> 미세 <span>좋음</span> 황사 <span>좋음</span></p>
+                    <button>길찾기</button>
+                    <script>
+                        const button = document.querySelector('button');
+                        console.log(button);
+                        button.addEventListener('click', (e) => {
+                            location.href = "	kakaomap://route?sp=37.537229,127.005515&ep=37.4979502,127.0276368&by=FOOT"
+                        })
+                    </script>
                 </div>
                 <div class="around-container">
                     <div class="around-title">

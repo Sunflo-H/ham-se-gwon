@@ -178,7 +178,6 @@
     display: flex;
     max-height: 50px;
     justify-content: space-between;
-    /* border-top: 1px solid rgba(237, 237, 237, 0.98); */
     border-bottom: 1px solid rgba(237, 237, 237, 0.98);
     padding: 10px 5px 10px 10px;
     cursor: pointer;
@@ -189,7 +188,8 @@
 }
 
 .action-container .nameAndAddress {
-    max-width: 170px;
+    max-width: 160px;
+    /* border: 1px solid red; */
 }
 
 .action-container .nameAndAddress .name {
@@ -235,13 +235,15 @@
 
 .action-container .distance {
     font-size: 14px;
-    min-width: 45px;
-    height: 16px;
+    min-width: 50px;
+    height: 18px;
+    line-height: 16px;
     background-color: var(--blue2);
     color: white;
     border-radius: 5px;
     font-weight: bold;
     text-align: center;
+    /* border: 1px solid red; */
 }
 
 /* 지도 박스 */

@@ -25,30 +25,52 @@ let searchbarIsOpen = false;
 let searchList = [];
 let polylineList = [];
 
+
+function addMarker() {
+    var imageSrc = 'https://t1.daumcdn.net/localimg/localimages/07/mapapidoc/marker_number_blue.png', // 마커 이미지 url, 스프라이트 이미지
+        imageSize = new kakao.maps.Size(36, 37),  // 마커 이미지의 크기
+        imgOptions =  {
+          spriteSize : new kakao.maps.Size(36, 691), // 스프라이트 이미지의 크기
+          spriteOrigin : new kakao.maps.Point(0, (0*46)+10), // 스프라이트 이미지 중 사용할 영역의 좌상단 좌표
+          offset: new kakao.maps.Point(13, 37) // 마커 좌표에 일치시킬 이미지 내에서의 좌표
+        },
+        markerImage = new kakao.maps.MarkerImage(imageSrc, imageSize, imgOptions),
+        marker = new kakao.maps.Marker({
+          position: map.getCenter(), // 마커의 위치
+          image: markerImage 
+        });
+
+    marker.setMap(map); // 지도 위에 마커를 표출
+    markers.push(marker);  // 배열에 생성된 마커를 추가
+
+    return marker;
+  }
+
 // place data에 distance를 추가하여 반환하는 함수
-// function addDistanceData(placeList, color = 'none'){
-//     console.log("거리를 추가합니다.");
-//     placeList.forEach(place => {
-//         polyline = new kakao.maps.Polyline({
-//             map: map,
-//             path: [
-//                 new kakao.maps.LatLng(place.y, place.x),
-//                 map.getCenter()
-//                 // 센터말고 다른기준이 필요해
-//             ],
-//             strokeWeight: 2,
-//             strokeColor: color,
-//             strokeOpacity: 0.8,
-//             strokeStyle: 'dashed'
-//         });
+function addDistanceData(placeList, color = 'none'){
+    console.log("거리를 추가합니다.");
+    placeList.forEach(place => {
+        polyline = new kakao.maps.Polyline({
+            map: map,
+            path: [
+                new kakao.maps.LatLng(place.y, place.x),
+                map.getCenter()
+                // 센터말고 다른기준이 필요해
+            ],
+            strokeWeight: 2,
+            strokeColor: color,
+            strokeOpacity: 0.8,
+            strokeStyle: 'dashed'
+        });
 
-//         polylineList.push(polyline);
+        polylineList.push(polyline);
 
-//         let distance = Math.round(polyline.getLength());
-//         console.log("거리:",  distance.length);
-//         place.distance = distance;
-//     })
-// }
+        let distance = Math.round(polyline.getLength());
+        console.log("거리:",  distance.length);
+        place.distance = distance;
+    })
+}
+
 function displaySearchList(placeList) {
     console.log("검색 리스트 보여주기 실행");
     const searchListContainer = document.querySelector('.searchList-container');
@@ -88,6 +110,12 @@ function displaySearchList(placeList) {
             let address = place.address_name;
             let roadAddress = place.road_address_name;
             let distance = place.distance;
+            if(distance.length < 4) {
+                distance = place.distance + 'm'
+            }
+            else {
+                distance = Math.round(distance/100)/10 + 'km'
+            }
 
             title.innerHTML = `장소<span class="list-count"> ${placeList.length}</span>`
             
@@ -97,8 +125,9 @@ function displaySearchList(placeList) {
                                 <div class="roadName-address">${roadAddress}</div>
                                 <div class="region-address">(지번) ${address}</div>
                             </div> 
-                            <div class="distance">${distance}</div>
-                        </li>`
+                            <div class="pathfinder-button"> 길찾기 </div> 
+                            </li>`
+                            // <div class="distance">${distance}</div>
         }        
         ul.insertAdjacentHTML('beforeend', listElement);
     })
@@ -159,8 +188,10 @@ function displayMap(lat, lng) {
 function createMarkerByCoords(lat, lng) {
     let position = new kakao.maps.LatLng(lat, lng);
     let marker = new kakao.maps.Marker({
-        position: position
+        position: position,
+        title: "이게 모야"
     });
+    console.log(marker.getTitle());
     let place = {
         address_name: "내 위치",
         x: lng,
@@ -172,7 +203,6 @@ function createMarkerByCoords(lat, lng) {
     kakao.maps.event.addListener(marker, 'click', () => createCustomOverlay(place));
 
     marker.setMap(map);
-
 }
 
 function createMarker(placeList) {
@@ -182,7 +212,8 @@ function createMarker(placeList) {
     placeList.forEach(place => {
         let marker = new kakao.maps.Marker({
             map: map,
-            position: new kakao.maps.LatLng(place.y, place.x)
+            position: new kakao.maps.LatLng(place.y, place.x),
+            
         });
         markerList.push(marker);
         kakao.maps.event.addListener(marker, 'click', () => createCustomOverlay(place));
@@ -196,6 +227,7 @@ function removeMarker() {
     markerList = [];
 }
 
+// 커스텀 오버레이를 사용하여 카테고리 마커를 생성하는 함수
 function createCategoryMarker(placeList) {
     removeCategoryMarker();
     console.log("카테고리 마커 생성");
