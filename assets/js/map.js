@@ -19,7 +19,7 @@ const aroundTitle = document.querySelector('.around-title > span');
 let map;
 let historyList = [];
 let markerList = [];
-let categoryMarkerList = [];
+let numberMarkerList = [];
 let customOverlay;
 let searchbarIsOpen = false;
 let searchList = [];
@@ -157,7 +157,7 @@ function categorySearch(e) {
     // 카테고리 검색 결과를 받을 콜백 함수
     let callback = function (result, status) {
         if (status === kakao.maps.services.Status.OK) {
-            createCategoryMarker(result);
+            createNumberMarker(result);
             polylineList.forEach(polyline => polyline.setMap(null));
             // addDistanceData(result, '#FF00FF');
         }
@@ -228,32 +228,34 @@ function removeMarker() {
 }
 
 // 커스텀 오버레이를 사용하여 카테고리 마커를 생성하는 함수
-function createCategoryMarker(placeList) {
+function createNumberMarker(placeList) {
     removeCategoryMarker();
     console.log("카테고리 마커 생성");
-    placeList.forEach(place => {
-        let content = `<div class="category-marker-container"></div>`;
+    
+    placeList.forEach((place,index) => {
         let position = new kakao.maps.LatLng(place.y, place.x);
-
-        let categoryMarker = new kakao.maps.CustomOverlay({
-            map: map,
-            clickable: true,
-            content: content,
-            position: position,
-            xAnchor: 0.5,
-            yAnchor: 2.7,
-            zIndex: 1
+        let imageSrc = 'https://t1.daumcdn.net/localimg/localimages/07/mapapidoc/marker_number_blue.png', // 마커 이미지 url, 스프라이트 이미지
+        imageSize = new kakao.maps.Size(36, 37),  // 마커 이미지의 크기
+        imgOptions =  {
+          spriteSize : new kakao.maps.Size(36, 691), // 스프라이트 이미지의 크기
+          spriteOrigin : new kakao.maps.Point(0, (index*46)+10), // 스프라이트 이미지 중 사용할 영역의 좌상단 좌표
+          offset: new kakao.maps.Point(13, 37) // 마커 좌표에 일치시킬 이미지 내에서의 좌표
+        },
+        markerImage = new kakao.maps.MarkerImage(imageSrc, imageSize, imgOptions),
+        numberMarker = new kakao.maps.Marker({
+          position: position, // 마커의 위치
+          image: markerImage 
         });
-        categoryMarkerList.push(categoryMarker);
-        categoryMarker.setMap(map);
+        numberMarkerList.push(numberMarker);
+        numberMarker.setMap(map);
     })
 }
 
 function removeCategoryMarker() {
-    categoryMarkerList.forEach(marker => {
+    numberMarkerList.forEach(marker => {
         marker.setMap(null);
     })
-    categoryMarkerList = [];
+    numberMarkerList = [];
 }
 
 
