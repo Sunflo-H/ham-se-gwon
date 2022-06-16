@@ -20,7 +20,7 @@ let map;
 let historyList = [];
 let markerList = [];
 let numberMarkerList = [];
-let customOverlay;
+let overlay;
 let searchbarIsOpen = false;
 let searchList = [];
 let polylineList = [];
@@ -169,45 +169,36 @@ function categorySearch(e) {
     });
 }
 
-function displayMap(lat, lng) {
-    console.log("현재 위치로 맵을 띄웁니다.", lat, lng);
+function displayMap(lat, lng) {    
+    console.log("현재 위치를 중심으로 맵을 띄웁니다.", lat, lng);
     const mapContainer = document.getElementById('map'); // 지도를 표시할 div 
     let mapOption = {
         center: new kakao.maps.LatLng(lat, lng), // 지도의 중심좌표
         level: 3, // 지도의 확대 레벨
     };
     map = new kakao.maps.Map(mapContainer, mapOption);
-    let coords = {
-        lat: lat,
-        lng: lng
-    }
-    return coords;
 }
 
-// 사이트 접속시 내 좌표 정보만으로 마커를 생성한다. 이때만 쓰인다.
+//내 좌표 정보만으로 마커를 생성한다.
 function createMarkerByCoords(lat, lng) {
     let position = new kakao.maps.LatLng(lat, lng);
     let marker = new kakao.maps.Marker({
         position: position,
-        title: "이게 모야"
     });
-    console.log(marker.getTitle());
-    let place = {
-        address_name: "내 위치",
-        x: lng,
-        y: lat,
-    }
 
-    markerList.push(marker);
-
-    kakao.maps.event.addListener(marker, 'click', () => createCustomOverlay(place));
-
+    // 마커를 맵에 세팅합니다.
     marker.setMap(map);
+
+    // 마커에 클릭 이벤트를 적용합니다.
+    kakao.maps.event.addListener(marker, 'click', () => createOverlay(marker));
+    
+    // 생성한 마커를 마커 배열에 넣습니다.
+    markerList.push(marker);
 }
 
 function createMarker(placeList) {
     removeMarker();
-    removeCustomOverlay();
+    removeOverlay();
 
     placeList.forEach(place => {
         let marker = new kakao.maps.Marker({
@@ -216,7 +207,7 @@ function createMarker(placeList) {
             
         });
         markerList.push(marker);
-        kakao.maps.event.addListener(marker, 'click', () => createCustomOverlay(place));
+        kakao.maps.event.addListener(marker, 'click', () => createOverlay(place));
     })
 }
 
@@ -230,7 +221,7 @@ function removeMarker() {
 // 커스텀 오버레이를 사용하여 카테고리 마커를 생성하는 함수
 function createNumberMarker(placeList) {
     removeCategoryMarker();
-    console.log("카테고리 마커 생성");
+    console.log("숫자 마커 생성");
     
     placeList.forEach((place,index) => {
         let position = new kakao.maps.LatLng(place.y, place.x);
@@ -258,30 +249,59 @@ function removeCategoryMarker() {
     numberMarkerList = [];
 }
 
+// 기본 마커에 적용되는 커스텀 오버레이를 만드는 함수 입니다.
+function createOverlay(marker) {
+    removeOverlay();
+    console.log(marker.getPosition());
+    console.log("기본 오버레이 생성");
 
-function createCustomOverlay(place) {
-    removeCustomOverlay();
-    console.log("디스플레이 커스텀 오버레이");
-    let name = place.place_name;
-    if (name === undefined) name = place.address_name;
 
-    let content = `<div class="customOverlay">${name}</div>`;
-    let position = new kakao.maps.LatLng(place.y, place.x);
+    let setOverlay = (data) => {
+        console.log(data);
+        let title;
+        let addr = data[0].address.address_name;
+        let roadAddr = data[0].road_address.address_name;
+        let position = marker.getPosition();
+        let content;
 
-    customOverlay = new kakao.maps.CustomOverlay({
-        map: map,
-        clickable: true,
-        content: content,
-        position: position,
-        xAnchor: 0.5,
-        yAnchor: 2.7,
-        zIndex: 1
-    });
-    customOverlay.setMap(map);
+        if(roadAddr === undefined) {
+            title = addr;
+            content = `<div class="overlay overlay-region">
+                                <div class="title">${title}</div>
+                           </div>`;
+        }
+        else {
+            title = roadAddr;
+            content = `<div class="overlay overlay-road">
+                            <div class="title">${title}</div>
+                            <div class="region">(지번) ${addr}</div>
+                       </div>`;            
+        }
+
+        overlay = new kakao.maps.CustomOverlay({
+            map: map,
+            clickable: true,
+            content: content,
+            position: position,
+            xAnchor: 0.5,
+            yAnchor: 2,
+            zIndex: 1
+        });
+    }
+    // 주소-좌표 변환 객체를 생성합니다
+    var geocoder = new kakao.maps.services.Geocoder();      
+    
+    // 좌표로 법정동 상세 주소 정보를 요청합니다
+    geocoder.coord2Address(marker.getPosition().La, marker.getPosition().Ma , setOverlay);
+
+    
+    // let position = new kakao.maps.LatLng(place.y, place.x);
+
+    
 }
 
-function removeCustomOverlay() {
-    if (customOverlay !== undefined) customOverlay.setMap(null);
+function removeOverlay() {
+    if (overlay !== undefined) customOverlay.setMap(null);
 }
 
 // 앱의 초기단계에서 사용자의 위치를 받는 함수
@@ -612,8 +632,8 @@ function search() {
 function init() {
     getUserLocation()
         .then(data => {
-            let lat = data.coords.latitude;
-            let lng = data.coords.longitude;
+            let lat = data.coords.latitude; // 위도 (남북)
+            let lng = data.coords.longitude; // 경도 (동서)
             displayMap(lat, lng);
             createMarkerByCoords(lat, lng);
         })
@@ -689,7 +709,7 @@ function categoryClick(e, index) {
 
     removeMarker();
     removeCategoryMarker();
-    removeCustomOverlay();
+    removeOverlay();
 
     if (isActive.state === true) {
         console.log("활성화 된 카테고리가 있습니다.");
