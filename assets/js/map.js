@@ -73,7 +73,7 @@ function addDistanceData(placeList, color = 'none'){
 function displaySearchList(placeList) {
     console.log("검색 리스트 보여주기 실행");
     const searchListContainer = document.querySelector('.searchList-container');
-    const title = document.createElement('div');//document.querySelector('.searchList-title');
+    const title = document.createElement('div');
     const ul = document.createElement('ul');
 
     while (searchListContainer.hasChildNodes() )
@@ -87,7 +87,7 @@ function displaySearchList(placeList) {
 
     placeList.forEach((place, i) => {
         // i === 0 이니까 +65를해서 대문자 A가 나오게 한다.
-        let number = String.fromCharCode(i + 65);
+        let number = i+1;
         let listElement;
 
         if (place.place_name === undefined) { // 장소명이 undefined면 주소 검색입니다.
@@ -124,12 +124,23 @@ function displaySearchList(placeList) {
                                 <div class="roadName-address">${roadAddress}</div>
                                 <div class="region-address">(지번) ${address}</div>
                             </div> 
-                            <div class="pathfinder-button"> 길찾기 </div> 
+                            <div class="distance">${distance}</div>
                             </li>`
-                            // <div class="distance">${distance}</div>
+                            // <div class="pathfinder-button"> 길찾기 </div> 
         }        
         ul.insertAdjacentHTML('beforeend', listElement);
+
+        
     })
+
+    const names = document.querySelectorAll('.nameAndAddress .name');
+    names.forEach(name => {
+        name.addEventListener('click' , placeNameClick);
+    })
+}
+
+function placeNameClick(event) {
+    console.log(event.target);
 }
 
 function categoryIsActive() { // return 값이 undefinded면 비활성화중, 숫자값이면 활성화중
@@ -157,10 +168,11 @@ function aroundSearch(e) {
     // 카테고리 검색 결과를 받을 콜백 함수
     let callback = function (result, status) {
         if (status === kakao.maps.services.Status.OK) {
-            console.log(map.getCenter());
+            console.log(result);
             createMarkerByCoords(map.getCenter().Ma, map.getCenter().La);
             createNumberMarker(result);
-            polylineList.forEach(polyline => polyline.setMap(null));
+            displaySearchList(result);
+            // polylineList.forEach(polyline => polyline.setMap(null));
             // addDistanceData(result, '#FF00FF');
         }
     };
@@ -204,8 +216,8 @@ function createMarkerByCoords(lat, lng) {
     // 마커에 클릭 이벤트를 적용합니다.
     kakao.maps.event.addListener(marker, 'click', () => createOverlay(marker));
     
-    // 기존에 존재하는 마커를 삭제합니다.
     removeMarker();
+    removeOverlay();
 
     // 생성한 마커를 마커 배열에 넣습니다.
     markerList.push(marker);
@@ -225,12 +237,6 @@ function createMarker(placeList) {
     })
 }
 
-function removeMarker() {
-    markerList.forEach(marker => {
-        marker.setMap(null);
-    })
-    markerList = [];
-}
 
 // 커스텀 오버레이를 사용하여 카테고리 마커를 생성하는 함수
 function createNumberMarker(placeList) {
@@ -248,7 +254,7 @@ function createNumberMarker(placeList) {
         },
         markerImage = new kakao.maps.MarkerImage(imageSrc, imageSize, imgOptions),
         numberMarker = new kakao.maps.Marker({
-          position: position, // 마커의 위치
+            position: position, // 마커의 위치
           image: markerImage 
         });
         numberMarkerList.push(numberMarker);
@@ -256,34 +262,27 @@ function createNumberMarker(placeList) {
     })
 }
 
-function removeNumberMarker() {
-    numberMarkerList.forEach(numberMarker => {
-        numberMarker.setMap(null);
-    })
-    numberMarkerList = [];
-}
 
 // 기본 마커에 적용되는 커스텀 오버레이를 만드는 함수 입니다.
 function createOverlay(marker) {
     removeOverlay();
     console.log(marker.getPosition());
     console.log("기본 오버레이 생성");
-
-
-    let setOverlay = (data) => {
+    
+    //geocoder.coord2Address 에 사용될 콜백함수 정의
+    let callback = (data) => {
         console.log(data);
         let title;
         let addr = data[0].address.address_name;
         let position = marker.getPosition();
         let content;
-
+        
         if(data[0].road_address === null) {
-            console.log("이거 실행됨?");
             title = addr;
             content = `<div class="overlay overlay-region">
                                 <div class="title">${title}</div>
                            </div>`;
-            overlay = new kakao.maps.CustomOverlay({
+                           overlay = new kakao.maps.CustomOverlay({
                 map: map,
                 clickable: true,
                 content: content,
@@ -292,13 +291,14 @@ function createOverlay(marker) {
                 yAnchor: 2.2,
                 zIndex: 1
             });      
-        } else {
+        } 
+        else {
             title = data[0].road_address.address_name;
             content = `<div class="overlay overlay-road">
                             <div class="title">${title}</div>
                             <div class="region">(지번) ${addr}</div>
                        </div>`;     
-            overlay = new kakao.maps.CustomOverlay({
+                       overlay = new kakao.maps.CustomOverlay({
                 map: map,
                 clickable: true,
                 content: content,
@@ -307,20 +307,28 @@ function createOverlay(marker) {
                 yAnchor: 1.8,
                 zIndex: 1
             });       
-        }
-
-        
+        }        
     }
     // 주소-좌표 변환 객체를 생성합니다
     var geocoder = new kakao.maps.services.Geocoder();      
     
     // 좌표로 법정동 상세 주소 정보를 요청합니다
-    geocoder.coord2Address(marker.getPosition().La, marker.getPosition().Ma , setOverlay);
+    geocoder.coord2Address(marker.getPosition().La, marker.getPosition().Ma , callback);
 
-    
-    // let position = new kakao.maps.LatLng(place.y, place.x);
+}
 
-    
+function removeMarker() {
+    markerList.forEach(marker => {
+        marker.setMap(null);
+    })
+    markerList = [];
+}
+
+function removeNumberMarker() {
+    numberMarkerList.forEach(numberMarker => {
+        numberMarker.setMap(null);
+    })
+    numberMarkerList = [];
 }
 
 function removeOverlay() {
