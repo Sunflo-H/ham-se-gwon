@@ -25,7 +25,6 @@ let searchbarIsOpen = false;
 let searchList = [];
 let polylineList = [];
 
-
 function addMarker() {
     var imageSrc = 'https://t1.daumcdn.net/localimg/localimages/07/mapapidoc/marker_number_blue.png', // 마커 이미지 url, 스프라이트 이미지
         imageSize = new kakao.maps.Size(36, 37),  // 마커 이미지의 크기
@@ -177,6 +176,17 @@ function displayMap(lat, lng) {
         level: 3, // 지도의 확대 레벨
     };
     map = new kakao.maps.Map(mapContainer, mapOption);
+
+    kakao.maps.event.addListener(map, 'click', (mouseEvent) => {
+        if(overlay !== undefined) removeOverlay();
+    });
+
+    kakao.maps.event.addListener(map, 'rightclick', (mouseEvent) => {
+        var latlng = mouseEvent.latLng;
+        console.log(latlng);
+    });
+
+    
 }
 
 //내 좌표 정보만으로 마커를 생성한다.
@@ -275,18 +285,19 @@ function createOverlay(marker) {
             content = `<div class="overlay overlay-road">
                             <div class="title">${title}</div>
                             <div class="region">(지번) ${addr}</div>
-                       </div>`;            
+                       </div>`;     
+            overlay = new kakao.maps.CustomOverlay({
+                map: map,
+                clickable: true,
+                content: content,
+                position: position,
+                xAnchor: 0.5,
+                yAnchor: 1.8,
+                zIndex: 1
+            });       
         }
 
-        overlay = new kakao.maps.CustomOverlay({
-            map: map,
-            clickable: true,
-            content: content,
-            position: position,
-            xAnchor: 0.5,
-            yAnchor: 2,
-            zIndex: 1
-        });
+        
     }
     // 주소-좌표 변환 객체를 생성합니다
     var geocoder = new kakao.maps.services.Geocoder();      
@@ -301,7 +312,7 @@ function createOverlay(marker) {
 }
 
 function removeOverlay() {
-    if (overlay !== undefined) customOverlay.setMap(null);
+    if (overlay !== undefined) overlay.setMap(null);
 }
 
 // 앱의 초기단계에서 사용자의 위치를 받는 함수

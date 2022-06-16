@@ -275,36 +275,35 @@
 	content: '';
 	position: absolute;
 	bottom: 0;
-	left: 60%;
+	left: 50%;
 	width: 0;
 	height: 0;
-	border: 14px solid transparent;
+	border: 12px solid transparent;
 	border-top-color: var(--blue2);
 	border-bottom: 0;
-	border-left: 0;
-	margin-left: -20px;
-	margin-bottom: -14px;
+	margin-left: -12px;
+	margin-bottom: -12px;
 }
 
 .overlay-region {
-    width: 300px;
+    width: 270px;
     height: 40px;
 }
 
 .overlay-road {
-    width: 300px;
-    height: 70px;
+    width: 270px;
+    height: 60px;
 }
 
 .overlay .title {
     margin: 10px;
-    border: 1px solid red;
+    /* border: 1px solid red; */
     font-weight: bold;
 }
 
 .overlay .region {
     margin: 10px;
-    border: 1px solid red;
+    /* border: 1px solid red; */
     font-size: 12px;
 }
 
