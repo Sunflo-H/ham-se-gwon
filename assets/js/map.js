@@ -148,20 +148,23 @@ function categoryIsActive() { // return 값이 undefinded면 비활성화중, �
     return result;
 }
 
-function categorySearch(e) {
-    console.log("카테고리를 눌렀습니다. 카테고리 검색을 실행합니다.");
+function aroundSearch(e) {
+    console.log("카테고리를 눌렀습니다. 해당 카테고리로 주변 탐색을 실행합니다.");
     let places = new kakao.maps.services.Places();
     let category = e.currentTarget.parentNode.getAttribute('data-category');
 
+    
     // 카테고리 검색 결과를 받을 콜백 함수
     let callback = function (result, status) {
         if (status === kakao.maps.services.Status.OK) {
+            console.log(map.getCenter());
+            createMarkerByCoords(map.getCenter().Ma, map.getCenter().La);
             createNumberMarker(result);
             polylineList.forEach(polyline => polyline.setMap(null));
             // addDistanceData(result, '#FF00FF');
         }
     };
-
+    
     // 공공기관 코드 검색, 찾은 placeList는 callback으로 전달한다.
     places.categorySearch(category, callback, {
         location: map.getCenter()
@@ -177,7 +180,7 @@ function displayMap(lat, lng) {
     };
     map = new kakao.maps.Map(mapContainer, mapOption);
 
-    kakao.maps.event.addListener(map, 'click', (mouseEvent) => {
+    kakao.maps.event.addListener(map, 'click', () => {
         if(overlay !== undefined) removeOverlay();
     });
 
@@ -189,19 +192,21 @@ function displayMap(lat, lng) {
     
 }
 
+// * 마커와 오버레이 관련 함수들
 //내 좌표 정보만으로 마커를 생성한다.
 function createMarkerByCoords(lat, lng) {
     let position = new kakao.maps.LatLng(lat, lng);
     let marker = new kakao.maps.Marker({
-        position: position,
+        map : map,
+        position : position,
     });
-
-    // 마커를 맵에 세팅합니다.
-    marker.setMap(map);
 
     // 마커에 클릭 이벤트를 적용합니다.
     kakao.maps.event.addListener(marker, 'click', () => createOverlay(marker));
     
+    // 기존에 존재하는 마커를 삭제합니다.
+    removeMarker();
+
     // 생성한 마커를 마커 배열에 넣습니다.
     markerList.push(marker);
 }
@@ -214,7 +219,6 @@ function createMarker(placeList) {
         let marker = new kakao.maps.Marker({
             map: map,
             position: new kakao.maps.LatLng(place.y, place.x),
-            
         });
         markerList.push(marker);
         kakao.maps.event.addListener(marker, 'click', () => createOverlay(place));
@@ -230,7 +234,7 @@ function removeMarker() {
 
 // 커스텀 오버레이를 사용하여 카테고리 마커를 생성하는 함수
 function createNumberMarker(placeList) {
-    removeCategoryMarker();
+    removeNumberMarker();
     console.log("숫자 마커 생성");
     
     placeList.forEach((place,index) => {
@@ -252,9 +256,9 @@ function createNumberMarker(placeList) {
     })
 }
 
-function removeCategoryMarker() {
-    numberMarkerList.forEach(marker => {
-        marker.setMap(null);
+function removeNumberMarker() {
+    numberMarkerList.forEach(numberMarker => {
+        numberMarker.setMap(null);
     })
     numberMarkerList = [];
 }
@@ -270,18 +274,26 @@ function createOverlay(marker) {
         console.log(data);
         let title;
         let addr = data[0].address.address_name;
-        let roadAddr = data[0].road_address.address_name;
         let position = marker.getPosition();
         let content;
 
-        if(roadAddr === undefined) {
+        if(data[0].road_address === null) {
+            console.log("이거 실행됨?");
             title = addr;
             content = `<div class="overlay overlay-region">
                                 <div class="title">${title}</div>
                            </div>`;
-        }
-        else {
-            title = roadAddr;
+            overlay = new kakao.maps.CustomOverlay({
+                map: map,
+                clickable: true,
+                content: content,
+                position: position,
+                xAnchor: 0.5,
+                yAnchor: 2.2,
+                zIndex: 1
+            });      
+        } else {
+            title = data[0].road_address.address_name;
             content = `<div class="overlay overlay-road">
                             <div class="title">${title}</div>
                             <div class="region">(지번) ${addr}</div>
@@ -314,6 +326,8 @@ function createOverlay(marker) {
 function removeOverlay() {
     if (overlay !== undefined) overlay.setMap(null);
 }
+
+
 
 // 앱의 초기단계에서 사용자의 위치를 받는 함수
 function getUserLocation() {
@@ -718,8 +732,7 @@ function categoryMouseLeave(e) {
 function categoryClick(e, index) {
     let isActive = categoryIsActive(); // return {활성화된게 있는지 여부, 활성화된 인덱스}
 
-    removeMarker();
-    removeCategoryMarker();
+    removeNumberMarker();
     removeOverlay();
 
     if (isActive.state === true) {
@@ -729,7 +742,7 @@ function categoryClick(e, index) {
         if (e.currentTarget.lastElementChild.classList.contains('category-active') === false) {
             console.log("클릭한 카테고리는 활성화된 카테고리가 아닙니다. 활성화 시작합니다.");
             e.currentTarget.lastElementChild.classList.add('category-active');
-            categorySearch(e);
+            aroundSearch(e);
         }
         console.log("활성화된 카테고리를 비활성화 합니다.");
         categoryCircles[num].lastElementChild.classList.remove('category-active');
@@ -737,9 +750,9 @@ function categoryClick(e, index) {
         categoryCircles[num].style.color = 'black';
     }
     else if (isActive.state === false) {
-        console.log("활성화된 카테고리가 없습니다.");
+        console.log("활성화된 카테고리가 없습니다. 클릭한 카테고리를 활성화 합니다.");
         e.currentTarget.lastElementChild.classList.add('category-active');
-        categorySearch(e);
+        aroundSearch(e);
         if (e.currentTarget.lastElementChild.classList.contains('category-hover') === false) {
             e.currentTarget.lastElementChild.classList.add('category-hover');
             e.currentTarget.style.color = 'white';
