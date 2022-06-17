@@ -296,18 +296,59 @@
     height: 60px;
 }
 
+.overlay-number {
+    width: 280px;
+    height: 100px
+}
+
+.overlay-number:hover {
+    cursor: pointer;
+}
+
 .overlay .title {
     margin: 10px;
-    /* border: 1px solid red; */
     font-weight: bold;
 }
 
 .overlay .region {
     margin: 10px;
-    /* border: 1px solid red; */
     font-size: 12px;
 }
 
+.overlay-number .title {
+    font-size: 18px;
+    font-weight: bold;
+}
+
+.overlay-number .title:hover {
+    text-decoration: dashed;
+}
+ 
+.overlay-number .roadName {
+    margin: 10px;
+    font-size: 12px;
+}
+
+
+.overlay-number .region {
+    color: rgba(0, 0, 0, 0.628)
+}
+
+.overlay-number .phoneAndDetailPage {
+    display: flex;
+    margin-left: 10px;
+    
+    font-size: 14px;
+}
+
+.overlay-number .phoneAndDetailPage .phone {
+    color: rgba(12, 115, 41, 0.783);
+    margin-right: 5px;
+}
+
+.overlay-number .phoneAndDetailPage .detailPage {
+    color: var(--blue2);
+}
 
 
 @keyframes wave {

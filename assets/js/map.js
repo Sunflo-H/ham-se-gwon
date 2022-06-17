@@ -290,7 +290,7 @@ function createOverlay(marker) {
 //숫자 마커에 적용되는 오버레이입니다.
 function createNumberOverlay(place) {
     removeOverlay();
-
+    console.log(place);
     let {place_name, road_address_name, address_name, phone, place_url, distance} = place;
     let position = new kakao.maps.LatLng(place.y, place.x);
 
@@ -298,10 +298,11 @@ function createNumberOverlay(place) {
                     <div class="title">${place_name}</div>
                     <div class="roadName">${road_address_name}</div>
                     <div class="region">(지번) ${address_name}</div>
-                    <div class="phone">${phone}</div>
-                    <div class="detailPage">${place_url}</div>
-                    <div class="distance">${distance}</div>
-                </div>`;
+                    </div>`;
+                    // <div class="phoneAndDetailPage">
+                    //     <div class="phone">${phone}</div>
+                    // </div>
+                    // <div class="pathfinder">길찾기</div>
 
     //오버레이 생성
     overlay = new kakao.maps.CustomOverlay({
@@ -310,9 +311,12 @@ function createNumberOverlay(place) {
         content: content,
         position: position,
         xAnchor: 0.5,
-        yAnchor: 1.8,
+        yAnchor: 1.32,
         zIndex: 1
     });
+
+    //class detailPage 또는 title을 클릭하면 상세 페이지로 이동
+    // kakao.maps.event.addListener(numberMarker, 'click', () => createNumberOverlay(place));
 }
 
 function removeMarker() {
