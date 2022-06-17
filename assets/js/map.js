@@ -25,28 +25,8 @@ let searchbarIsOpen = false;
 let searchList = [];
 let polylineList = [];
 
-function addMarker() {
-    var imageSrc = 'https://t1.daumcdn.net/localimg/localimages/07/mapapidoc/marker_number_blue.png', // 마커 이미지 url, 스프라이트 이미지
-        imageSize = new kakao.maps.Size(36, 37),  // 마커 이미지의 크기
-        imgOptions =  {
-          spriteSize : new kakao.maps.Size(36, 691), // 스프라이트 이미지의 크기
-          spriteOrigin : new kakao.maps.Point(0, (0*46)+10), // 스프라이트 이미지 중 사용할 영역의 좌상단 좌표
-          offset: new kakao.maps.Point(13, 37) // 마커 좌표에 일치시킬 이미지 내에서의 좌표
-        },
-        markerImage = new kakao.maps.MarkerImage(imageSrc, imageSize, imgOptions),
-        marker = new kakao.maps.Marker({
-          position: map.getCenter(), // 마커의 위치
-          image: markerImage 
-        });
-
-    marker.setMap(map); // 지도 위에 마커를 표출
-    markers.push(marker);  // 배열에 생성된 마커를 추가
-
-    return marker;
-  }
-
 // place data에 distance를 추가하여 반환하는 함수
-function addDistanceData(placeList, color = 'none'){
+function addDistanceData(placeList, color = 'none') {
     console.log("거리를 추가합니다.");
     placeList.forEach(place => {
         polyline = new kakao.maps.Polyline({
@@ -65,7 +45,7 @@ function addDistanceData(placeList, color = 'none'){
         polylineList.push(polyline);
 
         let distance = Math.round(polyline.getLength());
-        console.log("거리:",  distance.length);
+        console.log("거리:", distance.length);
         place.distance = distance;
     })
 }
@@ -76,9 +56,8 @@ function displaySearchList(placeList) {
     const title = document.createElement('div');
     const ul = document.createElement('ul');
 
-    while (searchListContainer.hasChildNodes() )
-    {
-        searchListContainer.removeChild(searchListContainer.firstChild );
+    while (searchListContainer.hasChildNodes()) {
+        searchListContainer.removeChild(searchListContainer.firstChild);
     }
 
     title.classList.add('searchList-title');
@@ -87,17 +66,17 @@ function displaySearchList(placeList) {
 
     placeList.forEach((place, i) => {
         // i === 0 이니까 +65를해서 대문자 A가 나오게 한다.
-        let number = i+1;
+        let number = i + 1;
         let listElement;
 
         if (place.place_name === undefined) { // 장소명이 undefined면 주소 검색입니다.
             let addressName = place.address_name;
 
-            if(addressName === undefined) addressName = place.road_address;
+            if (addressName === undefined) addressName = place.road_address;
 
             title.innerHTML = `주소<span class="list-count"> ${placeList.length}</span>`
-            
-            
+
+
             listElement = `<li>
                             <div class="nameAndAddress">
                                 <div class="name"><span class="number">${number}</span><span>${addressName}<span></div>
@@ -109,15 +88,15 @@ function displaySearchList(placeList) {
             let address = place.address_name;
             let roadAddress = place.road_address_name;
             let distance = place.distance;
-            if(distance.length < 4) {
+            if (distance.length < 4) {
                 distance = place.distance + 'm'
             }
             else {
-                distance = Math.round(distance/100)/10 + 'km'
+                distance = Math.round(distance / 100) / 10 + 'km'
             }
 
             title.innerHTML = `장소<span class="list-count"> ${placeList.length}</span>`
-            
+
             listElement = `<li>
                             <div class="nameAndAddress">
                                 <div class="name"><span class="number">${number}</span><span>${placeName}<span></div>
@@ -126,16 +105,17 @@ function displaySearchList(placeList) {
                             </div> 
                             <div class="distance">${distance}</div>
                             </li>`
-                            // <div class="pathfinder-button"> 길찾기 </div> 
-        }        
+            // <div class="pathfinder-button"> 길찾기 </div> 
+        }
         ul.insertAdjacentHTML('beforeend', listElement);
 
-        
+
     })
 
     const names = document.querySelectorAll('.nameAndAddress .name');
+
     names.forEach(name => {
-        name.addEventListener('click' , placeNameClick);
+        name.addEventListener('click', placeNameClick);
     })
 }
 
@@ -164,7 +144,7 @@ function aroundSearch(e) {
     let places = new kakao.maps.services.Places();
     let category = e.currentTarget.parentNode.getAttribute('data-category');
 
-    
+
     // 카테고리 검색 결과를 받을 콜백 함수
     let callback = function (result, status) {
         if (status === kakao.maps.services.Status.OK) {
@@ -176,14 +156,14 @@ function aroundSearch(e) {
             // addDistanceData(result, '#FF00FF');
         }
     };
-    
+
     // 공공기관 코드 검색, 찾은 placeList는 callback으로 전달한다.
     places.categorySearch(category, callback, {
         location: map.getCenter()
     });
 }
 
-function displayMap(lat, lng) {    
+function displayMap(lat, lng) {
     console.log("현재 위치를 중심으로 맵을 띄웁니다.", lat, lng);
     const mapContainer = document.getElementById('map'); // 지도를 표시할 div 
     let mapOption = {
@@ -193,7 +173,7 @@ function displayMap(lat, lng) {
     map = new kakao.maps.Map(mapContainer, mapOption);
 
     kakao.maps.event.addListener(map, 'click', () => {
-        if(overlay !== undefined) removeOverlay();
+        if (overlay !== undefined) removeOverlay();
     });
 
     kakao.maps.event.addListener(map, 'rightclick', (mouseEvent) => {
@@ -201,21 +181,22 @@ function displayMap(lat, lng) {
         console.log(latlng);
     });
 
-    
+
 }
 
 // * 마커와 오버레이 관련 함수들
-//내 좌표 정보만으로 마커를 생성한다.
+//좌표 정보만으로 마커를 한개만 생성한다. (내 좌표로 마커띄울때, 주변탐색시 중앙좌표에 마커띄울때 사용)
 function createMarkerByCoords(lat, lng) {
+    console.log("좌표로 마커 생성 실행");
     let position = new kakao.maps.LatLng(lat, lng);
     let marker = new kakao.maps.Marker({
-        map : map,
-        position : position,
+        map: map,
+        position: position,
     });
 
     // 마커에 클릭 이벤트를 적용합니다.
     kakao.maps.event.addListener(marker, 'click', () => createOverlay(marker));
-    
+
     removeMarker();
     removeOverlay();
 
@@ -223,42 +204,32 @@ function createMarkerByCoords(lat, lng) {
     markerList.push(marker);
 }
 
-function createMarker(placeList) {
-    removeMarker();
-    removeOverlay();
-
-    placeList.forEach(place => {
-        let marker = new kakao.maps.Marker({
-            map: map,
-            position: new kakao.maps.LatLng(place.y, place.x),
-        });
-        markerList.push(marker);
-        kakao.maps.event.addListener(marker, 'click', () => createOverlay(place));
-    })
-}
-
-
-// 커스텀 오버레이를 사용하여 카테고리 마커를 생성하는 함수
+// 검색, 주변탐색에 사용되는 숫자 마커를 생성하는 함수
 function createNumberMarker(placeList) {
     removeNumberMarker();
     console.log("숫자 마커 생성");
-    
-    placeList.forEach((place,index) => {
+
+    placeList.forEach((place, index) => {
         let position = new kakao.maps.LatLng(place.y, place.x);
-        let imageSrc = 'https://t1.daumcdn.net/localimg/localimages/07/mapapidoc/marker_number_blue.png', // 마커 이미지 url, 스프라이트 이미지
-        imageSize = new kakao.maps.Size(36, 37),  // 마커 이미지의 크기
-        imgOptions =  {
-          spriteSize : new kakao.maps.Size(36, 691), // 스프라이트 이미지의 크기
-          spriteOrigin : new kakao.maps.Point(0, (index*46)+10), // 스프라이트 이미지 중 사용할 영역의 좌상단 좌표
-          offset: new kakao.maps.Point(13, 37) // 마커 좌표에 일치시킬 이미지 내에서의 좌표
-        },
-        markerImage = new kakao.maps.MarkerImage(imageSrc, imageSize, imgOptions),
-        numberMarker = new kakao.maps.Marker({
+        let imageSrc = 'https://t1.daumcdn.net/localimg/localimages/07/mapapidoc/marker_number_blue.png' // 마커 이미지 url, 스프라이트 이미지
+        let imageSize = new kakao.maps.Size(36, 37)  // 마커 이미지의 크기
+
+        let imgOptions = {
+            spriteSize: new kakao.maps.Size(36, 691), // 스프라이트 이미지의 크기
+            spriteOrigin: new kakao.maps.Point(0, (index * 46) + 10), // 스프라이트 이미지 중 사용할 영역의 좌상단 좌표
+            offset: new kakao.maps.Point(13, 37) // 마커 좌표에 일치시킬 이미지 내에서의 좌표
+        }
+
+        let markerImage = new kakao.maps.MarkerImage(imageSrc, imageSize, imgOptions)
+
+        let numberMarker = new kakao.maps.Marker({
+            map: map,
             position: position, // 마커의 위치
-          image: markerImage 
+            image: markerImage
         });
+
         numberMarkerList.push(numberMarker);
-        numberMarker.setMap(map);
+        kakao.maps.event.addListener(numberMarker, 'click', () => createNumberOverlay(place));
     })
 }
 
@@ -266,39 +237,38 @@ function createNumberMarker(placeList) {
 // 기본 마커에 적용되는 커스텀 오버레이를 만드는 함수 입니다.
 function createOverlay(marker) {
     removeOverlay();
-    console.log(marker.getPosition());
     console.log("기본 오버레이 생성");
-    
+
     //geocoder.coord2Address 에 사용될 콜백함수 정의
     let callback = (data) => {
-        console.log(data);
         let title;
         let addr = data[0].address.address_name;
         let position = marker.getPosition();
         let content;
-        
-        if(data[0].road_address === null) {
+
+
+        if (data[0].road_address === null) { // 지번 데이터만 존재할 경우
             title = addr;
             content = `<div class="overlay overlay-region">
                                 <div class="title">${title}</div>
                            </div>`;
-                           overlay = new kakao.maps.CustomOverlay({
+            overlay = new kakao.maps.CustomOverlay({
                 map: map,
                 clickable: true,
                 content: content,
                 position: position,
                 xAnchor: 0.5,
-                yAnchor: 2.2,
+                yAnchor: 2.3, // 높을수록 위로 올라감
                 zIndex: 1
-            });      
-        } 
-        else {
+            });
+        }
+        else { // 도로명 데이터가 존재할 경우
             title = data[0].road_address.address_name;
             content = `<div class="overlay overlay-road">
                             <div class="title">${title}</div>
                             <div class="region">(지번) ${addr}</div>
-                       </div>`;     
-                       overlay = new kakao.maps.CustomOverlay({
+                       </div>`;
+            overlay = new kakao.maps.CustomOverlay({
                 map: map,
                 clickable: true,
                 content: content,
@@ -306,15 +276,43 @@ function createOverlay(marker) {
                 xAnchor: 0.5,
                 yAnchor: 1.8,
                 zIndex: 1
-            });       
-        }        
+            });
+        }
     }
     // 주소-좌표 변환 객체를 생성합니다
-    var geocoder = new kakao.maps.services.Geocoder();      
-    
-    // 좌표로 법정동 상세 주소 정보를 요청합니다
-    geocoder.coord2Address(marker.getPosition().La, marker.getPosition().Ma , callback);
+    var geocoder = new kakao.maps.services.Geocoder();
 
+    // 좌표로 법정동 상세 주소 정보를 요청합니다
+    geocoder.coord2Address(marker.getPosition().La, marker.getPosition().Ma, callback);
+}
+
+
+//숫자 마커에 적용되는 오버레이입니다.
+function createNumberOverlay(place) {
+    removeOverlay();
+
+    let {place_name, road_address_name, address_name, phone, place_url, distance} = place;
+    let position = new kakao.maps.LatLng(place.y, place.x);
+
+    content = `<div class="overlay overlay-number">
+                    <div class="title">${place_name}</div>
+                    <div class="roadName">${road_address_name}</div>
+                    <div class="region">(지번) ${address_name}</div>
+                    <div class="phone">${phone}</div>
+                    <div class="detailPage">${place_url}</div>
+                    <div class="distance">${distance}</div>
+                </div>`;
+
+    //오버레이 생성
+    overlay = new kakao.maps.CustomOverlay({
+        map: map,
+        clickable: true,
+        content: content,
+        position: position,
+        xAnchor: 0.5,
+        yAnchor: 1.8,
+        zIndex: 1
+    });
 }
 
 function removeMarker() {
@@ -449,7 +447,7 @@ function clickSearch(e) {
             searchByAddr(relation)
                 .then(placeList => {
                     map.setCenter(new kakao.maps.LatLng(placeList[0].y, placeList[0].x));
-                    createMarker(placeList);
+                    createNumberMarker(placeList);
                     displaySearchList(placeList);
                 });
             break;
@@ -458,7 +456,7 @@ function clickSearch(e) {
             searchByKeyword(relation)
                 .then(placeList => {
                     map.setCenter(new kakao.maps.LatLng(placeList[0].y, placeList[0].x));
-                    createMarker(placeList);
+                    createNumberMarker(placeList);
                     displaySearchList(placeList);
                 })
             break;
@@ -546,7 +544,7 @@ function placesSearchCB(data, status, pagination) {
         var bounds = new kakao.maps.LatLngBounds();
 
         for (var i = 0; i < data.length; i++) {
-            createMarker(data[i]);
+            createNumberMarker(data[i]);
             // 좌표들을 더해 범위를 확장함
             bounds.extend(new kakao.maps.LatLng(data[i].y, data[i].x));
         }
@@ -651,12 +649,12 @@ function search() {
             console.log(data);
             if (data[0].length === 0) {
                 map.setCenter(new kakao.maps.LatLng(data[1][0].y, data[1][0].x));
-                createMarker(data[1]);
+                createNumberMarker(data[1]);
                 displaySearchList(data[1]);
             }
             else {
                 map.setCenter(new kakao.maps.LatLng(data[0][0].y, data[0][0].x));
-                createMarker(data[0]);
+                createNumberMarker(data[0]);
                 displaySearchList(data[0]);
             }
         })
