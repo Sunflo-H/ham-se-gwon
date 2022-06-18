@@ -298,7 +298,7 @@
 
 .overlay-number {
     width: 280px;
-    height: 100px
+    height: 90px;
 }
 
 .overlay-number:hover {
@@ -321,7 +321,7 @@
 }
 
 .overlay-number .title:hover {
-    text-decoration: dashed;
+    text-decoration: underline;
 }
  
 .overlay-number .roadName {

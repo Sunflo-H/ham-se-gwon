@@ -317,7 +317,15 @@ function createNumberOverlay(place) {
 
     //class detailPage 또는 title을 클릭하면 상세 페이지로 이동
     // kakao.maps.event.addListener(numberMarker, 'click', () => createNumberOverlay(place));
+    const title = document.querySelectorAll('.overlay-number .title');
+    let titleClick = (e) => {
+        location.href = place_url;
+    }
+    title.forEach(title => {
+        title.addEventListener('click', titleClick);
+    })
 }
+
 
 function removeMarker() {
     markerList.forEach(marker => {
