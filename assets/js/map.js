@@ -1,5 +1,4 @@
 const HISTORY_LIST_MAX_LENGTH = 5;
-const ADMINISTRATIVE_DISTRICT = ['서울특별시', '대구광역시', '광주광역시', '울산광역시', '경기도', '충청북도', '전라북도', '경상북도', '제주특별자치도', '부산광역시', '인천광역시', '대전광역시', '세종특별자치시', '강원도', '충청남도', '전라남도', '경상남도'];
 const RADIUS = {
     LV1: 5000,
     LV2: 10000,
@@ -22,7 +21,6 @@ let markerList = [];
 let numberMarkerList = [];
 let overlay;
 let searchbarIsOpen = false;
-let searchList = [];
 let polylineList = [];
 
 // place data에 distance를 추가하여 반환하는 함수
@@ -52,6 +50,7 @@ function addDistanceData(placeList, color = 'none') {
 
 function displaySearchList(placeList) {
     console.log("검색 리스트 보여주기 실행");
+
     const searchListContainer = document.querySelector('.searchList-container');
     const title = document.createElement('div');
     const ul = document.createElement('ul');
@@ -64,8 +63,18 @@ function displaySearchList(placeList) {
     searchListContainer.appendChild(title);
     searchListContainer.appendChild(ul);
 
+    // 검색 리스트 데이터의 이름을 클릭하면 실행되는 이벤트함수
+    let placeNameClick = (e) => {
+        let place = placeList.find(place => place.place_name === e.target.innerText)
+
+        // 장소를 맵의 중앙으로 놓는다.
+        map.setCenter(new kakao.maps.LatLng(place.y, place.x));
+        
+        // 장소의 오버레이를 연다.
+        createNumberOverlay(place);
+    }
+
     placeList.forEach((place, i) => {
-        // i === 0 이니까 +65를해서 대문자 A가 나오게 한다.
         let number = i + 1;
         let listElement;
 
@@ -75,7 +84,6 @@ function displaySearchList(placeList) {
             if (addressName === undefined) addressName = place.road_address;
 
             title.innerHTML = `주소<span class="list-count"> ${placeList.length}</span>`
-
 
             listElement = `<li>
                             <div class="nameAndAddress">
@@ -88,6 +96,7 @@ function displaySearchList(placeList) {
             let address = place.address_name;
             let roadAddress = place.road_address_name;
             let distance = place.distance;
+
             if (distance.length < 4) {
                 distance = place.distance + 'm'
             }
@@ -109,16 +118,14 @@ function displaySearchList(placeList) {
         }
         ul.insertAdjacentHTML('beforeend', listElement);
 
-
     })
-
     const names = document.querySelectorAll('.nameAndAddress .name');
 
-    let placeNameClick = (e) => {
-
-    }
-
     names.forEach(name => {
+        //이름을 클릭하면 
+        //해당 마커를 맵의 중앙에 놓는다, => 좌표를 알아야한다. 
+        //그리고 그 마커의 오버레이를 연다
+        //검색 => 마커 생성, 검색리스트 생성 => 넘버마커리스트에 데이터는 존재해
         name.addEventListener('click', placeNameClick);
     })
 }
