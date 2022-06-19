@@ -149,6 +149,7 @@
 
 /* 검색 결과 리스트 컨테이너 */
 .action-container .searchList-container {
+    /* height: 78%; */
     height: 100%;
 }
 
@@ -166,8 +167,11 @@
 }
 
 .action-container .searchList-container ul {
-    height: 100%;
+    /* 주변탐색 열려있을때 height : 310px;
+       주변탐색 닫혀있을때 height : 510px; */ 
+    height: 310px;
     overflow: scroll;
+    transition-duration: 1s;
 }
 
 .searchList-container ul::-webkit-scrollbar {
