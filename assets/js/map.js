@@ -23,6 +23,13 @@ let overlay;
 let searchbarIsOpen = false;
 let polylineList = [];
 
+function panTo(lat , lng) {
+    // 지도 중심을 부드럽게 이동시킵니다
+    // 만약 이동할 거리가 지도 화면보다 크면 부드러운 효과 없이 이동합니다
+    map.panTo(new kakao.maps.LatLng(lat, lng));     
+}        
+
+
 // place data에 distance를 추가하여 반환하는 함수
 function addDistanceData(placeList, color = 'none') {
     console.log("거리를 추가합니다.");
@@ -68,8 +75,8 @@ function displaySearchList(placeList) {
         let place = placeList.find(place => place.place_name === e.target.innerText)
 
         // 장소를 맵의 중앙으로 놓는다.
-        map.setCenter(new kakao.maps.LatLng(place.y, place.x));
-        
+        panTo(place.y, place.x);
+
         // 장소의 오버레이를 연다.
         createNumberOverlay(place);
     }
@@ -465,7 +472,7 @@ function clickSearch(e) {
             console.log("주소로 검색 분기");
             searchByAddr(relation)
                 .then(placeList => {
-                    map.setCenter(new kakao.maps.LatLng(placeList[0].y, placeList[0].x));
+                    panTo(placeList[0].y, placeList[0].x);
                     createNumberMarker(placeList);
                     displaySearchList(placeList);
                 });
@@ -474,7 +481,7 @@ function clickSearch(e) {
             console.log("키워드로 검색 분기");
             searchByKeyword(relation)
                 .then(placeList => {
-                    map.setCenter(new kakao.maps.LatLng(placeList[0].y, placeList[0].x));
+                   panTo(placeList[0].y, placeList[0].x);
                     createNumberMarker(placeList);
                     displaySearchList(placeList);
                 })
@@ -667,12 +674,12 @@ function search() {
             //data[0], data[1]들은 배열(placeList)로 나오게끔 코드를 짰다. x,y 를 얻어 함수에 적용하면 된다.
             console.log(data);
             if (data[0].length === 0) {
-                map.setCenter(new kakao.maps.LatLng(data[1][0].y, data[1][0].x));
+               panTo(data[1][0].y, data[1][0].x);
                 createNumberMarker(data[1]);
                 displaySearchList(data[1]);
             }
             else {
-                map.setCenter(new kakao.maps.LatLng(data[0][0].y, data[0][0].x));
+                panTo(data[0][0].y, data[0][0].x);
                 createNumberMarker(data[0]);
                 displaySearchList(data[0]);
             }
