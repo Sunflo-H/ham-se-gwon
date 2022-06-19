@@ -114,13 +114,13 @@ function displaySearchList(placeList) {
 
     const names = document.querySelectorAll('.nameAndAddress .name');
 
+    let placeNameClick = (e) => {
+
+    }
+
     names.forEach(name => {
         name.addEventListener('click', placeNameClick);
     })
-}
-
-function placeNameClick(event) {
-    console.log(event.target);
 }
 
 function categoryIsActive() { // return 값이 undefinded면 비활성화중, 숫자값이면 활성화중
@@ -721,16 +721,18 @@ function openSearchBar_histroy() {
 function categoryOpenAndClose() {
     const categoryContainer = document.querySelector('.category-container');
     const aroundTitle = document.querySelector('.around-title');
-    const arrow = aroundTitle.querySelector('.fa-solid')
-    if (categoryContainer.style.height !== '0px') {
-        categoryContainer.style.height = '0px';
-        arrow.style.transform = 'rotate(-180deg)'
-        // aroundTitle.style.marginBottom = '0px';
-    }
-    else {
+    const arrow = aroundTitle.querySelector('.fa-solid');
+    const ul = document.querySelector('.searchList-container ul');
+    console.log(ul);
+    if (categoryContainer.style.height === '0px') {
         categoryContainer.style.height = '210px';
         arrow.style.transform = 'rotate(0deg)'
-        // aroundTitle.style.marginBottom = '10px';
+        if(ul !== null) ul.style.height = "310px";
+    }
+    else {
+        categoryContainer.style.height = '0px';
+        arrow.style.transform = 'rotate(-180deg)'
+        if(ul !== null) ul.style.height = "510px";
     }
 }
 
@@ -786,7 +788,7 @@ categoryCircles.forEach((circle, i) => {
     // 자식에게 이벤트가 전파되지 않는 enter와 leave를 사용
     circle.addEventListener('mouseenter', categoryMouseEnter);
     circle.addEventListener('mouseleave', categoryMouseLeave);
-    circle.addEventListener('click', (event) => categoryClick(event, i));
+    circle.addEventListener('click', (e) => categoryClick(e, i));
 })
 
 aroundTitle.addEventListener('click', categoryOpenAndClose);
