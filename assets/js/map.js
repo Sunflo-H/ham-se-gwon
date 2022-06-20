@@ -684,7 +684,7 @@ function search() {
                 displaySearchList(data[1]);
                 if(categoryIsActive().state === true) closeCategory(categoryIsActive().index);
             }
-            else if (data[1].length === 0 && data[0].length !== 0) {                
+            else if (data[0].length !== 0) {                
                 panTo(data[0][0].y, data[0][0].x);
                 removeMarker();
                 createNumberMarker(data[0]);
