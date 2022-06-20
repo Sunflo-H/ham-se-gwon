@@ -23,11 +23,11 @@ let overlay;
 let searchbarIsOpen = false;
 let polylineList = [];
 
-function panTo(lat , lng) {
+function panTo(lat, lng) {
     // 지도 중심을 부드럽게 이동시킵니다
     // 만약 이동할 거리가 지도 화면보다 크면 부드러운 효과 없이 이동합니다
-    map.panTo(new kakao.maps.LatLng(lat, lng));     
-}        
+    map.panTo(new kakao.maps.LatLng(lat, lng));
+}
 
 
 // place data에 distance를 추가하여 반환하는 함수
@@ -137,7 +137,7 @@ function displaySearchList(placeList) {
     })
 }
 
-function categoryIsActive() { // return 값이 undefinded면 비활성화중, 숫자값이면 활성화중
+function categoryIsActive() { 
     let result = {
         state: false,
         index: ''
@@ -305,7 +305,7 @@ function createOverlay(marker) {
 function createNumberOverlay(place) {
     removeOverlay();
     console.log(place);
-    let {place_name, road_address_name, address_name, phone, place_url, distance} = place;
+    let { place_name, road_address_name, address_name, phone, place_url, distance } = place;
     let position = new kakao.maps.LatLng(place.y, place.x);
 
     content = `<div class="overlay overlay-number">
@@ -313,10 +313,10 @@ function createNumberOverlay(place) {
                     <div class="roadName">${road_address_name}</div>
                     <div class="region">(지번) ${address_name}</div>
                     </div>`;
-                    // <div class="phoneAndDetailPage">
-                    //     <div class="phone">${phone}</div>
-                    // </div>
-                    // <div class="pathfinder">길찾기</div>
+    // <div class="phoneAndDetailPage">
+    //     <div class="phone">${phone}</div>
+    // </div>
+    // <div class="pathfinder">길찾기</div>
 
     //오버레이 생성
     overlay = new kakao.maps.CustomOverlay({
@@ -481,7 +481,7 @@ function clickSearch(e) {
             console.log("키워드로 검색 분기");
             searchByKeyword(relation)
                 .then(placeList => {
-                   panTo(placeList[0].y, placeList[0].x);
+                    panTo(placeList[0].y, placeList[0].x);
                     createNumberMarker(placeList);
                     displaySearchList(placeList);
                 })
@@ -674,14 +674,18 @@ function search() {
             //data[0], data[1]들은 배열(placeList)로 나오게끔 코드를 짰다. x,y 를 얻어 함수에 적용하면 된다.
             console.log(data);
             if (data[0].length === 0) {
-               panTo(data[1][0].y, data[1][0].x);
+                panTo(data[1][0].y, data[1][0].x);
+                removeMarker();
                 createNumberMarker(data[1]);
                 displaySearchList(data[1]);
+                if(categoryIsActive().state === true) closeCategory(categoryIsActive().index);
             }
             else {
                 panTo(data[0][0].y, data[0][0].x);
+                removeMarker();
                 createNumberMarker(data[0]);
                 displaySearchList(data[0]);
+                if(categoryIsActive().state === true) closeCategory(categoryIsActive().index);
             }
         })
 }
@@ -741,12 +745,12 @@ function categoryOpenAndClose() {
     if (categoryContainer.style.height === '0px') {
         categoryContainer.style.height = '210px';
         arrow.style.transform = 'rotate(0deg)'
-        if(ul !== null) ul.style.height = "310px";
+        if (ul !== null) ul.style.height = "310px";
     }
     else {
         categoryContainer.style.height = '0px';
         arrow.style.transform = 'rotate(-180deg)'
-        if(ul !== null) ul.style.height = "510px";
+        if (ul !== null) ul.style.height = "510px";
     }
 }
 
@@ -770,33 +774,36 @@ function categoryClick(e, index) {
     removeOverlay();
 
     if (isActive.state === true) {
-        console.log("활성화 된 카테고리가 있습니다.");
-        let num = isActive.index;
+        console.log("활성화 된 카테고리가 있습니다. 비활성화 합니다.");
 
+        // 활성화된 카테고리가 존재하고, 클릭한 카테고리는 활성화가 아니라면 연다.
         if (e.currentTarget.lastElementChild.classList.contains('category-active') === false) {
-            console.log("클릭한 카테고리는 활성화된 카테고리가 아닙니다. 활성화 시작합니다.");
-            e.currentTarget.lastElementChild.classList.add('category-active');
+            openCateogry(e.currentTarget);
             aroundSearch(e);
         }
-        console.log("활성화된 카테고리를 비활성화 합니다.");
-        categoryCircles[num].lastElementChild.classList.remove('category-active');
-        categoryCircles[num].lastElementChild.classList.remove('category-hover');
-        categoryCircles[num].style.color = 'black';
+        // 원래 활성화 되어있던 index의 카테고리는 닫는다.
+        closeCategory(isActive.index);
     }
     else if (isActive.state === false) {
         console.log("활성화된 카테고리가 없습니다. 클릭한 카테고리를 활성화 합니다.");
         e.currentTarget.lastElementChild.classList.add('category-active');
         aroundSearch(e);
         if (e.currentTarget.lastElementChild.classList.contains('category-hover') === false) {
-            e.currentTarget.lastElementChild.classList.add('category-hover');
-            e.currentTarget.style.color = 'white';
+            openCateogry(e.currentTarget);
         }
     }
 }
-
+function openCateogry(target) {
+    target.lastElementChild.classList.add('category-hover');
+    target.style.color = "white";
+}
+function closeCategory(i) {
+    categoryCircles[i].lastElementChild.classList.remove('category-active');
+    categoryCircles[i].lastElementChild.classList.remove('category-hover');
+    categoryCircles[i].style.color = 'black';
+}
 
 //* 이벤트 리스너들 @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
-
 
 categoryCircles.forEach((circle, i) => {
     // 자식에게 이벤트가 전파되지 않는 enter와 leave를 사용
