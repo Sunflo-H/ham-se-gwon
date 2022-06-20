@@ -470,18 +470,25 @@ function clickSearch(e) {
             console.log("주소로 검색 분기");
             searchByAddr(relation)
                 .then(placeList => {
-                    panTo(placeList[0].y, placeList[0].x);
-                    createNumberMarker(placeList);
-                    displaySearchList(placeList);
+                    if(placeList.length === 0) noPlaceError();
+                    else {
+                        panTo(placeList[0].y, placeList[0].x);
+                        createNumberMarker(placeList);
+                        displaySearchList(placeList);
+                    }
                 });
             break;
         case "restaurant":
             console.log("키워드로 검색 분기");
             searchByKeyword(relation)
                 .then(placeList => {
-                    panTo(placeList[0].y, placeList[0].x);
-                    createNumberMarker(placeList);
-                    displaySearchList(placeList);
+                    // placeList = [{place정보들} , {} , {} ...]
+                    if(placeList.length === 0) noPlaceError();
+                    else {
+                        panTo(placeList[0].y, placeList[0].x);
+                        createNumberMarker(placeList);
+                        displaySearchList(placeList);
+                    }
                 })
             break;
     }
@@ -546,11 +553,9 @@ function searchByKeyword(searchInput) {
         .then((response) => response.json())
         .then((data) => {
             console.log("키워드로 검색 결과 :", data);
-            if(data.documents.length === 0) alert("데이터가 없습니다.");
             return data.documents;
         })
         .catch((error) => console.log("error:" + error));
-    console.log(placeList);
     return placeList;
 }
 
@@ -669,19 +674,25 @@ function search() {
         .then(data => {
             //data[0], data[1]들은 배열(placeList)로 나오게끔 코드를 짰다. x,y 를 얻어 함수에 적용하면 된다.
             console.log(data);
-            if (data[0].length === 0) {
+            // 주소로 검색해서 나온 결과가 0이면 키워드로 검색을 살펴봐라
+            // 키워드로 검색해서 나온 결과가 0이면 주소로 검색을 살펴봐라
+            // 둘다로 0이면 noPlaceError()를 실행
+            if (data[0].length === 0 && data[1].length !== 0) {
                 panTo(data[1][0].y, data[1][0].x);
                 removeMarker();
                 createNumberMarker(data[1]);
                 displaySearchList(data[1]);
                 if(categoryIsActive().state === true) closeCategory(categoryIsActive().index);
             }
-            else {
+            else if (data[1].length === 0 && data[0].length !== 0) {                
                 panTo(data[0][0].y, data[0][0].x);
                 removeMarker();
                 createNumberMarker(data[0]);
                 displaySearchList(data[0]);
                 if(categoryIsActive().state === true) closeCategory(categoryIsActive().index);
+            }
+            else if(data[0].length === 0 && data[1].length === 0) {
+                noPlaceError();
             }
         })
 }
@@ -747,7 +758,7 @@ function openSearchBar_histroy() {
     historyContainer.classList.remove('hide');
 }
 
-function categoryOpenAndClose() {
+function aroundOpenAndClose() {
     const categoryContainer = document.querySelector('.category-container');
     const aroundTitle = document.querySelector('.around-title');
     const arrow = aroundTitle.querySelector('.fa-solid');
@@ -799,7 +810,7 @@ categoryCircles.forEach((circle, i) => {
     circle.addEventListener('click', (e) => categoryClick(e, i));
 })
 
-aroundTitle.addEventListener('click', categoryOpenAndClose);
+aroundTitle.addEventListener('click', aroundOpenAndClose);
 
 // 검색창에 값이 입력될 때마다 연관검색어, 히스토리를 보여주는 이벤트
 // ! 아직 조정할 내용이 남아있다.
@@ -880,6 +891,12 @@ body.addEventListener('click', e => {
 
 searchIcon.addEventListener('click', search);
 
+
+// *에러함수
+
+function noPlaceError() {
+    alert('검색한 정보의 장소가 존재하지 않습니다.')
+}
 
 
 init();
