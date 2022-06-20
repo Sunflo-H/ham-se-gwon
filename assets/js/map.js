@@ -10,7 +10,9 @@ const searchInput = document.querySelector('.search-bar input[type=text]');
 const searchBar = document.querySelector('.search-bar');
 const body = document.querySelector('body');
 const searchIcon = document.querySelector('.fa-search');
-const listContainer = document.querySelector('.list-container');
+const relationAndHistoryContainer = document.querySelector('.relationAndHistory-container');
+const historyContainer = document.querySelector('.history-container');
+const relationContainer = document.querySelector('.relation-container');
 const categories = document.querySelectorAll('.category');
 const categoryCircles = document.querySelectorAll('.category-circle');
 const aroundTitle = document.querySelector('.around-title > span');
@@ -129,10 +131,6 @@ function displaySearchList(placeList) {
     const names = document.querySelectorAll('.nameAndAddress .name');
 
     names.forEach(name => {
-        //이름을 클릭하면 
-        //해당 마커를 맵의 중앙에 놓는다, => 좌표를 알아야한다. 
-        //그리고 그 마커의 오버레이를 연다
-        //검색 => 마커 생성, 검색리스트 생성 => 넘버마커리스트에 데이터는 존재해
         name.addEventListener('click', placeNameClick);
     })
 }
@@ -460,7 +458,7 @@ function setHtmlHistory() {
 }
 
 function clickSearch(e) {
-    console.log("클릭해서 검색을 실행합니다.");
+    console.log("리스트를 클릭해서 검색을 실행합니다.");
     console.log(e.target);
     const relation = e.target.innerText;
     const type = e.target.getAttribute("data-type");
@@ -526,9 +524,6 @@ function searchByAddr(searchInput) {
             // 정상적으로 검색이 완료됐으면 
             if (status === kakao.maps.services.Status.OK) {
                 console.log("주소로 검색 결과 : ", result);
-                // addDistanceData(result);
-                console.log(result);
-
                 resolve(result);
 
             } else {
@@ -542,9 +537,8 @@ function searchByAddr(searchInput) {
 
 function searchByKeyword(searchInput) {
     console.log("키워드로 검색 실행합니다.");
-    const { La, Ma } = map.getCenter();
-    const lat = Ma;
-    const lng = La;
+    const lat = map.getCenter().Ma;
+    const lng = map.getCenter().La;
 
     let placeList = fetch(`https://dapi.kakao.com/v2/local/search/keyword.json?y=${lat}&x=${lng}&radius=${RADIUS.LV1}&query=${searchInput}`, {
         headers: { Authorization: `KakaoAK 621a24687f9ad83f695acc0438558af2` }
@@ -552,9 +546,11 @@ function searchByKeyword(searchInput) {
         .then((response) => response.json())
         .then((data) => {
             console.log("키워드로 검색 결과 :", data);
+            if(data.documents.length === 0) alert("데이터가 없습니다.");
             return data.documents;
         })
         .catch((error) => console.log("error:" + error));
+    console.log(placeList);
     return placeList;
 }
 
@@ -690,6 +686,33 @@ function search() {
         })
 }
 
+function categoryClick(e, index) {
+    let isActive = categoryIsActive(); // return {활성화된게 있는지 여부, 활성화된 인덱스}
+
+    removeNumberMarker();
+    removeOverlay();
+
+    if (isActive.state === true) {
+        console.log("활성화 된 카테고리가 있습니다. 비활성화 합니다.");
+
+        // 활성화된 카테고리가 존재하고, 클릭한 카테고리는 활성화가 아니라면 연다.
+        if (e.currentTarget.lastElementChild.classList.contains('category-active') === false) {
+            openCateogry(e.currentTarget);
+            aroundSearch(e);
+        }
+        // 원래 활성화 되어있던 index의 카테고리는 닫는다.
+        closeCategory(isActive.index);
+    }
+    else if (isActive.state === false) {
+        console.log("활성화된 카테고리가 없습니다. 클릭한 카테고리를 활성화 합니다.");
+        e.currentTarget.lastElementChild.classList.add('category-active');
+        aroundSearch(e);
+        if (e.currentTarget.lastElementChild.classList.contains('category-hover') === false) {
+            openCateogry(e.currentTarget);
+        }
+    }
+}
+
 function init() {
     getUserLocation()
         .then(data => {
@@ -701,13 +724,8 @@ function init() {
 }
 //* css를 조작하는 함수들은 여기에 정리 @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 function closeSearchBar() {
-    const listContainer = document.querySelector('.list-container');
-    const searchBar = document.querySelector('.search-bar');
-    const historyContainer = document.querySelector('.history-container');
-    const relationContainer = document.querySelector('.relation-container');
-
     searchBar.style.borderRadius = "15px";
-    listContainer.classList.add('hide');
+    relationAndHistoryContainer.classList.add('hide');
     historyContainer.classList.add('hide');
     relationContainer.classList.add('hide');
 
@@ -715,24 +733,17 @@ function closeSearchBar() {
 }
 
 function openSearchBar() {
-    const listContainer = document.querySelector('.list-container');
-    const searchBar = document.querySelector('.search-bar');
-
-    listContainer.classList.remove('hide');
+    relationAndHistoryContainer.classList.remove('hide');
     searchBar.style.borderRadius = "15px 15px 0px 0px";
 
     searchbarIsOpen = true;
 }
 
 function openSearchBar_relation() {
-    const relationContainer = document.querySelector('.relation-container');
-
     relationContainer.classList.remove('hide');
 }
 
 function openSearchBar_histroy() {
-    const historyContainer = document.querySelector('.history-container');
-
     historyContainer.classList.remove('hide');
 }
 
@@ -767,32 +778,8 @@ function categoryMouseLeave(e) {
 
 }
 
-function categoryClick(e, index) {
-    let isActive = categoryIsActive(); // return {활성화된게 있는지 여부, 활성화된 인덱스}
 
-    removeNumberMarker();
-    removeOverlay();
 
-    if (isActive.state === true) {
-        console.log("활성화 된 카테고리가 있습니다. 비활성화 합니다.");
-
-        // 활성화된 카테고리가 존재하고, 클릭한 카테고리는 활성화가 아니라면 연다.
-        if (e.currentTarget.lastElementChild.classList.contains('category-active') === false) {
-            openCateogry(e.currentTarget);
-            aroundSearch(e);
-        }
-        // 원래 활성화 되어있던 index의 카테고리는 닫는다.
-        closeCategory(isActive.index);
-    }
-    else if (isActive.state === false) {
-        console.log("활성화된 카테고리가 없습니다. 클릭한 카테고리를 활성화 합니다.");
-        e.currentTarget.lastElementChild.classList.add('category-active');
-        aroundSearch(e);
-        if (e.currentTarget.lastElementChild.classList.contains('category-hover') === false) {
-            openCateogry(e.currentTarget);
-        }
-    }
-}
 function openCateogry(target) {
     target.lastElementChild.classList.add('category-hover');
     target.style.color = "white";
@@ -882,8 +869,8 @@ searchInput.addEventListener('click', e => {
     }
 })
 
-listContainer.addEventListener('mouseover', mouseOver);
-listContainer.addEventListener('mouseout', mouseOut);
+relationAndHistoryContainer.addEventListener('mouseover', mouseOver);
+relationAndHistoryContainer.addEventListener('mouseout', mouseOut);
 
 // e.target이 searchWrapper면 검색창을 유지하고, 그 외의 요소들이면 검색창 닫는 이벤트
 body.addEventListener('click', e => {
