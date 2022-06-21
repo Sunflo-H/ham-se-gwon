@@ -31,6 +31,10 @@
 .action-container .current-location-info-container p{
     margin-bottom: 10px;
     margin-left: 20px;
+    margin-right: 20px;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
 }
 
 .action-container .current-location-info-container p:nth-child(1){
@@ -167,8 +171,6 @@
 }
 
 .action-container .searchList-container ul {
-    /* 주변탐색 열려있을때 height : 310px;
-       주변탐색 닫혀있을때 height : 510px; */ 
     height: 310px;
     overflow: scroll;
     transition-duration: 1s;
@@ -193,29 +195,26 @@
 
 .action-container .nameAndAddress {
     max-width: 160px;
-    /* border: 1px solid red; */
 }
 
 .action-container .nameAndAddress .name {
     color: rgba(0, 0, 0, 0.888);
+    cursor: pointer;
+    
+    /* 오버플로우시 ... 으로 대체 */
     overflow: hidden;
     white-space: nowrap;
     text-overflow: ellipsis;
-    cursor: pointer;
 }
 
 .action-container .nameAndAddress .number + span:hover{
     text-decoration: underline;
 }
 
-
 .action-container .nameAndAddress .number{
     font-weight: bold;
     color: var(--blue2);
     margin-right: 8px;
-    overflow: hidden;
-    white-space: nowrap;
-    text-overflow: ellipsis;
 }
 
 

@@ -676,11 +676,14 @@ function init() {
 
              // 주소-좌표 변환 객체를 생성합니다
             var geocoder = new kakao.maps.services.Geocoder();
+
             let callback = (data) => {
+                console.log(data);
                 let currentLocation = data[0].road_address.address_name;
                 if(currentLocation === null) currentLocation = data[0].address.address_name;
                 currentLocationName.innerText = currentLocation;
             }
+            // 좌표로 주소 찾기
             geocoder.coord2Address(lng, lat, callback);
         })
 }
