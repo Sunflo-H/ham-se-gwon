@@ -371,69 +371,47 @@ function error() {
     alert('Sorry, no position available.');
 }
 
-/**
- * & 검색 함수들 적용 설명
- * 값 입력 => getAddrList() or getRestList()로 자동완성에 사용할 데이터를 받아온다
- * {type, name} 객체를 Promise로 리턴한다.
- * 
- * 이렇게 얻은 Promise데이터를 displayRelation()함수를 실행하여 연관검색어로 보여준다. 
- * 
- * 연관검색어 클릭 => clickSearch() 실행 => 
- * 클릭한 데이터의 {type : 주소 또는 키워드}에 따라 각각 함수실행 searchByAddr(), searchByKeyword()
- * 
- * type이 키워드인 경우
- * 일단 현재 좌표 얻어와서 반경 내 검색
- * 없으면 전체 검색
- */
-// ! 이 함수들 비동기함수로 변환될수 있대. 누르면 async await코드로 바뀜 공부하고 스스로 바꾸자
+// 검색 api를 사용하여 검색후 장소의 이름들을 promise형태 및 배열로 return 하는 함수
 function getAddrList(keyword) {
-    console.log("겟 어드레스 리스트");
-    return fetch(`https://dapi.kakao.com/v2/local/search/address.json?query=${keyword}&size=5`, {
+    console.log("주소 데이터로부터 연관검색어를 찾습니다. 검색어 : " , keyword );
+    let result =  fetch(`https://dapi.kakao.com/v2/local/search/address.json?query=${keyword}&size=5`, {
         headers: { Authorization: `KakaoAK 621a24687f9ad83f695acc0438558af2` }
     })
         .then(res => res.json())
         .then(data => {
+            console.log(data);
             let list = [];
-            //forEach 안의 data는 배열, data[0].address_name
-            data.documents.forEach(data => {
-                let obj = {
-                    type: "address",
-                    name: data.address_name
-                }
-                list.push(obj);
-            })
+            // data = documents[{...}, {...}, {...}]; 의 형태
+            data.documents.forEach(data => list.push(data.address_name));
             return list;
         });
+    return result;
 }
 
+//직접 만든 restaurant.json 으로부터 검색어와 일치하는 값을 찾아 promise형태 및 배열로 return 하는 함수
 function getRestList(keyword) {
-    return fetch('/data/restaurant.json')
+    console.log("레스토랑 데이터로부터 연관검색어를 찾습니다. 검색어 : " , keyword);
+    let result = fetch('/data/restaurant.json')
         .then(res => res.json())
         .then(data => {
             let list = [];
             const restList = data.results[0].items.filter(restaurant => restaurant.name.substring(0, keyword.length) === keyword);
-            restList.forEach(data => {
-                let obj = {
-                    type: "restaurant",
-                    name: data.name
-                }
-                list.push(obj);
-            })
+            restList.forEach(data => list.push(data.name));
             return list;
         })
+    return result;
 }
 
 //* 검색창에 연관 검색어를 세팅하는 함수
 function displayRelation(relationList) {
     console.log("릴레이션 세팅");
     console.log(relationList);
-    const relationContainer = document.querySelector('.relation-container');
     while (relationContainer.hasChildNodes()) {
         relationContainer.removeChild(relationContainer.firstChild);
     }
 
     relationList.forEach(data => {
-        let html = `<div class="relation" data-type=${data.type}>${data.name}</div>`
+        let html = `<div class="relation">${data}</div>`
         relationContainer.insertAdjacentHTML('beforeend', html);
     });
 
@@ -817,7 +795,7 @@ searchInput.addEventListener('keyup', e => {
     else if (e.keyCode === 40) {
         if (searchbarIsOpen === true) downKey();
     }
-    else if (e.isComposing === false) return;
+    else if (e.isComposing === false) return; //키 입력 중복을 막아주는 기능
     else {
         //value가 공백이 되면 query에러가 발생하여 넣은 코드
         if (searchInput.value === '') return;
@@ -826,11 +804,13 @@ searchInput.addEventListener('keyup', e => {
         const promise2 = getRestList(searchInput.value);
         Promise.all([promise1, promise2]).then(data => {
             //! 이후 검색 데이터가 더 추가되면 그때 relationList에 배열을 합치는 코드를 바꿔주자
-            //! 일단 이렇게 두개의 데이터만 두고 짜
+            //! 일단 이렇게 두개의 데이터만 두고 짜            
             let relationList = data[0].concat(data[1]).slice(0, 10);
+
             if (relationList.length === 0) {
                 closeSearchBar();
-            } else {
+            } 
+            else {
                 openSearchBar();
                 openSearchBar_relation();
                 openSearchBar_histroy();
@@ -856,7 +836,8 @@ searchInput.addEventListener('click', e => {
             let relationList = data[0].concat(data[1]).slice(0, 10); // 찾은 데이터를 합쳐, 리스트로 보여준다.
             if (relationList.length === 0) {
                 closeSearchBar();
-            } else {
+            } 
+            else {
                 openSearchBar();
                 openSearchBar_relation();
                 openSearchBar_histroy();
