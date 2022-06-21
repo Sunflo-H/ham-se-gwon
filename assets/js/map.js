@@ -461,37 +461,38 @@ function clickSearch(e) {
     console.log("리스트를 클릭해서 검색을 실행합니다.");
     console.log(e.target);
     const relation = e.target.innerText;
-    const type = e.target.getAttribute("data-type");
+    // const type = e.target.getAttribute("data-type");
     const currentLocationName = document.querySelector('.current-location');
 
     // ! clickSearch로 바꿈으로써 히스토리가 클릭되었을때도 생각해야되는 함수가 되었다.
-    switch (type) {
-        case "address":
-            console.log("주소로 검색 분기");
-            searchByAddr(relation)
-                .then(placeList => {
-                    if(placeList.length === 0) noPlaceError();
-                    else {
-                        panTo(placeList[0].y, placeList[0].x);
-                        createNumberMarker(placeList);
-                        displaySearchList(placeList);
-                    }
-                });
-            break;
-        case "restaurant":
-            console.log("키워드로 검색 분기");
-            searchByKeyword(relation)
-                .then(placeList => {
-                    // placeList = [{place정보들} , {} , {} ...]
-                    if(placeList.length === 0) noPlaceError();
-                    else {
-                        panTo(placeList[0].y, placeList[0].x);
-                        createNumberMarker(placeList);
-                        displaySearchList(placeList);
-                    }
-                })
-            break;
-    }
+    // switch (type) {
+    //     case "address":
+    //         console.log("주소로 검색");
+    //         searchByAddr(relation)
+    //             .then(placeList => {
+    //                 if(placeList.length === 0) noPlaceError();
+    //                 else {
+    //                     panTo(placeList[0].y, placeList[0].x);
+    //                     createNumberMarker(placeList);
+    //                     displaySearchList(placeList);
+    //                 }
+    //             });
+    //         break;
+    //     case "restaurant":
+    //         console.log("키워드로 검색");
+    //         searchByKeyword(relation)
+    //             .then(placeList => {
+    //                 // placeList = [{place정보들} , {} , {} ...]
+    //                 if(placeList.length === 0) noPlaceError();
+    //                 else {
+    //                     panTo(placeList[0].y, placeList[0].x);
+    //                     createNumberMarker(placeList);
+    //                     displaySearchList(placeList);
+    //                 }
+    //             })
+    //         break;
+    // }
+    search(e.target.innerText);
     currentLocationName.innerText = relation;
 }
 
@@ -582,16 +583,11 @@ function placesSearchCB(data, status, pagination) {
 }
 
 function enterKey() {
-    search();
+    search(searchInput.value);
     closeSearchBar();
 }
 
 function upKey() {
-    // const end = searchInput.value.length;
-    // searchInput.setSelectionRange(end, end);
-    // searchInput.focus();
-
-    const relationContainer = document.querySelector('.relation-container');
     let activeChild = relationContainer.lastElementChild;
     let isActive = false;
 
@@ -626,7 +622,6 @@ function upKey() {
 }
 
 function downKey() {
-    const relationContainer = document.querySelector('.relation-container');
     let activeChild = relationContainer.firstElementChild;
     let isActive = false;
     for (let i = 0; i < relationContainer.childElementCount; i++) {
@@ -665,33 +660,33 @@ function mouseOut(e) {
     e.target.classList.remove('active');
 }
 
-function search() {
+function search(keyword) {
     // * searchInput의 이벤트중 엔터키가 눌렸을때 '현재 텍스트'로 검색하는 함수
     // keyup 이벤트라서 검색어 정보를 event.target으로는 불러올수 없기때문에
     // 연관검색어를 클릭하여 검색하는 기능과 엔터키를 눌러 검색하는 기능을 나누어서 만들었다.
-    console.log("엔터로 검색 시작");
-    Promise.all([searchByAddr(searchInput.value), searchByKeyword(searchInput.value)])
+    console.log("검색 시작");
+    Promise.all([searchByAddr(keyword), searchByKeyword(searchInput.value)])
         .then(data => {
             //data[0], data[1]들은 배열(placeList)로 나오게끔 코드를 짰다. x,y 를 얻어 함수에 적용하면 된다.
             console.log(data);
             // 주소로 검색해서 나온 결과가 0이면 키워드로 검색을 살펴봐라
             // 키워드로 검색해서 나온 결과가 0이면 주소로 검색을 살펴봐라
             // 둘다로 0이면 noPlaceError()를 실행
-            if (data[0].length === 0 && data[1].length !== 0) {
+            if (data[0].length === 0 && data[1].length !== 0) { // 주소데이터가 없고, 키워드데이터가 있다면
                 panTo(data[1][0].y, data[1][0].x);
                 removeMarker();
                 createNumberMarker(data[1]);
                 displaySearchList(data[1]);
                 if(categoryIsActive().state === true) closeCategory(categoryIsActive().index);
             }
-            else if (data[0].length !== 0) {                
+            else if (data[0].length !== 0) { // 주소 데이터가 있다면
                 panTo(data[0][0].y, data[0][0].x);
                 removeMarker();
                 createNumberMarker(data[0]);
                 displaySearchList(data[0]);
                 if(categoryIsActive().state === true) closeCategory(categoryIsActive().index);
             }
-            else if(data[0].length === 0 && data[1].length === 0) {
+            else if(data[0].length === 0 && data[1].length === 0) { // 주소데이터, 키워드데이터 둘다 없다면
                 noPlaceError();
             }
         })
@@ -789,12 +784,11 @@ function categoryMouseLeave(e) {
 
 }
 
-
-
 function openCateogry(target) {
     target.lastElementChild.classList.add('category-hover');
     target.style.color = "white";
 }
+
 function closeCategory(i) {
     categoryCircles[i].lastElementChild.classList.remove('category-active');
     categoryCircles[i].lastElementChild.classList.remove('category-hover');
@@ -848,18 +842,18 @@ searchInput.addEventListener('keyup', e => {
 })
 
 searchInput.addEventListener('keydown', e => {
+    // 위아래 누를시 input의 마우스커서가 맨 앞, 맨 뒤로 가는 기능을 막는다.
     if (e.keyCode === 38) e.preventDefault();
     else if (e.keyCode === 40) e.preventDefault();
-
-
 })
 
+//비어있는 검색창을 클릭했을때, 검색어가 존재하는 검색창을 클릭했을때 연관검색어리스트를 보여주는 이벤트함수 
 searchInput.addEventListener('click', e => {
-    if (searchInput.value !== '') {
-        const promise1 = getAddrList(e.target.value);
-        const promise2 = getRestList(e.target.value);
+    if (searchInput.value !== '') { // 검색창에 검색어가 존재한다면
+        const promise1 = getAddrList(e.target.value); // 주소데이터에서 검색어를 찾는다.
+        const promise2 = getRestList(e.target.value); // 음식점데이터에서 검색어를 찾는다.
         Promise.all([promise1, promise2]).then(data => {
-            let relationList = data[0].concat(data[1]).slice(0, 10);
+            let relationList = data[0].concat(data[1]).slice(0, 10); // 찾은 데이터를 합쳐, 리스트로 보여준다.
             if (relationList.length === 0) {
                 closeSearchBar();
             } else {
@@ -871,7 +865,7 @@ searchInput.addEventListener('click', e => {
             }
         })
     }
-    else {
+    else { // 검색창에 검색어가 존재하지 않는다면
         if (historyList.length !== 0) {
             setHtmlHistory();
             openSearchBar();
@@ -889,7 +883,7 @@ body.addEventListener('click', e => {
     else closeSearchBar();
 });
 
-searchIcon.addEventListener('click', search);
+searchIcon.addEventListener('click', () => search(searchInput.value));
 
 
 // *에러함수
