@@ -6,6 +6,7 @@ const RADIUS = {
     LV4: 20000
 }
 
+const currentLocationName = document.querySelector('.current-location');
 const searchInput = document.querySelector('.search-bar input[type=text]');
 const searchBar = document.querySelector('.search-bar');
 const body = document.querySelector('body');
@@ -437,39 +438,8 @@ function setHtmlHistory() {
 
 function clickSearch(e) {
     console.log("리스트를 클릭해서 검색을 실행합니다.");
-    console.log(e.target);
     const relation = e.target.innerText;
-    // const type = e.target.getAttribute("data-type");
-    const currentLocationName = document.querySelector('.current-location');
 
-    // ! clickSearch로 바꿈으로써 히스토리가 클릭되었을때도 생각해야되는 함수가 되었다.
-    // switch (type) {
-    //     case "address":
-    //         console.log("주소로 검색");
-    //         searchByAddr(relation)
-    //             .then(placeList => {
-    //                 if(placeList.length === 0) noPlaceError();
-    //                 else {
-    //                     panTo(placeList[0].y, placeList[0].x);
-    //                     createNumberMarker(placeList);
-    //                     displaySearchList(placeList);
-    //                 }
-    //             });
-    //         break;
-    //     case "restaurant":
-    //         console.log("키워드로 검색");
-    //         searchByKeyword(relation)
-    //             .then(placeList => {
-    //                 // placeList = [{place정보들} , {} , {} ...]
-    //                 if(placeList.length === 0) noPlaceError();
-    //                 else {
-    //                     panTo(placeList[0].y, placeList[0].x);
-    //                     createNumberMarker(placeList);
-    //                     displaySearchList(placeList);
-    //                 }
-    //             })
-    //         break;
-    // }
     search(e.target.innerText);
     currentLocationName.innerText = relation;
 }
@@ -477,7 +447,6 @@ function clickSearch(e) {
 //* 히스토리를 클릭하면 바로 검색결과 나타나게 하는 함수
 function clickHistory(e) {
     const history = e.target.innerText;
-    const currentLocation = document.querySelector('.current-location');
 
     searchByAddr(history);
     closeSearchBar();
@@ -704,6 +673,15 @@ function init() {
             let lng = data.coords.longitude; // 경도 (동서)
             displayMap(lat, lng);
             createMarkerByCoords(lat, lng);
+
+             // 주소-좌표 변환 객체를 생성합니다
+            var geocoder = new kakao.maps.services.Geocoder();
+            let callback = (data) => {
+                let currentLocation = data[0].road_address.address_name;
+                if(currentLocation === null) currentLocation = data[0].address.address_name;
+                currentLocationName.innerText = currentLocation;
+            }
+            geocoder.coord2Address(lng, lat, callback);
         })
 }
 //* css를 조작하는 함수들은 여기에 정리 @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
@@ -736,7 +714,7 @@ function aroundOpenAndClose() {
     const aroundTitle = document.querySelector('.around-title');
     const arrow = aroundTitle.querySelector('.fa-solid');
     const ul = document.querySelector('.searchList-container ul');
-    console.log(ul);
+    
     if (categoryContainer.style.height === '0px') {
         categoryContainer.style.height = '210px';
         arrow.style.transform = 'rotate(0deg)'
