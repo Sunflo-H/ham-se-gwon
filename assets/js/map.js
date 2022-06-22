@@ -137,7 +137,11 @@ function displaySearchList(placeList) {
 
     // 검색 리스트 데이터의 이름을 클릭하면 실행되는 이벤트함수
     let placeNameClick = (e) => {
-        let place = placeList.find(place => place.place_name === e.target.innerText)
+        let place = placeList.find(place => {
+            if(place.place_name !== undefined) return place.place_name === e.target.innerText;
+            else if(place.address_name !== undefined) return place.address_name === e.target.innerText
+            
+        });
 
         // 장소를 맵의 중앙으로 놓는다.
         panTo(place.y, place.x);
@@ -145,7 +149,6 @@ function displaySearchList(placeList) {
         // 장소의 오버레이를 생성한다.
         if(place.place_name !== undefined) createNumberOverlay(place);
         else if(place.address_name !== undefined) createNumberOverlay(place); 
-
     }
 
     placeList.forEach((place, i) => {
@@ -319,8 +322,7 @@ function createOverlay(marker) {
 
     //geocoder.coord2Address 에 사용될 콜백함수 정의
     let callback = (data) => {
-        let title = placeName;
-        console.log(title);
+        let title ;
         let addr = data[0].address.address_name;
         let position = marker.getPosition();
         let content;
@@ -372,26 +374,42 @@ function createNumberOverlay(place) {
     let { place_name, road_address_name, address_name, phone, place_url, distance } = place;
     let position = new kakao.maps.LatLng(place.y, place.x);
 
-    content = `<div class="overlay overlay-number">
-                    <div class="title">${place_name}</div>
-                    <div class="roadName">${road_address_name}</div>
-                    <div class="region">(지번) ${address_name}</div>
-                    </div>`;
-    // <div class="phoneAndDetailPage">
-    //     <div class="phone">${phone}</div>
-    // </div>
-    // <div class="pathfinder">길찾기</div>
-
-    //오버레이 생성
-    overlay = new kakao.maps.CustomOverlay({
-        map: map,
-        clickable: true,
-        content: content,
-        position: position,
-        xAnchor: 0.5,
-        yAnchor: 1.32,
-        zIndex: 1
-    });
+    if(place_name === undefined) {
+        content = `<div class="overlay overlay-region">
+                                <div class="title">${address_name}</div>
+                            </div>`;
+            overlay = new kakao.maps.CustomOverlay({
+                map: map,
+                clickable: true,
+                content: content,
+                position: position,
+                xAnchor: 0.5,
+                yAnchor: 2.2, // 높을수록 위로 올라감
+                zIndex: 1
+            });
+    }
+    else {
+        content = `<div class="overlay overlay-number">
+                        <div class="title">${place_name}</div>
+                        <div class="roadName">${road_address_name}</div>
+                        <div class="region">(지번) ${address_name}</div>
+                        </div>`;
+        // <div class="phoneAndDetailPage">
+        //     <div class="phone">${phone}</div>
+        // </div>
+        // <div class="pathfinder">길찾기</div>
+    
+        //오버레이 생성
+        overlay = new kakao.maps.CustomOverlay({
+            map: map,
+            clickable: true,
+            content: content,
+            position: position,
+            xAnchor: 0.5,
+            yAnchor: 1.32,
+            zIndex: 1
+        });
+    }
 
     //class detailPage 또는 title을 클릭하면 상세 페이지로 이동
     // kakao.maps.event.addListener(numberMarker, 'click', () => createNumberOverlay(place));
