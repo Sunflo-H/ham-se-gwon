@@ -674,7 +674,7 @@ function search(keyword) {
     // keyup 이벤트라서 검색어 정보를 event.target으로는 불러올수 없기때문에
     // 연관검색어를 클릭하여 검색하는 기능과 엔터키를 눌러 검색하는 기능을 나누어서 만들었다.
     console.log("검색 시작");
-    Promise.all([searchByAddr(keyword), searchByKeyword(searchInput.value)])
+    Promise.all([searchByAddr(keyword), searchByKeyword(keyword)])
         .then(data => {
             //data[0], data[1]들은 배열(placeList)로 나오게끔 코드를 짰다. x,y 를 얻어 함수에 적용하면 된다.
             console.log(data);

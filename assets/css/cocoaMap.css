@@ -34,6 +34,8 @@
 .action-container .current-location-container .current-location{
     font-size: 14px;
     font-weight: bold;
+    text-align: center;
+
     overflow: hidden;
     white-space: nowrap;
     text-overflow: ellipsis;
@@ -41,6 +43,7 @@
 
 .action-container .current-location-container .weather-container{
     font-size: 12px;
+    text-align: center;
 }
 
 .action-container .current-location-container .weather-container .weather{
