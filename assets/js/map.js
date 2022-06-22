@@ -146,7 +146,7 @@ function displaySearchList(placeList) {
 
         // 장소의 오버레이를 생성한다.
         if(place.place_name !== undefined) createNumberOverlay(place);
-        else if(place.address_name !== undefined) createOverlay(place.y, place.x); 
+        else if(place.address_name !== undefined) createNumberOverlay(place); 
     }
 
     placeList.forEach((place, i) => {
@@ -314,30 +314,30 @@ function createNumberMarker(placeList) {
 
 
 // 기본 마커에 적용되는 커스텀 오버레이를 만드는 함수 입니다.
-function createOverlay(lat, lng) {
+function createOverlay(lat, lng, placeName) {
     removeOverlay();
     console.log("기본 오버레이 생성");
 
     //geocoder.coord2Address 에 사용될 콜백함수 정의
     let callback = (data) => {
-        let title;
+        let title = placeName;
+        console.log(title);
         let addr = data[0].address.address_name;
         let position = new kakao.maps.LatLng(lat, lng);
         let content;
-
 
         if (data[0].road_address === null) { // 지번 데이터만 존재할 경우
             title = addr;
             content = `<div class="overlay overlay-region">
                                 <div class="title">${title}</div>
-                           </div>`;
+                            </div>`;
             overlay = new kakao.maps.CustomOverlay({
                 map: map,
                 clickable: true,
                 content: content,
                 position: position,
                 xAnchor: 0.5,
-                yAnchor: 2.3, // 높을수록 위로 올라감
+                yAnchor: 2.2, // 높을수록 위로 올라감
                 zIndex: 1
             });
         }
@@ -346,7 +346,7 @@ function createOverlay(lat, lng) {
             content = `<div class="overlay overlay-road">
                             <div class="title">${title}</div>
                             <div class="region">(지번) ${addr}</div>
-                       </div>`;
+                        </div>`;
             overlay = new kakao.maps.CustomOverlay({
                 map: map,
                 clickable: true,
