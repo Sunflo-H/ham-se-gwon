@@ -212,6 +212,10 @@
     max-width: 160px;
 }
 
+.action-container .onlyAddr {
+    max-width: 210px;
+}
+
 .action-container .nameAndAddress .name {
     color: rgba(0, 0, 0, 0.888);
     cursor: pointer;

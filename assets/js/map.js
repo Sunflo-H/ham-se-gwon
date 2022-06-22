@@ -151,14 +151,15 @@ function displaySearchList(placeList) {
         let listElement;
 
         if (place.place_name === undefined) { // 장소명이 undefined면 주소 검색입니다.
+            // 지번으로 검색했다면 지번만, 도로명으로 검색했다면 도로명만 data를 가져온다.
             let addressName = place.address_name;
 
-            if (addressName === undefined) addressName = place.road_address;
+            if (addressName === undefined) addressName = place.road_address; // 지번인지 도로명인지 체크
 
             title.innerHTML = `주소<span class="list-count"> ${placeList.length}</span>`
 
             listElement = `<li>
-                            <div class="nameAndAddress">
+                            <div class="nameAndAddress onlyAddr">
                                 <div class="name"><span class="number">${number}</span><span>${addressName}<span></div>
                             </div> 
                         </li>`
