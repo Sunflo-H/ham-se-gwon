@@ -137,16 +137,15 @@ function displaySearchList(placeList) {
 
     // 검색 리스트 데이터의 이름을 클릭하면 실행되는 이벤트함수
     let placeNameClick = (e) => {
-        let place = placeList.find(place => {
-            if(place.place_name !== undefined) return place.place_name === e.target.innerText;
-            else if(place.address_name !== undefined) return place.address_name === e.target.innerText;
-        })
+        let place = placeList.find(place => place.place_name === e.target.innerText)
+
         // 장소를 맵의 중앙으로 놓는다.
         panTo(place.y, place.x);
 
         // 장소의 오버레이를 생성한다.
         if(place.place_name !== undefined) createNumberOverlay(place);
         else if(place.address_name !== undefined) createNumberOverlay(place); 
+
     }
 
     placeList.forEach((place, i) => {
@@ -274,7 +273,7 @@ function createMarkerByCoords(lat, lng) {
     });
 
     // 마커에 클릭 이벤트를 적용합니다.
-    kakao.maps.event.addListener(marker, 'click', () => createOverlay(lat, lng));
+    kakao.maps.event.addListener(marker, 'click', () => createOverlay(marker));
 
     removeMarker();
     removeOverlay();
@@ -314,7 +313,7 @@ function createNumberMarker(placeList) {
 
 
 // 기본 마커에 적용되는 커스텀 오버레이를 만드는 함수 입니다.
-function createOverlay(lat, lng, placeName) {
+function createOverlay(marker) {
     removeOverlay();
     console.log("기본 오버레이 생성");
 
@@ -323,7 +322,7 @@ function createOverlay(lat, lng, placeName) {
         let title = placeName;
         console.log(title);
         let addr = data[0].address.address_name;
-        let position = new kakao.maps.LatLng(lat, lng);
+        let position = marker.getPosition();
         let content;
 
         if (data[0].road_address === null) { // 지번 데이터만 존재할 경우
@@ -362,8 +361,9 @@ function createOverlay(lat, lng, placeName) {
     var geocoder = new kakao.maps.services.Geocoder();
 
     // 좌표로 법정동 상세 주소 정보를 요청합니다
-    geocoder.coord2Address(lng, lat, callback);
+    geocoder.coord2Address(marker.getPosition().La, marker.getPosition().Ma, callback);
 }
+
 
 //숫자 마커에 적용되는 오버레이입니다.
 function createNumberOverlay(place) {
