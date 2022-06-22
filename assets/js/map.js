@@ -35,18 +35,25 @@ function getWeather(lat,lng) {
     let weatherData = fetch(`https://api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=${lng}&units=${units}&appid=${apiKey}`)
     .then(response => response.json())
     .then(data => {
+        console.log(data);
         let weather;
         let temp = Math.round(data.main.temp*10)/10;
-        switch(data.weather[0].description) {
-                case 'few clouds' : weather = '약간흐림'; break;
-                case 'scattered clouds' : weather = '흐림'; break;
-                case 'broken clouds' : weather = '많이흐림'
-                case 'clear sky' : weather = '맑음'; break;
-                case 'shower rain' : weather = '소나기'; break;
-                case 'rain' : weather = '비'; break;
-                case 'thunderstorm' : weather = '폭풍'; break;
-                case 'snow' : weather = '눈'; break;
-                case 'mist' : weather = '안개'; break;
+        switch(data.weather[0].main) {
+                case 'Clouds' : weather = '구름'
+                case 'Clear' : weather = '맑음'; break;
+                case 'Rain' : weather = '비'; break;
+                case 'Thunderstorm' : weather = '뇌우'; break;
+                case 'Snow' : weather = '눈'; break;
+                case 'Smoke' : 
+                case 'Haze' :
+                case 'Fog' :
+                case 'Dust' :
+                case 'Sand' :
+                case 'Ash' :
+                case 'Mist' : weather = '안개'; break;
+                case 'Drizzle' : weather = '이슬비'; break;
+                case 'Squall' : weather = '스콜'; break;
+                case 'Tornado' : weather = '폭풍'; break;
         }
 
         let result = {weather : weather, temp : temp};
