@@ -26,6 +26,68 @@ let overlay;
 let searchbarIsOpen = false;
 let polylineList = [];
 
+function getWeather(lat,lng) {
+    console.log("현재 좌표의 날씨정보를 받아옵니다.");
+    const weatherContainer = document.querySelector('.weather-container');
+
+    let apiKey = '2bd8aa9e0a77682baadc650722225f4d',
+        units = 'metric' // 섭씨 적용
+    let weatherData = fetch(`https://api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=${lng}&units=${units}&appid=${apiKey}`)
+    .then(response => response.json())
+    .then(data => {
+        let weather;
+        let temp = Math.round(data.main.temp*10)/10;
+        switch(data.weather[0].description) {
+                case 'few clouds' : weather = '약간흐림'; break;
+                case 'scattered clouds' : weather = '흐림'; break;
+                case 'broken clouds' : weather = '많이흐림'
+                case 'clear sky' : weather = '맑음'; break;
+                case 'shower rain' : weather = '소나기'; break;
+                case 'rain' : weather = '비'; break;
+                case 'thunderstorm' : weather = '폭풍'; break;
+                case 'snow' : weather = '눈'; break;
+                case 'mist' : weather = '안개'; break;
+        }
+
+        let result = {weather : weather, temp : temp};
+
+        return result;
+    });
+
+    let dustData = fetch(`http://api.openweathermap.org/data/2.5/air_pollution/forecast?lat=${lat}&lon=${lng}&appid=${apiKey}`)
+    .then(response => response.json())
+    .then(data => {
+        let result = {fineDust : '', yellowDust : ''};
+        let pm2_5 = data.list[0].components.pm2_5; // 초미세먼지 ===> 미세먼지
+        let pm10 = data.list[0].components.pm10; // 미세먼지 ===> 황사
+
+        if(0<=pm2_5 && pm2_5<16) result.fineDust = '좋음';
+        else if (16<=pm2_5 && pm2_5<36) result.fineDust = '보통';
+        else if (36<=pm2_5 && pm2_5<76) result.fineDust = '나쁨';
+        else if (76<=pm2_5) result.fineDust = '매우나쁨';
+        
+        if(0<=pm10 && pm10<31) result.yellowDust = '좋음';
+        else if(31<=pm10 && pm10<81) result.yellowDust = '보통';
+        else if(81<=pm10 && pm10<151) result.yellowDust = '나쁨';
+        else if(151<=pm10) result.yellowDust = '매우나쁨';
+
+        return result;
+    });
+
+    Promise.all([weatherData, dustData])
+    .then(data => {
+        let temp = data[0].temp,
+            weather= data[0].weather,
+            fineDust = data[1].fineDust,
+            yellowDust = data[1].yellowDust;
+
+        weatherContainer.innerHTML = `<span class="weather">${weather}</span>
+                                      <span class="temp">${temp}°C</span>
+                                      미세<span class="fineDust">${fineDust}</span>
+                                      황사<span class="yellowDust">${yellowDust}</span>`
+    })
+}
+
 function panTo(lat, lng) {
     // 지도 중심을 부드럽게 이동시킵니다
     // 만약 이동할 거리가 지도 화면보다 크면 부드러운 효과 없이 이동합니다
@@ -618,7 +680,7 @@ function search(keyword) {
             console.log(data);
             // 주소로 검색해서 나온 결과가 0이면 키워드로 검색을 살펴봐라
             // 키워드로 검색해서 나온 결과가 0이면 주소로 검색을 살펴봐라
-            // 둘다로 0이면 noPlaceError()를 실행
+            // 둘다 0이면 noPlaceError()를 실행
             if (data[0].length === 0 && data[1].length !== 0) { // 주소데이터가 없고, 키워드데이터가 있다면
                 panTo(data[1][0].y, data[1][0].x);
                 removeMarker();
@@ -673,12 +735,11 @@ function init() {
             let lng = data.coords.longitude; // 경도 (동서)
             displayMap(lat, lng);
             createMarkerByCoords(lat, lng);
-
+            getWeather(lat, lng)
              // 주소-좌표 변환 객체를 생성합니다
             var geocoder = new kakao.maps.services.Geocoder();
 
             let callback = (data) => {
-                console.log(data);
                 let currentLocation = data[0].road_address.address_name;
                 if(currentLocation === null) currentLocation = data[0].address.address_name;
                 currentLocationName.innerText = currentLocation;

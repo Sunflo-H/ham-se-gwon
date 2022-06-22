@@ -5,8 +5,6 @@
     margin: 0 20px;
 }
 
-
-
 /* 액션 컨테이너 */
 .action-container {
     position: relative;
@@ -19,35 +17,49 @@
     box-shadow:  1px 1px 5px #dedede,
              -1px -1px 5px #ffffff;
     overflow: hidden;
-    
 }
 
-.action-container .current-location-info-container {
+.action-container .current-location-container {
     width: 100%;
     margin-top: 20px;
     border-bottom: 1px solid #e4e4e4;
 }
 
-.action-container .current-location-info-container p{
+.action-container .current-location-container p{
     margin-bottom: 10px;
-    margin-left: 20px;
-    margin-right: 20px;
+    margin-left: 10px;
+    margin-right: 10px;
+}
+
+.action-container .current-location-container .current-location{
+    font-size: 14px;
+    font-weight: bold;
     overflow: hidden;
     white-space: nowrap;
     text-overflow: ellipsis;
 }
 
-.action-container .current-location-info-container p:nth-child(1){
-    font-size: 14px;
-    font-weight: bold;
-}
-
-.action-container .current-location-info-container p:nth-child(2){
+.action-container .current-location-container .weather-container{
     font-size: 12px;
 }
 
-.action-container .current-location-info-container p:nth-child(2) span{
+.action-container .current-location-container .weather-container .weather{
+    width: 30px;
+}
+
+.action-container .current-location-container .weather-container .temp{
+    /* margin-left: 5px; */
+    margin-right: 5px;
+    font-weight: bold;
+    font-size: 14px;
+}
+
+.action-container .current-location-container .weather-container .fineDust,
+.action-container .current-location-container .weather-container .yellowDust {
     color: var(--blue);
+    margin-left: 2px;
+    margin-right: 5px;
+    
 }
 
 /* 주변 탐색 컨테이너*/
